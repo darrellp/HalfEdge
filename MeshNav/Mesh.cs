@@ -220,6 +220,7 @@ namespace MeshNav
                 if (halfEdgePrev != null)
                 {
                     halfEdgePrev.NextEdge = halfEdge;
+                    halfEdge.PreviousEdge = halfEdge;
                 }
                 halfEdgePrev = halfEdge;
             }
