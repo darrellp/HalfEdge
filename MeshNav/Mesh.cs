@@ -220,13 +220,14 @@ namespace MeshNav
                 if (halfEdgePrev != null)
                 {
                     halfEdgePrev.NextEdge = halfEdge;
-                    halfEdge.PreviousEdge = halfEdge;
+                    halfEdge.PreviousEdge = halfEdgePrev;
                 }
                 halfEdgePrev = halfEdge;
             }
             Debug.Assert(halfEdgePrev != null, "halfEdgePrev != null");
           
             halfEdgePrev.NextEdge = newFace.HalfEdge;
+            newFace.HalfEdge.PreviousEdge = halfEdgePrev;
             FacesInternal.Add(newFace);
             return newFace;
         }
@@ -264,6 +265,8 @@ namespace MeshNav
         /// <remarks>   TODO: Think about this
         ///             How much do we really want to do at this top level?  Without making certain assumptions
         ///             it's really difficult to do anything useful but we want to be as flexible as possible.
+        ///             Since we currently only create elements by adding faces, it's pretty safe, I think, to
+        ///             insist that all faces have at least three edges.
         ///             
         ///             Darrell Plank, 12/8/2017. </remarks>
         ///

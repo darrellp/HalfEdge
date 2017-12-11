@@ -2,25 +2,29 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
 using MeshNav.BoundaryMesh;
+using MeshNav.PrevEdgeMesh;
 
 namespace MeshNavTests
 {
     [TestClass]
     public class TestMesh
     {
-        [TestMethod]
-        public void TestBuildSquare()
+        private Face<double> BuildSquare(Mesh<double> mesh)
         {
-            var mesh = new BoundaryMesh<double>(2);
-
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
             // ReSharper restore InconsistentNaming
-            var face = mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+            return mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+        }
 
+        [TestMethod]
+        public void TestBuildSquare()
+        {
+            var mesh = new BoundaryMesh<double>(2);
+            var face = BuildSquare(mesh);
             mesh.FinalizeMesh();
 
             Assert.AreEqual(4, face.Edges().Count());
@@ -30,6 +34,14 @@ namespace MeshNavTests
                 Assert.AreEqual(face, halfEdge.Face);
                 Assert.AreEqual(mesh.FaceAtInfinity, halfEdge.OppositeFace);
             }
+            var prevEdge = face.HalfEdge.PreviousEdge;
+            Assert.AreEqual(prevEdge.NextVertex, face.HalfEdge.InitVertex);
+
+            var meshPE = new PrevEdgeMesh<double>(2);
+            var facePE = BuildSquare(meshPE);
+            meshPE.FinalizeMesh();
+            prevEdge = facePE.HalfEdge.PreviousEdge;
+            Assert.AreEqual(prevEdge.NextVertex, facePE.HalfEdge.InitVertex);
         }
 
         [TestMethod]

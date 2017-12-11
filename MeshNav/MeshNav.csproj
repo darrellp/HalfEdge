@@ -46,8 +46,11 @@
     <Compile Include="BoundaryMesh\BoundaryMesh.cs" />
     <Compile Include="BoundaryMesh\BoundaryMeshFace.cs" />
     <Compile Include="BoundaryMesh\BoundaryMeshFactory.cs" />
+    <Compile Include="PrevEdgeMesh\PrevEdgeHalfEdge.cs" />
     <Compile Include="Face.cs" />
     <Compile Include="HalfEdge.cs" />
+    <Compile Include="PrevEdgeMesh\PrevEdgeMesh.cs" />
+    <Compile Include="PrevEdgeMesh\PrevEdgeMeshFactory.cs" />
     <Compile Include="TraitInterfaces\IAtInfinity.cs" />
     <Compile Include="TraitInterfaces\INormal.cs" />
     <Compile Include="Mesh.cs" />
