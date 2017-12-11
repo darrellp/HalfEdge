@@ -163,6 +163,10 @@ namespace MeshNav
             for (var i = 0; i < vertices.Length; i++)
             {
                 var thisVertex = vertices[i];
+                if (thisVertex.Mesh != this)
+                {
+                    throw new MeshNavException("Using vertices which don't belong to this mesh is disallowed");
+                }
                 var nextIndex = (i + 1) % vertices.Length;
                 var nextVertex = vertices[nextIndex];
                 HalfEdge<T> halfEdge = null;
