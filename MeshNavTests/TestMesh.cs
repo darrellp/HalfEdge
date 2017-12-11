@@ -1,0 +1,131 @@
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MeshNav;
+using MeshNav.BoundaryMesh;
+
+namespace MeshNavTests
+{
+    [TestClass]
+    public class TestMesh
+    {
+        [TestMethod]
+        public void TestBuildSquare()
+        {
+            var mesh = new BoundaryMesh<double>(2);
+
+            // ReSharper disable InconsistentNaming
+            var ptLL = mesh.AddVertex(0, 0);
+            var ptLR = mesh.AddVertex(1, 0);
+            var ptUL = mesh.AddVertex(0, 1);
+            var ptUR = mesh.AddVertex(1, 1);
+            // ReSharper restore InconsistentNaming
+            var face = mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+
+            mesh.FinalizeMesh();
+
+            Assert.AreEqual(4, face.Edges().Count());
+            Assert.AreEqual(4, mesh.FaceAtInfinity.Edges().Count());
+            foreach (var halfEdge in face.Edges())
+            {
+                Assert.AreEqual(face, halfEdge.Face);
+                Assert.AreEqual(mesh.FaceAtInfinity, halfEdge.OppositeFace);
+            }
+        }
+
+        [TestMethod]
+        public void TestBuildAdjacentSquares()
+        {
+            var mesh = new BoundaryMesh<double>(2);
+
+            var ptL0 = mesh.AddVertex(0, 0);
+            var ptU0 = mesh.AddVertex(0, 1);
+            var ptL1 = mesh.AddVertex(1, 0);
+            var ptU1 = mesh.AddVertex(1, 1);
+            var ptL2 = mesh.AddVertex(2, 0);
+            var ptU2 = mesh.AddVertex(2, 1);
+
+            var faceLeft = mesh.AddFace(ptL0, ptL1, ptU1, ptU0);
+            var faceRight = mesh.AddFace(ptL1, ptL2, ptU2, ptU1);
+
+            mesh.FinalizeMesh();
+            Assert.AreEqual(4, faceLeft.Edges().Count());
+            Assert.AreEqual(4, faceRight.Edges().Count());
+            Assert.AreEqual(14, mesh.HalfEdges.Count());
+            Assert.AreEqual(6, mesh.FaceAtInfinity.Edges().Count());
+        }
+
+        [TestMethod]
+        public void TestWrongOrdering()
+        {
+            var mesh = new BoundaryMesh<double>(2);
+
+            var ptL0 = mesh.AddVertex(0, 0);
+            var ptU0 = mesh.AddVertex(0, 1);
+            var ptL1 = mesh.AddVertex(1, 0);
+            var ptU1 = mesh.AddVertex(1, 1);
+            var ptL2 = mesh.AddVertex(2, 0);
+            var ptU2 = mesh.AddVertex(2, 1);
+
+            mesh.AddFace(ptL0, ptL1, ptU1, ptU0);
+            var failed = false;
+            try
+            {
+                // This vertex order is inconsistent with the first face added and should cause a failure
+                mesh.AddFace(ptL1, ptU1, ptU2, ptL2);
+            }
+            catch (MeshNavException)
+            {
+                failed = true;
+            }
+            Assert.IsTrue(failed);
+        }
+
+        [TestMethod]
+        public void TestCube()
+        {
+            var mesh = new BoundaryMesh<double>(3);
+
+            var pt000 = mesh.AddVertex(0, 0, 0);
+            var pt001 = mesh.AddVertex(0, 0, 1);
+            var pt010 = mesh.AddVertex(0, 1, 0);
+            var pt011 = mesh.AddVertex(0, 1, 1);
+            var pt100 = mesh.AddVertex(1, 0, 0);
+            var pt101 = mesh.AddVertex(1, 0, 1);
+            var pt110 = mesh.AddVertex(1, 1, 0);
+            var pt111 = mesh.AddVertex(1, 1, 1);
+
+            var bottom = mesh.AddFace(pt000, pt100, pt110, pt010);
+            var left = mesh.AddFace(pt000, pt010, pt011, pt001);
+            var front = mesh.AddFace(pt000, pt001, pt101, pt100);
+            var right = mesh.AddFace(pt100, pt101, pt111, pt110);
+            var back = mesh.AddFace(pt010, pt110, pt111, pt011);
+            var top = mesh.AddFace(pt001, pt011, pt111, pt101);
+
+            mesh.FinalizeMesh();
+
+            Assert.AreEqual(4, bottom.Edges().Count());
+            Assert.AreEqual(4, top.Edges().Count());
+            Assert.AreEqual(4, left.Edges().Count());
+            Assert.AreEqual(4, right.Edges().Count());
+            Assert.AreEqual(4, front.Edges().Count());
+            Assert.AreEqual(4, back.Edges().Count());
+
+            Assert.AreEqual(0, mesh.FaceAtInfinity.Edges().Count());
+
+            Assert.AreEqual(6, mesh.Faces.Count());
+            Assert.AreEqual(8, mesh.Vertices.Count());
+            Assert.AreEqual(24, mesh.HalfEdges.Count());
+
+            foreach (var vtx in mesh.Vertices)
+            {
+                Assert.AreEqual(3, vtx.AdjacentEdges().Count());
+                Assert.AreEqual(3, vtx.AdjacentVertices().Count());
+            }
+        }
+
+	    public void TestSubclassedMesh()
+	    {
+		    
+	    }
+    }
+}

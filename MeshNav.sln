@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshNav", "MeshNav\MeshNav.csproj", "{0BCF6FBD-4821-410D-A8C9-C11827B81992}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshNavTests", "MeshNavTests\MeshNavTests.csproj", "{8F010830-C921-4B7C-94BF-111620F5BF3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {822D76D2-401D-4C5C-8FB3-07DD7A1B6706}
+	EndGlobalSection
+EndGlobal
