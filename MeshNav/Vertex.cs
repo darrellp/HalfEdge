@@ -45,6 +45,22 @@ namespace MeshNav
             // ReSharper restore PossibleNullReferenceException
             // ReSharper restore SuspiciousTypeConversion.Global
         }
+
+        public Vector<double> UV
+        {
+            // ReSharper disable SuspiciousTypeConversion.Global
+            // ReSharper disable PossibleNullReferenceException
+            get => Mesh.UvTrait ? null : (this as IUV).UvAccessor;
+            set
+            {
+                if (Mesh.UvTrait)
+                {
+                    (this as IUV).UvAccessor = value;
+                }
+            }
+            // ReSharper restore PossibleNullReferenceException
+            // ReSharper restore SuspiciousTypeConversion.Global
+        }
         #endregion
 
         #region Operator overrides

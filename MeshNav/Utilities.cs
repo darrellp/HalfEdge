@@ -8,11 +8,8 @@ namespace MeshNav
     public static class Utilities
     {
         internal static readonly VectorBuilder<double> DblBuilder = Vector<double>.Build;
-
-        public static Vector<double> ToDouble(this Vector<double> v)
-        {
-            return v;
-        }
+        internal static readonly VectorBuilder<int> IntBuilder = Vector<int>.Build;
+        internal static readonly VectorBuilder<float> FloatBuilder = Vector<float>.Build;
 
         public static Vector<double> ToDouble(this Vector<float> v)
         {

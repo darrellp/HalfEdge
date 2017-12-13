@@ -1,6 +1,7 @@
 ﻿using System;
 using MathNet.Numerics.LinearAlgebra;
 using System.Linq;
+using Assimp;
 
 namespace MeshNav
 {
@@ -8,6 +9,8 @@ namespace MeshNav
     {
         #region Static Variables
         protected static readonly VectorBuilder<T> Builder = Vector<T>.Build;
+        protected static readonly VectorBuilder<float> FBuilder = Vector<float>.Build;
+        private readonly bool fFloatType;
         #endregion
 
         #region Private Variables
@@ -21,10 +24,30 @@ namespace MeshNav
         public HalfEdgeFactory(int dimension)
         {
             Dimension = dimension;
+            if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
+            {
+                throw new MeshNavException("MeshNav only accepts types of float and double");
+            }
+            fFloatType = typeof(T) == typeof(float);
         }
         #endregion
 
         #region Virtual functions
+        internal Vector<T> FromVector3D(Vector3D vec)
+        {
+            if (fFloatType)
+            {
+                return Vector<float>.Build.DenseOfArray(new[] { vec.X, vec.Y, vec.Z }) as Vector<T>;
+            }
+            // ReSharper disable once RedundantCast
+            return Vector<double>.Build.DenseOfArray(new[] { (double)vec.X, (double)vec.Y, (double)vec.Z }) as Vector<T>;
+        }
+
+        public virtual Mesh<T> CreateMesh()
+        {
+            return new Mesh<T>(Dimension);
+        }
+
         public Vertex<T> CreateVertex(Mesh<T> mesh, params T[] coords)
         {
             var vector = Builder.Dense(coords);
@@ -39,7 +62,6 @@ namespace MeshNav
             }
             return new Vertex<T>(vec, mesh);
         }
-
 
         public virtual Face<T> CreateFace()
 	    {

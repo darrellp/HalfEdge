@@ -10,6 +10,11 @@ namespace MeshNav.BoundaryMesh
         {
             return new BoundaryMeshFace<T>();
         }
+
+	    public override Mesh<T> CreateMesh()
+	    {
+		    return new BoundaryMesh<T>(Dimension);
+	    }
     }
 
 }

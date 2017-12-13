@@ -11,5 +11,10 @@ namespace MeshNav.PrevEdgeMesh
         {
             return new PrevEdgeHalfEdge<T>(vertex, opposite, face, nextEdge);
         }
+
+	    public override Mesh<T> CreateMesh()
+	    {
+		    return new PrevEdgeMesh<T>(Dimension);
+	    }
     }
 }

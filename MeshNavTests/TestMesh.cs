@@ -34,6 +34,10 @@ namespace MeshNavTests
                 Assert.AreEqual(face, halfEdge.Face);
                 Assert.AreEqual(mesh.FaceAtInfinity, halfEdge.OppositeFace);
             }
+
+            // Only real way to test the PreviousEdge is to debug and check that we use the
+            // PreviousEdge stored in the HalfEdge rather than calculating by walking around
+            // the face.
             var prevEdge = face.HalfEdge.PreviousEdge;
             Assert.AreEqual(prevEdge.NextVertex, face.HalfEdge.InitVertex);
 

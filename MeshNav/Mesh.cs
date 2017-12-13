@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
 
 namespace MeshNav
@@ -61,6 +62,13 @@ namespace MeshNav
         internal bool AtInfinityTrait;
         internal bool NormalsTrait;
         internal bool PreviousEdgeTrait;
+        internal bool UvTrait;
+        #endregion
+ 
+        #region Element collections
+        internal List<HalfEdge<T>> HalfEdgesInternal = new List<HalfEdge<T>>();
+        internal List<Vertex<T>> VerticesInternal = new List<Vertex<T>>();
+        internal List<Face<T>> FacesInternal = new List<Face<T>>();
         #endregion
 
         #region Constructor
@@ -84,6 +92,7 @@ namespace MeshNav
             AtInfinityTrait = face is IAtInfinity;
             var vertex = HalfEdgeFactory.CreateVertex(this, Enumerable.Repeat(default(T), dimension).ToArray());
             NormalsTrait = vertex is INormal;
+            UvTrait = vertex is IUV;
             var halfEdge = HalfEdgeFactory.CreateHalfEdge(null, null, null, null);
             PreviousEdgeTrait = halfEdge is IPreviousEdge<T>;
              // ReSharper restore SuspiciousTypeConversion.Global
@@ -93,12 +102,6 @@ namespace MeshNav
 	    {
 		    return new HalfEdgeFactory<T>(dimension);
 	    }
-        #endregion
-
-        #region Element collections
-        internal List<HalfEdge<T>> HalfEdgesInternal = new List<HalfEdge<T>>();
-        internal List<Vertex<T>> VerticesInternal = new List<Vertex<T>>();
-        internal List<Face<T>> FacesInternal = new List<Face<T>>();
         #endregion
 
         #region Build Methods
@@ -122,34 +125,50 @@ namespace MeshNav
             {
                 throw new MeshNavException("Adding vertex to finalized mesh");
             }
-            var newVertex = InternalAddVertex(coords);
-            MapVerticesToEdges[newVertex] = new List<HalfEdge<T>>();
-            return newVertex;
+            var vec = HalfEdgeFactory<T>.Vector(coords);
+            return AddVertex(vec);
         }
 
-        internal Vertex<T> InternalAddVertex(params T[] coords)
+        public Vertex<T> AddVertex(Vector<T> vec)
         {
-            var newVertex = _halfEdgeFactory.CreateVertex(this, coords);
-            VerticesInternal.Add(newVertex);
-            return newVertex;
+            if (IsInitialized)
+            {
+                throw new MeshNavException("Adding vertex to finalized mesh");
+            }
+            var vtx = HalfEdgeFactory.CreateVertex(this, vec);
+            MapVerticesToEdges[vtx] = new List<HalfEdge<T>>();
+            VerticesInternal.Add(vtx);
+            return vtx;
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Adds a face. </summary>
-        ///
-        /// <remarks>   The passed in vertices are assumed to have already been added to the mesh
-        ///             and so are not added here.  Any edge pairs required are added to the edges list.
-        ///             Each vertex has it's halfedge assigned from this face.
-        ///             Darrell Plank, 12/7/2017. </remarks>
-        ///
-        /// <exception cref="MeshNavException"> Thrown if there are less than three points. </exception>
-        ///
-        /// <param name="vertices"> A variable-length parameters list containing the vertices. </param>
-        ///
-        /// <returns>   The created Face </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public virtual Face<T> AddFace(params Vertex<T>[] vertices)
-        {
+	    public Face<T> AddFace(IEnumerable<int> indices)
+	    {
+		    return AddFaceEnumerable(indices.Select(i => VerticesInternal[i]));
+	    }
+
+	    public Face<T> AddFace(params Vertex<T>[] vertices)
+	    {
+			return AddFaceEnumerable(vertices);
+
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>   Adds a face. </summary>
+		///
+		/// <remarks>   The passed in vertices are assumed to have already been added to the mesh
+		///             and so are not added here.  Any edge pairs required are added to the edges list.
+		///             Each vertex has it's halfedge assigned from this face.
+		///             Darrell Plank, 12/7/2017. </remarks>
+		///
+		/// <exception cref="MeshNavException"> Thrown if there are less than three points. </exception>
+		///
+		/// <param name="verticesEnum"> A variable-length parameters list containing the vertices. </param>
+		///
+		/// <returns>   The created Face </returns>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		public virtual Face<T> AddFaceEnumerable(IEnumerable<Vertex<T>> verticesEnum)
+		{
+			var vertices = verticesEnum.ToArray();
             if (IsInitialized)
             {
                 throw new MeshNavException("Adding face to finalized mesh");
@@ -160,9 +179,9 @@ namespace MeshNav
             }
             HalfEdge<T> halfEdgePrev = null;
             var newFace = HalfEdgeFactory.CreateFace();
-            for (var i = 0; i < vertices.Length; i++)
-            {
-                var thisVertex = vertices[i];
+			for (int i = 0; i < vertices.Length; i++)
+			{
+				var thisVertex = vertices[i];
                 if (thisVertex.Mesh != this)
                 {
                     throw new MeshNavException("Using vertices which don't belong to this mesh is disallowed");
