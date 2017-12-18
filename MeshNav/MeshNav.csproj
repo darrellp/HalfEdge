@@ -54,6 +54,7 @@
     <Compile Include="MeshNavException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TraitInterfaces\IPreviousEdge.cs" />
+    <Compile Include="TraitInterfaces\IRayed.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="HalfEdgeFactory.cs" />
