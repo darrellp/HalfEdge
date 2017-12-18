@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Assimp;
 
 namespace MeshNav
@@ -24,11 +23,18 @@ namespace MeshNav
                     }
 	                var mesh = factory.CreateMesh();
 	                ret.Add(mesh);
-                    foreach (var vtx in aiMesh.Vertices)
-                    {
-                        mesh.AddVertex(mesh.HalfEdgeFactory.FromVector3D(vtx));
-                    }
-	                foreach (var face in aiMesh.Faces)
+	                var addNormals = mesh.NormalsTrait && aiMesh.HasNormals;
+
+					for (var iVtx = 0; iVtx < aiMesh.Vertices.Count; iVtx++)
+	                {
+		                var aiVtx = aiMesh.Vertices[iVtx];
+                        var vtx = mesh.AddVertex(mesh.HalfEdgeFactory.FromVector3D(aiVtx));
+						if (addNormals)
+						{
+							vtx.Normal = mesh.HalfEdgeFactory.FromVector3D(aiMesh.Normals[iVtx]);
+						}
+					}
+                    foreach (var face in aiMesh.Faces)
 	                {
 		                mesh.AddFace(face.Indices);
 	                }

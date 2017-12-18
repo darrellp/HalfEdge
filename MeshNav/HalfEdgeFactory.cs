@@ -1,6 +1,5 @@
 ﻿using System;
 using MathNet.Numerics.LinearAlgebra;
-using System.Linq;
 using Assimp;
 
 namespace MeshNav
@@ -9,8 +8,7 @@ namespace MeshNav
     {
         #region Static Variables
         protected static readonly VectorBuilder<T> Builder = Vector<T>.Build;
-        protected static readonly VectorBuilder<float> FBuilder = Vector<float>.Build;
-        private readonly bool fFloatType;
+        private readonly bool _fFloatType;
         #endregion
 
         #region Private Variables
@@ -28,19 +26,20 @@ namespace MeshNav
             {
                 throw new MeshNavException("MeshNav only accepts types of float and double");
             }
-            fFloatType = typeof(T) == typeof(float);
+            _fFloatType = typeof(T) == typeof(float);
         }
         #endregion
 
         #region Virtual functions
         internal Vector<T> FromVector3D(Vector3D vec)
         {
-            if (fFloatType)
+            if (_fFloatType)
             {
                 return Vector<float>.Build.DenseOfArray(new[] { vec.X, vec.Y, vec.Z }) as Vector<T>;
             }
-            // ReSharper disable once RedundantCast
+	        // ReSharper disable RedundantCast
             return Vector<double>.Build.DenseOfArray(new[] { (double)vec.X, (double)vec.Y, (double)vec.Z }) as Vector<T>;
+	        // ReSharper restore RedundantCast
         }
 
         public virtual Mesh<T> CreateMesh()
@@ -78,10 +77,12 @@ namespace MeshNav
             return Builder.Dense(coords);
         }
 
-        public Vector<double> ZeroVector()
-        {
-            return Utilities.DblBuilder.Dense(Dimension);
-        }
-        #endregion
-    }
+	    public Vector<T> ZeroVector()
+	    {
+		    return _fFloatType
+			    ? Utilities.FloatBuilder.Dense(Dimension) as Vector<T>
+			    : Utilities.DblBuilder.Dense(Dimension) as Vector<T>;
+	    }
+		#endregion
+	}
 }

@@ -36,9 +36,8 @@ namespace MeshNav
     public class Mesh<T> where T : struct, IEquatable<T>, IFormattable
     {
         #region Private variables
-        private readonly HalfEdgeFactory<T> _halfEdgeFactory;
 
-        // During the construction of the mesh, we can't guarantee valid topologies which means that a lot of the iterators, etc.
+	    // During the construction of the mesh, we can't guarantee valid topologies which means that a lot of the iterators, etc.
         // that we can eventually rely on won't work during construction.  In particular, we can't use AdjacentEdges for vertices.
         // Still, we need to verify which edges emanate from each vertex so during the construction we use a dictionary to
         // map the vertices to the edges which emanate from them.  When we finalize the mesh we can dereference the following
@@ -52,8 +51,9 @@ namespace MeshNav
         public IEnumerable<Face<T>> Faces => FacesInternal;
         public IEnumerable<HalfEdge<T>> HalfEdges => HalfEdgesInternal;
         public bool IsInitialized { get; internal set; }
-        internal HalfEdgeFactory<T> HalfEdgeFactory => _halfEdgeFactory;
-        protected virtual Face<T> BoundaryFace => null;
+        internal HalfEdgeFactory<T> HalfEdgeFactory { get; }
+
+	    protected virtual Face<T> BoundaryFace => null;
         #endregion
 
         #region Traits
@@ -83,7 +83,7 @@ namespace MeshNav
         public Mesh(int dimension)
         {
             // ReSharper disable once VirtualMemberCallInConstructor
-            _halfEdgeFactory = GetFactory(dimension);
+            HalfEdgeFactory = GetFactory(dimension);
 
             // Determine supported traits by checking what Interfaces are supported by the elements
 
@@ -91,7 +91,7 @@ namespace MeshNav
             var face = HalfEdgeFactory.CreateFace();
             AtInfinityTrait = face is IAtInfinity;
             var vertex = HalfEdgeFactory.CreateVertex(this, Enumerable.Repeat(default(T), dimension).ToArray());
-            NormalsTrait = vertex is INormal;
+            NormalsTrait = vertex is INormal<T>;
             UvTrait = vertex is IUV;
             var halfEdge = HalfEdgeFactory.CreateHalfEdge(null, null, null, null);
             PreviousEdgeTrait = halfEdge is IPreviousEdge<T>;

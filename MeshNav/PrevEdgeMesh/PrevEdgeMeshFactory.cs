@@ -1,5 +1,4 @@
 ﻿using System;
-using MeshNav.BoundaryMesh;
 
 namespace MeshNav.PrevEdgeMesh
 {

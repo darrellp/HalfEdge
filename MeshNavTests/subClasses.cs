@@ -2,7 +2,6 @@
 using MathNet.Numerics.LinearAlgebra;
 using MeshNav;
 using MeshNav.BoundaryMesh;
-using MeshNav.TraitInterfaces;
 
 namespace MeshNavTests
 {
@@ -13,7 +12,6 @@ namespace MeshNavTests
 
 	class SubClassedFace<T> : BoundaryMeshFace<T> where T : struct, IEquatable<T>, IFormattable
 	{
-		public SubClassedFace(){ }
 	}
 
 	class SubClassedHalfEdge<T> : HalfEdge<T> where T : struct, IEquatable<T>, IFormattable

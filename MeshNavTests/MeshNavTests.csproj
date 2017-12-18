@@ -58,6 +58,7 @@
     <Compile Include="TestMesh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestImport.cs" />
+    <Compile Include="TestUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

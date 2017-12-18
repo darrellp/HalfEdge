@@ -30,22 +30,23 @@ namespace MeshNav
         #endregion
 
         #region Traits
-        public Vector<double> Normal
+        public Vector<T> Normal
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
-            get => Mesh.NormalsTrait ? null : (this as INormal).NormalAccessor;
+            get => Mesh.NormalsTrait ? null : (this as INormal<T>).NormalAccessor;
             set
             {
                 if (Mesh.NormalsTrait)
                 {
-                    (this as INormal).NormalAccessor = value;
+                    (this as INormal<T>).NormalAccessor = value;
                 }
             }
             // ReSharper restore PossibleNullReferenceException
             // ReSharper restore SuspiciousTypeConversion.Global
         }
 
+	    // ReSharper disable once InconsistentNaming
         public Vector<double> UV
         {
             // ReSharper disable SuspiciousTypeConversion.Global
@@ -154,7 +155,7 @@ namespace MeshNav
         #region Traits
         internal void CalculateNormal()
         {
-            if (!(this is INormal)|| Dimension != 3)
+            if (!(this is INormal<T>)|| Dimension != 3)
             {
                 return;
             }
@@ -166,11 +167,11 @@ namespace MeshNav
                 sum = sum + FaceNormal(he);
                 faceCount++;
             }
-            Normal = sum / faceCount;
+            Normal = sum.ScalarDivide(faceCount);
             Normal.Normalize(2.0);
         }
 
-        private Vector<double> FaceNormal(HalfEdge<T> he)
+        private Vector<T> FaceNormal(HalfEdge<T> he)
         {
             var pos = Position;
             var pos1 = he.NextVertex.Position;
@@ -183,7 +184,7 @@ namespace MeshNav
 
         #region Mesh Operations
 
-        private HalfEdge<T> SplitTo(Vertex<T> vtxOther, Face<T> face = null)
+        public HalfEdge<T> SplitTo(Vertex<T> vtxOther, Face<T> face = null)
         {
             if (vtxOther == this)
             {
@@ -192,7 +193,6 @@ namespace MeshNav
             if (face == null)
             {
                 // We weren't given a face so figure out the face that's common between the two vertices
-                var ourFaces = new HashSet<Face<T>>(AdjacentFaces());
                 face = vtxOther.AdjacentFaces().FirstOrDefault(f => !f.AtInfinity && AdjacentFaces().Contains(f));
                 if (face == null)
                 {

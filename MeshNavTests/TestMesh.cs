@@ -41,11 +41,11 @@ namespace MeshNavTests
             var prevEdge = face.HalfEdge.PreviousEdge;
             Assert.AreEqual(prevEdge.NextVertex, face.HalfEdge.InitVertex);
 
-            var meshPE = new PrevEdgeMesh<double>(2);
-            var facePE = BuildSquare(meshPE);
-            meshPE.FinalizeMesh();
-            prevEdge = facePE.HalfEdge.PreviousEdge;
-            Assert.AreEqual(prevEdge.NextVertex, facePE.HalfEdge.InitVertex);
+            var meshPe = new PrevEdgeMesh<double>(2);
+            var facePe = BuildSquare(meshPe);
+            meshPe.FinalizeMesh();
+            prevEdge = facePe.HalfEdge.PreviousEdge;
+            Assert.AreEqual(prevEdge.NextVertex, facePe.HalfEdge.InitVertex);
         }
 
         [TestMethod]
