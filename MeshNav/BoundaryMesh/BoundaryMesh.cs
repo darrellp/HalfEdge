@@ -7,7 +7,7 @@ namespace MeshNav.BoundaryMesh
     class BoundaryMesh<T> : Mesh<T> where T : struct, IEquatable<T>, IFormattable
     {
         #region Private variables
-        private readonly BoundaryMeshFace<T> _faceAtInfinity;
+        private readonly BoundaryMeshFace<T> _boundaryFace;
         // We don't currently allow for separate components in a boundary mesh.  Otherwise we break the notion that all the adjacent edges
         // to a face can be enumerated by starting at one HE and then going from one to the next.  A separate component would mean the
         // face at infinity had to enumerate through two sets of border edges.  We keep count of the number of outside edges so
@@ -21,15 +21,15 @@ namespace MeshNav.BoundaryMesh
         #endregion
 
         #region Properties
-        protected override Face<T> BoundaryFace => _faceAtInfinity;
-        public Face<T> FaceAtInfinity => _faceAtInfinity;
+//        protected override Face<T> BoundaryFace => _boundaryFace;
+        public override Face<T> BoundaryFace => _boundaryFace;
         #endregion
 
         #region Overrides
         protected override void AddBoundaryEdgeHook(HalfEdge<T> edge)
         {
             _boundaryCount++;
-            _faceAtInfinity.HalfEdge = edge;
+            _boundaryFace.HalfEdge = edge;
         }
 
         protected override void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge)
@@ -55,8 +55,8 @@ namespace MeshNav.BoundaryMesh
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
 	    public BoundaryMesh(int dimension) : base(dimension)
 	    {
-	        _faceAtInfinity = (BoundaryMeshFace < T >)HalfEdgeFactory.CreateFace();
-	        _faceAtInfinity.AtInfinityAccessor = true;
+	        _boundaryFace = (BoundaryMeshFace < T >)HalfEdgeFactory.CreateFace();
+	        _boundaryFace.IsBoundaryAccessor = true;
 	    }
         #endregion
 
@@ -65,7 +65,7 @@ namespace MeshNav.BoundaryMesh
         /// <summary>   Finalizes the mesh. </summary>
         ///
         /// <remarks>   Sets up the outside edges.  Is it possible we could end up
-        ///             in an infinite loop that never returns to the original _faceAtInfinity.HalfEdge?
+        ///             in an infinite loop that never returns to the original _boundaryFace.HalfEdge?
         ///             Needs mulling over. Only way that could happen is two incoming boundaries meet at a
         ///             single vertex.  We're checking if more that one outside edge exit from a node but
         ///             not two incoming outside edges.  I think that this may be impossible.  Needs more
@@ -77,11 +77,11 @@ namespace MeshNav.BoundaryMesh
         {
             if (_boundaryCount == 0)
             {
-                _faceAtInfinity.HalfEdge = null;
+                _boundaryFace.HalfEdge = null;
                 return;
             }
             var edgeCount = 0;
-            var curEdge = _faceAtInfinity.HalfEdge;
+            var curEdge = _boundaryFace.HalfEdge;
             if (curEdge.NextEdge != null)
             {
                 // Don't think this can happen since we only 
@@ -93,7 +93,7 @@ namespace MeshNav.BoundaryMesh
                 var foundNextEdge = false;
                 foreach (var halfEdge in MapVerticesToEdges[nextVertex])
                 {
-                    if (halfEdge.Face == _faceAtInfinity)
+                    if (halfEdge.Face == _boundaryFace)
                     {
                         if (foundNextEdge)
                         {
@@ -110,7 +110,7 @@ namespace MeshNav.BoundaryMesh
                 {
                     throw new MeshNavException("Outside Edge has no successor");
                 }
-            } while (curEdge != _faceAtInfinity.HalfEdge);
+            } while (curEdge != _boundaryFace.HalfEdge);
 
             if (edgeCount != _boundaryCount)
             {
@@ -122,8 +122,8 @@ namespace MeshNav.BoundaryMesh
 		#region Validation
 	    public override bool Validate()
 	    {
-	        var boundaries = new HashSet<HalfEdge<T>>(FaceAtInfinity.Edges());
-	        if (HalfEdges.Any(halfEdge => halfEdge.Face == FaceAtInfinity && !boundaries.Contains(halfEdge)))
+	        var boundaries = new HashSet<HalfEdge<T>>(BoundaryFace.Edges());
+	        if (HalfEdges.Any(halfEdge => halfEdge.Face == BoundaryFace && !boundaries.Contains(halfEdge)))
 	        {
 	            throw new MeshNavException("Multiple components not allowed in BoundaryMesh");
 	        }

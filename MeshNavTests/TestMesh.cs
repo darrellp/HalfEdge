@@ -24,11 +24,11 @@ namespace MeshNavTests
             mesh.FinalizeMesh();
 
             Assert.AreEqual(4, face.Edges().Count());
-            Assert.AreEqual(4, mesh.FaceAtInfinity.Edges().Count());
+            Assert.AreEqual(4, mesh.BoundaryFace.Edges().Count());
             foreach (var halfEdge in face.Edges())
             {
                 Assert.AreEqual(face, halfEdge.Face);
-                Assert.AreEqual(mesh.FaceAtInfinity, halfEdge.OppositeFace);
+                Assert.AreEqual(mesh.BoundaryFace, halfEdge.OppositeFace);
             }
         }
 
@@ -51,7 +51,7 @@ namespace MeshNavTests
             Assert.AreEqual(4, faceLeft.Edges().Count());
             Assert.AreEqual(4, faceRight.Edges().Count());
             Assert.AreEqual(14, mesh.HalfEdges.Count());
-            Assert.AreEqual(6, mesh.FaceAtInfinity.Edges().Count());
+            Assert.AreEqual(6, mesh.BoundaryFace.Edges().Count());
         }
 
         [TestMethod]
@@ -110,7 +110,7 @@ namespace MeshNavTests
             Assert.AreEqual(4, front.Edges().Count());
             Assert.AreEqual(4, back.Edges().Count());
 
-            Assert.AreEqual(0, mesh.FaceAtInfinity.Edges().Count());
+            Assert.AreEqual(0, mesh.BoundaryFace.Edges().Count());
 
             Assert.AreEqual(6, mesh.Faces.Count());
             Assert.AreEqual(8, mesh.Vertices.Count());

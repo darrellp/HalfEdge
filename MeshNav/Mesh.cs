@@ -52,7 +52,7 @@ namespace MeshNav
         public IEnumerable<HalfEdge<T>> HalfEdges => HalfEdgesInternal;
         public bool IsInitialized { get; internal set; }
         internal HalfEdgeFactory<T> HalfEdgeFactory => _halfEdgeFactory;
-        protected virtual Face<T> BoundaryFace => null;
+        public virtual Face<T> BoundaryFace => null;
         #endregion
 
         #region Traits
@@ -81,7 +81,7 @@ namespace MeshNav
 
             // ReSharper disable SuspiciousTypeConversion.Global
             var face = HalfEdgeFactory.CreateFace();
-            AtInfinityTrait = face is IAtInfinity;
+            AtInfinityTrait = face is IBoundary;
             var vertex = HalfEdgeFactory.CreateVertex(this, Enumerable.Repeat(default(T), dimension).ToArray());
             NormalsTrait = vertex is INormal;
             var halfEdge = HalfEdgeFactory.CreateHalfEdge(null, null, null, null);

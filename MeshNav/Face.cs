@@ -16,12 +16,12 @@ namespace MeshNav
         public bool AtInfinity
         {
             // ReSharper disable PossibleNullReferenceException
-            get => !Mesh.AtInfinityTrait && (this as IAtInfinity).AtInfinityAccessor;
+            get => !Mesh.AtInfinityTrait && (this as IBoundary).IsBoundaryAccessor;
             set
             {
                 if (Mesh.AtInfinityTrait)
                 {
-                    (this as IAtInfinity).AtInfinityAccessor = value;
+                    (this as IBoundary).IsBoundaryAccessor = value;
                 }
             }
             // ReSharper restore PossibleNullReferenceException
@@ -37,7 +37,7 @@ namespace MeshNav
         {
             if (HalfEdge == null)
             {
-                // This occurs on the FaceAtInfinity when there are no border edges
+                // This occurs on the BoundaryFace when there are no border edges
                 yield break;
             }
             var curEdge = HalfEdge;
