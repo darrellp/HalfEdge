@@ -59,7 +59,7 @@ namespace MeshNav
             {
                 throw new MeshNavException("Dimension mismatch");
             }
-            return new Vertex<T>(vec, mesh);
+            return new Vertex<T>(mesh, vec);
         }
 
         public virtual Face<T> CreateFace()

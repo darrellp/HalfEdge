@@ -91,7 +91,7 @@ namespace MeshNav
         #endregion
 
         #region Constructor
-        internal Vertex(Vector<T> position, Mesh<T> mesh)
+        internal Vertex(Mesh<T> mesh, Vector<T> position)
         {
             Position = position;
             Mesh = mesh;
