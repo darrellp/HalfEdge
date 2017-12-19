@@ -5,15 +5,12 @@
     {
         // A ray extending out from a border vertex
         bool IsRayed { get; }
-
-        // An edge connecting two rayed edges
-        bool IsInfinite { get; }
     }
 
-    // Interface implemented by faces
+    // Interface implemented by halfedges, faces and vertices at infinity
     public interface IAtInfinity
     {
         // This is the face at infinity
-        bool IsFaceAtInfinity { get; }
+        bool IsAtInfinity { get; }
     }
 }
