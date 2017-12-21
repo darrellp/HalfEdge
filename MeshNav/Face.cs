@@ -13,13 +13,14 @@ namespace MeshNav
         #endregion
 
         #region Traits
-        public bool AtInfinity
+        public bool IsBoundary
         {
             // ReSharper disable PossibleNullReferenceException
-            get => !Mesh.AtInfinityTrait && (this as IBoundary).IsBoundaryAccessor;
+			// TODO: Figure out how to handle boundaries and whether we can share that between BoundaryMesh and RayedMesh
+            get => !Mesh.BoundaryTrait && (this as IBoundary).IsBoundaryAccessor;
             set
             {
-                if (Mesh.AtInfinityTrait)
+                if (Mesh.BoundaryTrait)
                 {
                     (this as IBoundary).IsBoundaryAccessor = value;
                 }

@@ -142,7 +142,7 @@ namespace MeshNav
             {
                 return;
             }
-            var sum = Mesh.HalfEdgeFactory.ZeroVector();
+            var sum = Mesh.Factory.ZeroVector();
             var faceCount = 0;
 
             foreach (var he in AdjacentEdges())
@@ -167,7 +167,7 @@ namespace MeshNav
 
         #region Mesh Operations
 
-        private HalfEdge<T> SplitTo(Vertex<T> vtxOther, Face<T> face = null)
+        public HalfEdge<T> SplitTo(Vertex<T> vtxOther, Face<T> face = null)
         {
             if (vtxOther == this)
             {
@@ -176,14 +176,13 @@ namespace MeshNav
             if (face == null)
             {
                 // We weren't given a face so figure out the face that's common between the two vertices
-                var ourFaces = new HashSet<Face<T>>(AdjacentFaces());
-                face = vtxOther.AdjacentFaces().FirstOrDefault(f => !f.AtInfinity && AdjacentFaces().Contains(f));
+                face = vtxOther.AdjacentFaces().FirstOrDefault(f => !f.IsBoundary && AdjacentFaces().Contains(f));
                 if (face == null)
                 {
                     throw new MeshNavException("Vertices to split don't belong to a common face");
                 }
             }
-            else if (face.AtInfinity)
+            else if (face.IsBoundary)
             {
                 throw new MeshNavException("Can't split across the face at infinity");
             }
@@ -220,8 +219,8 @@ namespace MeshNav
             {
                 throw new MeshNavException("Vertices to split don't belong to given face");
             }
-            var heFromThis = Mesh.HalfEdgeFactory.CreateHalfEdge(this, null, face, heNextOther);
-            var heFromOther = Mesh.HalfEdgeFactory.CreateHalfEdge(vtxOther, heFromThis, null, heNextThis);
+            var heFromThis = Mesh.Factory.CreateHalfEdge(this, null, face, heNextOther);
+            var heFromOther = Mesh.Factory.CreateHalfEdge(vtxOther, heFromThis, null, heNextThis);
 	        var newFace = new Face<T>() {HalfEdge = heFromOther};
 	        heFromOther.Face = newFace;
             heFromThis.Opposite = heFromOther;

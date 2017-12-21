@@ -1,4 +1,5 @@
 using System.Reflection;
+// ReSharper disable once RedundantUsingDirective
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

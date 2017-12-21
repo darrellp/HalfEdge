@@ -3,8 +3,10 @@ using MeshNav.TraitInterfaces;
 
 namespace MeshNav.RayedMesh
 {
-    class RayedFace<T> : Face<T>, IAtInfinity where T : struct, IEquatable<T>, IFormattable
+	class RayedFace<T> : Face<T>, IBoundary where T : struct, IEquatable<T>, IFormattable
     {
-        public bool IsAtInfinity { get; set; }
+        #region Public properties
+        public bool IsBoundaryAccessor { get; set; }
+        #endregion
     }
 }

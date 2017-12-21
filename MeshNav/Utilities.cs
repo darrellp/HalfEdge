@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -47,5 +48,14 @@ namespace MeshNav
 
             return result;
         }
+
+        // Linq
+        public static T FirstOr<T>(this IEnumerable<T> source, Func<T, bool> selector, T alternate)
+        {
+            foreach (T t in source.Where(selector))
+                return t;
+            return alternate;
+        }
+
     }
 }

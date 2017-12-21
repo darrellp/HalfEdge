@@ -2,7 +2,6 @@
 using MathNet.Numerics.LinearAlgebra;
 using MeshNav;
 using MeshNav.BoundaryMesh;
-using MeshNav.TraitInterfaces;
 
 namespace MeshNavTests
 {
@@ -11,9 +10,8 @@ namespace MeshNavTests
 		public SubClassedVertex(Vector<T> position, Mesh<T> mesh) : base(position, mesh) { Console.WriteLine(); }
 	}
 
-	class SubClassedFace<T> : BoundaryMeshFace<T> where T : struct, IEquatable<T>, IFormattable
+	class SubClassedFace<T> : BoundaryFace<T> where T : struct, IEquatable<T>, IFormattable
 	{
-		public SubClassedFace(){ }
 	}
 
 	class SubClassedHalfEdge<T> : HalfEdge<T> where T : struct, IEquatable<T>, IFormattable
@@ -22,7 +20,7 @@ namespace MeshNavTests
 			: base(vertex, opposite, face, nextEdge) { }
 	}
 
-	class SubClassedHalfEdgeFactory<T> : BoundaryMeshFactory<T> where T : struct, IEquatable<T>, IFormattable
+	class SubClassedHalfEdgeFactory<T> : BoundaryFactory<T> where T : struct, IEquatable<T>, IFormattable
 	{
 		public SubClassedHalfEdgeFactory(int dimension) : base(dimension) { }
 
@@ -46,7 +44,7 @@ namespace MeshNavTests
 	{
 		public SubClassedMesh(int dimension) : base(dimension) {}
 
-		protected override HalfEdgeFactory<T> GetFactory(int dimension)
+		protected override Factory<T> GetFactory(int dimension)
 		{
 			return new SubClassedHalfEdgeFactory<T>(dimension);
 		}

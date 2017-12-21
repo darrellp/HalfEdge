@@ -60,7 +60,7 @@ namespace MeshNav
         #endregion
 
         #region Accessors
-        public Vertex<T> NextVertex => NextEdge.InitVertex;
+        public Vertex<T> NextVertex => Opposite/*NextEdge*/.InitVertex;
         public Face<T> OppositeFace => Opposite.Face;
         #endregion
     }

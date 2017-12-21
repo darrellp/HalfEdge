@@ -1,16 +1,18 @@
 ﻿using System;
-using MeshNav.TraitInterfaces;
 
 namespace MeshNav.RayedMesh
 {
-    class RayedHalfEdge<T> : HalfEdge<T>, IRayed, IAtInfinity where T : struct, IEquatable<T>, IFormattable
+    public class RayedHalfEdge<T> : HalfEdge<T> where T : struct, IEquatable<T>, IFormattable
     {
         public RayedHalfEdge(Vertex<T> vertex, HalfEdge<T> opposite, Face<T> face, HalfEdge<T> nextEdge)
             : base(vertex, opposite, face, nextEdge)
         {
         }
 
-        public bool IsRayed { get; internal set; }
-        public bool IsAtInfinity { get; internal set; }
-    }
+	    // ReSharper disable PossibleNullReferenceException
+	    public bool IsAtInfinity => (InitVertex as RayedVertex<T>).IsRayed && (NextVertex as RayedVertex<T>).IsRayed;
+	    public bool IsInboundRay => (InitVertex as RayedVertex<T>).IsRayed && !(NextVertex as RayedVertex<T>).IsRayed;
+	    public bool IsOutboundRay => !(InitVertex as RayedVertex<T>).IsRayed && (NextVertex as RayedVertex<T>).IsRayed;
+	    // ReSharper restore PossibleNullReferenceException
+	}
 }

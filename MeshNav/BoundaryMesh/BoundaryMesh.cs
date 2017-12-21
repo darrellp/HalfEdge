@@ -7,7 +7,6 @@ namespace MeshNav.BoundaryMesh
     class BoundaryMesh<T> : Mesh<T> where T : struct, IEquatable<T>, IFormattable
     {
         #region Private variables
-        private readonly BoundaryMeshFace<T> _boundaryFace;
         // We don't currently allow for separate components in a boundary mesh.  Otherwise we break the notion that all the adjacent edges
         // to a face can be enumerated by starting at one HE and then going from one to the next.  A separate component would mean the
         // face at infinity had to enumerate through two sets of border edges.  We keep count of the number of outside edges so
@@ -21,15 +20,14 @@ namespace MeshNav.BoundaryMesh
         #endregion
 
         #region Properties
-//        protected override Face<T> BoundaryFace => _boundaryFace;
-        public override Face<T> BoundaryFace => _boundaryFace;
+        public override Face<T> BoundaryFace { get; }
         #endregion
 
         #region Overrides
         protected override void AddBoundaryEdgeHook(HalfEdge<T> edge)
         {
             _boundaryCount++;
-            _boundaryFace.HalfEdge = edge;
+            BoundaryFace.HalfEdge = edge;
         }
 
         protected override void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge)
@@ -37,9 +35,9 @@ namespace MeshNav.BoundaryMesh
             _boundaryCount--;
         }
 
-        protected override HalfEdgeFactory<T> GetFactory(int dimension)
+        protected override Factory<T> GetFactory(int dimension)
         {
-            return new BoundaryMeshFactory<T>(dimension);
+            return new BoundaryFactory<T>(dimension);
         }
 
         #endregion
@@ -55,8 +53,10 @@ namespace MeshNav.BoundaryMesh
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
 	    public BoundaryMesh(int dimension) : base(dimension)
 	    {
-	        _boundaryFace = (BoundaryMeshFace < T >)HalfEdgeFactory.CreateFace();
-	        _boundaryFace.IsBoundaryAccessor = true;
+	        BoundaryFace = Factory.CreateFace();
+		    // ReSharper disable once PossibleNullReferenceException
+		    // ReSharper disable once VirtualMemberCallInConstructor
+	        (BoundaryFace as BoundaryFace<T>).IsBoundaryAccessor = true;
 	    }
         #endregion
 
@@ -77,14 +77,14 @@ namespace MeshNav.BoundaryMesh
         {
             if (_boundaryCount == 0)
             {
-                _boundaryFace.HalfEdge = null;
+                BoundaryFace.HalfEdge = null;
                 return;
             }
             var edgeCount = 0;
-            var curEdge = _boundaryFace.HalfEdge;
+            var curEdge = BoundaryFace.HalfEdge;
             if (curEdge.NextEdge != null)
             {
-                // Don't think this can happen since we only 
+                // Don't think this can happen
                 throw new MeshNavException("Internal error");
             }
             do
@@ -93,7 +93,7 @@ namespace MeshNav.BoundaryMesh
                 var foundNextEdge = false;
                 foreach (var halfEdge in MapVerticesToEdges[nextVertex])
                 {
-                    if (halfEdge.Face == _boundaryFace)
+                    if (halfEdge.Face == BoundaryFace)
                     {
                         if (foundNextEdge)
                         {
@@ -110,7 +110,7 @@ namespace MeshNav.BoundaryMesh
                 {
                     throw new MeshNavException("Outside Edge has no successor");
                 }
-            } while (curEdge != _boundaryFace.HalfEdge);
+            } while (curEdge != BoundaryFace.HalfEdge);
 
             if (edgeCount != _boundaryCount)
             {

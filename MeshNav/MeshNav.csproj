@@ -44,13 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoundaryMesh\BoundaryMesh.cs" />
-    <Compile Include="BoundaryMesh\BoundaryMeshFace.cs" />
-    <Compile Include="BoundaryMesh\BoundaryMeshFactory.cs" />
+    <Compile Include="BoundaryMesh\BoundaryFace.cs" />
+    <Compile Include="BoundaryMesh\BoundaryFactory.cs" />
     <Compile Include="Face.cs" />
     <Compile Include="HalfEdge.cs" />
     <Compile Include="RayedMesh\RayedFace.cs" />
     <Compile Include="RayedMesh\RayedHalfEdge.cs" />
-    <Compile Include="RayedMesh\RayedHalfEdgeFactory.cs" />
+    <Compile Include="RayedMesh\RayedFactory.cs" />
     <Compile Include="RayedMesh\RayedMesh.cs" />
     <Compile Include="RayedMesh\RayedVertex.cs" />
     <Compile Include="TraitInterfaces\IBoundary.cs" />
@@ -62,7 +62,7 @@
     <Compile Include="TraitInterfaces\IRayed.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Vertex.cs" />
-    <Compile Include="HalfEdgeFactory.cs" />
+    <Compile Include="Factory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

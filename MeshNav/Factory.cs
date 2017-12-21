@@ -1,10 +1,9 @@
 ﻿using System;
 using MathNet.Numerics.LinearAlgebra;
-using System.Linq;
 
 namespace MeshNav
 {
-    public class HalfEdgeFactory<T> where T : struct, IEquatable<T>, IFormattable
+    public class Factory<T> where T : struct, IEquatable<T>, IFormattable
     {
         #region Static Variables
         protected static readonly VectorBuilder<T> Builder = Vector<T>.Build;
@@ -18,7 +17,7 @@ namespace MeshNav
         #endregion
 
         #region Constructor
-        public HalfEdgeFactory(int dimension)
+        public Factory(int dimension)
         {
             Dimension = dimension;
         }

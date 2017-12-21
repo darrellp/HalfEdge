@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
 using MeshNav.BoundaryMesh;
+using MeshNav.RayedMesh;
 
 namespace MeshNavTests
 {
@@ -123,9 +125,116 @@ namespace MeshNavTests
             }
         }
 
-	    public void TestSubclassedMesh()
-	    {
-		    
-	    }
+        [TestMethod]
+        public void TestInvalidSquareRayed1()
+        {
+            var mesh = new RayedMesh<double>(2);
+
+            // ReSharper disable InconsistentNaming
+            var ptLL = mesh.AddVertex(0, 0);
+            var ptLR = mesh.AddVertex(1, 0);
+            var ptUL = mesh.AddVertex(0, 1);
+            var ptUR = mesh.AddVertex(1, 1);
+            // ReSharper restore InconsistentNaming
+            var face = mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+
+            var failed = false;
+            try
+            {
+                // No valid boundary
+                mesh.FinalizeMesh();
+            }
+            catch (Exception)
+            {
+                failed = true;
+            }
+            Assert.IsTrue(failed);
+        }
+
+        [TestMethod]
+        public void TestInvalidSquareRayed2()
+        {
+            var mesh = new RayedMesh<double>(2);
+            var ptLL = mesh.AddVertex(0, 0);
+            var ptLR = mesh.AddVertex(1, 0);
+            var ptUL = mesh.AddVertex(0, 1);
+            var ptUR = mesh.AddVertex(1, 1);
+            mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+
+            // Adding one ray is invalid
+            var ptllRayed = mesh.AddRayedVertex(-1, -1);
+
+            var failed = false;
+            try
+            {
+                // Only one ray in a face is invalid
+                mesh.AddFace(ptLL, ptLR, ptllRayed);
+            }
+            catch (Exception)
+            {
+                failed = true;
+            }
+            Assert.IsTrue(failed);
+        }
+
+        [TestMethod]
+        public void TestInvalidSquareRayed3()
+        {
+            var mesh = new RayedMesh<double>(2);
+            var ptLL = mesh.AddVertex(0, 0);
+            var ptLR = mesh.AddVertex(1, 0);
+            var ptUL = mesh.AddVertex(0, 1);
+            var ptUR = mesh.AddVertex(1, 1);
+            mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+            // Adding one ray is invalid
+            var ptllRayed = mesh.AddRayedVertex(-1, -1);
+            var ptlrRayed = mesh.AddRayedVertex(1, -1);
+            mesh.AddFace(ptLR, ptLL, ptllRayed, ptlrRayed);
+
+            var failed = false;
+            try
+            {
+                // One face with two rays doesn't complete the boundary
+                mesh.FinalizeMesh();
+            }
+            catch (Exception)
+            {
+                failed = true;
+            }
+            Assert.IsTrue(failed);
+        }
+
+        [TestMethod]
+        public void TestValidSquareRayed()
+        {
+            var mesh = new RayedMesh<double>(2);
+            var ptLL = mesh.AddVertex(0, 0);
+            var ptLR = mesh.AddVertex(1, 0);
+            var ptUL = mesh.AddVertex(0, 1);
+            var ptUR = mesh.AddVertex(1, 1);
+            mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+            // Adding one ray is invalid
+            var ptllRayed = mesh.AddRayedVertex(-1, -1);
+            var ptlrRayed = mesh.AddRayedVertex(1, -1);
+            var pturRayed = mesh.AddRayedVertex(1, 1);
+            var ptulRayed = mesh.AddRayedVertex(-1, 1);
+            mesh.AddFace(ptLR, ptLL, ptllRayed, ptlrRayed);
+            mesh.AddFace(ptUR, ptLR, ptlrRayed, pturRayed);
+            mesh.AddFace(ptUL, ptUR, pturRayed, ptulRayed);
+            mesh.AddFace(ptLL, ptUL, ptulRayed, ptllRayed);
+
+            var failed = false;
+            try
+            {
+                // One face with two rays doesn't complete the boundary
+                mesh.FinalizeMesh();
+            }
+            catch (Exception)
+            {
+                failed = true;
+            }
+            Assert.IsFalse(failed);
+        }
+
     }
 }
