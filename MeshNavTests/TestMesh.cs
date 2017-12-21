@@ -10,19 +10,22 @@ namespace MeshNavTests
     [TestClass]
     public class TestMesh
     {
-        [TestMethod]
-        public void TestBuildSquare()
+        private Face<double> BuildSquare(Mesh<double> mesh)
         {
-            var mesh = new BoundaryMesh<double>(2);
-
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
             // ReSharper restore InconsistentNaming
-            var face = mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+            return mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+        }
 
+        [TestMethod]
+        public void TestBuildSquare()
+        {
+            var mesh = new BoundaryMesh<double>(2);
+            var face = BuildSquare(mesh);
             mesh.FinalizeMesh();
 
             Assert.AreEqual(4, face.Edges().Count());
@@ -32,6 +35,12 @@ namespace MeshNavTests
                 Assert.AreEqual(face, halfEdge.Face);
                 Assert.AreEqual(mesh.BoundaryFace, halfEdge.OppositeFace);
             }
+
+            // Only real way to test the PreviousEdge is to debug and check that we use the
+            // PreviousEdge stored in the HalfEdge rather than calculating by walking around
+            // the face.
+            var prevEdge = face.HalfEdge.PreviousEdge;
+            Assert.AreEqual(prevEdge.NextVertex, face.HalfEdge.InitVertex);
         }
 
         [TestMethod]
@@ -136,7 +145,7 @@ namespace MeshNavTests
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
             // ReSharper restore InconsistentNaming
-            var face = mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
+            mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
 
             var failed = false;
             try

@@ -19,7 +19,7 @@ namespace MeshNav
         {
             // ReSharper disable PossibleNullReferenceException
             // ReSharper disable SuspiciousTypeConversion.Global
-            get => Mesh.PreviousEdgeTrait ? FindPreviousEdge() : (this as IPreviousEdge<T>).PreviousEdgeAccessor;
+            get => Mesh.PreviousEdgeTrait ? (this as IPreviousEdge<T>).PreviousEdgeAccessor : FindPreviousEdge();
             set
             {
                 if (Mesh.PreviousEdgeTrait)

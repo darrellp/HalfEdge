@@ -30,16 +30,33 @@ namespace MeshNav
         #endregion
 
         #region Traits
-        public Vector<double> Normal
+        public Vector<T> Normal
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
-            get => Mesh.NormalsTrait ? null : (this as INormal).NormalAccessor;
+            get => Mesh.NormalsTrait ? null : (this as INormal<T>).NormalAccessor;
             set
             {
                 if (Mesh.NormalsTrait)
                 {
-                    (this as INormal).NormalAccessor = value;
+                    (this as INormal<T>).NormalAccessor = value;
+                }
+            }
+            // ReSharper restore PossibleNullReferenceException
+            // ReSharper restore SuspiciousTypeConversion.Global
+        }
+
+	    // ReSharper disable once InconsistentNaming
+        public Vector<double> UV
+        {
+            // ReSharper disable SuspiciousTypeConversion.Global
+            // ReSharper disable PossibleNullReferenceException
+            get => Mesh.UvTrait ? null : (this as IUV).UvAccessor;
+            set
+            {
+                if (Mesh.UvTrait)
+                {
+                    (this as IUV).UvAccessor = value;
                 }
             }
             // ReSharper restore PossibleNullReferenceException
@@ -74,7 +91,7 @@ namespace MeshNav
         #endregion
 
         #region Constructor
-        internal Vertex(Vector<T> position, Mesh<T> mesh)
+        internal Vertex(Mesh<T> mesh, Vector<T> position)
         {
             Position = position;
             Mesh = mesh;
@@ -138,7 +155,7 @@ namespace MeshNav
         #region Traits
         internal void CalculateNormal()
         {
-            if (!(this is INormal)|| Dimension != 3)
+            if (!(this is INormal<T>)|| Dimension != 3)
             {
                 return;
             }
@@ -150,11 +167,11 @@ namespace MeshNav
                 sum = sum + FaceNormal(he);
                 faceCount++;
             }
-            Normal = sum / faceCount;
+            Normal = sum.ScalarDivide(faceCount);
             Normal.Normalize(2.0);
         }
 
-        private Vector<double> FaceNormal(HalfEdge<T> he)
+        private Vector<T> FaceNormal(HalfEdge<T> he)
         {
             var pos = Position;
             var pos1 = he.NextVertex.Position;

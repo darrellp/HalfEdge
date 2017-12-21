@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MeshNav.BoundaryMesh;
 using MeshNav.TraitInterfaces;
 
 namespace MeshNav.RayedMesh
@@ -33,7 +32,7 @@ namespace MeshNav.RayedMesh
             {
                 throw new MeshNavException("Adding vertex to finalized mesh");
             }
-            var newVertex = InternalAddVertex(coords) as RayedVertex<T>;
+            var newVertex = AddVertex(coords) as RayedVertex<T>;
             // ReSharper disable once PossibleNullReferenceException
             newVertex.IsRayed = true;
             MapVerticesToEdges[newVertex] = new List<HalfEdge<T>>();

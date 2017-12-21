@@ -14,7 +14,7 @@ namespace MeshNav.RayedMesh
 
         public override Vertex<T> CreateVertex(Mesh<T> mesh, Vector<T> vec)
         {
-            return new RayedVertex<T>(vec, mesh);
+            return new RayedVertex<T>(mesh, vec);
         }
 
         public override Face<T> CreateFace()

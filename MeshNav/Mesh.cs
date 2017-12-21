@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
 
 namespace MeshNav
@@ -35,7 +36,6 @@ namespace MeshNav
     public class Mesh<T> where T : struct, IEquatable<T>, IFormattable
     {
         #region Private variables
-        private readonly Factory<T> _factory;
 
         // During the construction of the mesh, we can't guarantee valid topologies which means that a lot of the iterators, etc.
         // that we can eventually rely on won't work during construction.  In particular, we can't use AdjacentEdges for vertices.
@@ -51,7 +51,8 @@ namespace MeshNav
         public IEnumerable<Face<T>> Faces => FacesInternal;
         public IEnumerable<HalfEdge<T>> HalfEdges => HalfEdgesInternal;
         public bool IsInitialized { get; internal set; }
-        internal Factory<T> Factory => _factory;
+        internal Factory<T> Factory { get; }
+
         public virtual Face<T> BoundaryFace => null;
         #endregion
 
@@ -62,6 +63,13 @@ namespace MeshNav
         internal bool NormalsTrait;
         internal bool PreviousEdgeTrait;
         internal bool RayedTrait;
+        internal bool UvTrait;
+        #endregion
+ 
+        #region Element collections
+        internal List<HalfEdge<T>> HalfEdgesInternal = new List<HalfEdge<T>>();
+        internal List<Vertex<T>> VerticesInternal = new List<Vertex<T>>();
+        internal List<Face<T>> FacesInternal = new List<Face<T>>();
         #endregion
 
         #region Constructor
@@ -76,7 +84,7 @@ namespace MeshNav
         public Mesh(int dimension)
         {
             // ReSharper disable once VirtualMemberCallInConstructor
-            _factory = GetFactory(dimension);
+            Factory = GetFactory(dimension);
 
             // Determine supported traits by checking what Interfaces are supported by the elements
 
@@ -86,7 +94,8 @@ namespace MeshNav
             var halfEdge = Factory.CreateHalfEdge(null, null, null, null);
 
             BoundaryTrait = face is IBoundary;
-            NormalsTrait = vertex is INormal;
+            NormalsTrait = vertex is INormal<T>;
+            UvTrait = vertex is IUV;
             PreviousEdgeTrait = halfEdge is IPreviousEdge<T>;
 	        RayedTrait = vertex is IRayed;
        }
@@ -95,12 +104,6 @@ namespace MeshNav
 	    {
 		    return new Factory<T>(dimension);
 	    }
-        #endregion
-
-        #region Element collections
-        internal List<HalfEdge<T>> HalfEdgesInternal = new List<HalfEdge<T>>();
-        internal List<Vertex<T>> VerticesInternal = new List<Vertex<T>>();
-        internal List<Face<T>> FacesInternal = new List<Face<T>>();
         #endregion
 
         #region Build Methods
@@ -124,17 +127,39 @@ namespace MeshNav
             {
                 throw new MeshNavException("Adding vertex to finalized mesh");
             }
-            var newVertex = InternalAddVertex(coords);
-            MapVerticesToEdges[newVertex] = new List<HalfEdge<T>>();
-            return newVertex;
+            return AddVertex(Factory.CreateVertex(this, coords));
         }
 
-        internal Vertex<T> InternalAddVertex(params T[] coords)
+        public Vertex<T> AddVertex(Vector<T> vec)
         {
-            var newVertex = _factory.CreateVertex(this, coords);
-            VerticesInternal.Add(newVertex);
-            return newVertex;
+            if (IsInitialized)
+            {
+                throw new MeshNavException("Adding vertex to finalized mesh");
+            }
+            return AddVertex(Factory.CreateVertex(this, vec));
         }
+
+        internal Vertex<T> AddVertex(Vertex<T> vtx)
+        {
+            if (IsInitialized)
+            {
+                throw new MeshNavException("Adding vertex to finalized mesh");
+            }
+            VerticesInternal.Add(vtx);
+            MapVerticesToEdges[vtx] = new List<HalfEdge<T>>();
+            return vtx;
+        }
+
+        public Face<T> AddFace(IEnumerable<int> indices)
+	    {
+		    return AddFaceEnumerable(indices.Select(i => VerticesInternal[i]));
+	    }
+
+	    public Face<T> AddFace(params Vertex<T>[] vertices)
+	    {
+			return AddFaceEnumerable(vertices);
+
+		}
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Adds a face. </summary>
@@ -146,12 +171,13 @@ namespace MeshNav
         ///
         /// <exception cref="MeshNavException"> Thrown if there are less than three points. </exception>
         ///
-        /// <param name="vertices"> A variable-length parameters list containing the vertices. </param>
+        /// <param name="verticesEn"> An enumerable containing the vertices. </param>
         ///
         /// <returns>   The created Face </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public virtual Face<T> AddFace(params Vertex<T>[] vertices)
+        public virtual Face<T> AddFaceEnumerable(IEnumerable<Vertex<T>> verticesEn)
         {
+            var vertices = verticesEn.ToArray();
             ValidatePolygon(vertices);
             HalfEdge<T> halfEdgePrev = null;
             var newFace = Factory.CreateFace();
@@ -215,12 +241,14 @@ namespace MeshNav
                 if (halfEdgePrev != null)
                 {
                     halfEdgePrev.NextEdge = halfEdge;
+                    halfEdge.PreviousEdge = halfEdgePrev;
                 }
                 halfEdgePrev = halfEdge;
             }
             Debug.Assert(halfEdgePrev != null, "halfEdgePrev != null");
           
             halfEdgePrev.NextEdge = newFace.HalfEdge;
+            newFace.HalfEdge.PreviousEdge = halfEdgePrev;
             FacesInternal.Add(newFace);
             return newFace;
         }
@@ -249,15 +277,17 @@ namespace MeshNav
             }
             IsInitialized = true;
         }
-        #endregion
+#endregion
 
-        #region Validation
+#region Validation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Validates this mesh. </summary>
         ///
         /// <remarks>   TODO: Think about this
         ///             How much do we really want to do at this top level?  Without making certain assumptions
         ///             it's really difficult to do anything useful but we want to be as flexible as possible.
+        ///             Since we currently only create elements by adding faces, it's pretty safe, I think, to
+        ///             insist that all faces have at least three edges.
         ///             
         ///             Darrell Plank, 12/8/2017. </remarks>
         ///
@@ -279,9 +309,9 @@ namespace MeshNav
             }
             return true;
         }
-		#endregion
+#endregion
 
-		#region Hooks
+#region Hooks
 	    protected virtual void AddBoundaryEdgeHook(HalfEdge<T> opposite) { }
 	    protected virtual void FinalizeHook() { }
         protected virtual void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge) { }
@@ -297,6 +327,6 @@ namespace MeshNav
                 throw new MeshNavException("Degenerate polygon attempted");
             }
         }
-        #endregion
+#endregion
     }
 }
