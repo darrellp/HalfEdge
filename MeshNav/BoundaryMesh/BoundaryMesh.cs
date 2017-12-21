@@ -1,38 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MeshNav.TraitInterfaces;
 
 namespace MeshNav.BoundaryMesh
 {
     class BoundaryMesh<T> : Mesh<T> where T : struct, IEquatable<T>, IFormattable
     {
         #region Private variables
-        // We don't currently allow for separate components in a boundary mesh.  Otherwise we break the notion that all the adjacent edges
-        // to a face can be enumerated by starting at one HE and then going from one to the next.  A separate component would mean the
-        // face at infinity had to enumerate through two sets of border edges.  We keep count of the number of outside edges so
-        // that when we set them all at the finalization we can count and make sure the two counts match - otherwise we have bad
-        // topology.
-        //
-        // Strictly speaking, we don't allow two "outer edges".  For 3D closed objects there are not any edges but there may still
-        // be multiple components - two spheres for instance.  Do we need to check for this situation since there is no "face at
-        // infinity" which needs to be consistent?  Not sure.
-        private int _boundaryCount;
+        private readonly HashSet<HalfEdge<T>> _boundaryEdges = new HashSet<HalfEdge<T>>();
         #endregion
 
         #region Properties
-        public override Face<T> BoundaryFace { get; }
+        public List<Face<T>> BoundaryFaces { get; }
+        public override Face<T> BoundaryFace => null;
         #endregion
 
         #region Overrides
         protected override void AddBoundaryEdgeHook(HalfEdge<T> edge)
         {
-            _boundaryCount++;
-            BoundaryFace.HalfEdge = edge;
+            _boundaryEdges.Add(edge);
         }
 
-        protected override void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge)
+        protected override void ChangeBoundaryToInternalHook(HalfEdge<T> edge)
         {
-            _boundaryCount--;
+            _boundaryEdges.Remove(edge);
         }
 
         protected override Factory<T> GetFactory(int dimension)
@@ -53,10 +45,7 @@ namespace MeshNav.BoundaryMesh
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
 	    public BoundaryMesh(int dimension) : base(dimension)
 	    {
-	        BoundaryFace = Factory.CreateFace();
-		    // ReSharper disable once PossibleNullReferenceException
-		    // ReSharper disable once VirtualMemberCallInConstructor
-	        (BoundaryFace as BoundaryFace<T>).IsBoundaryAccessor = true;
+            BoundaryFaces = new List<Face<T>>();
 	    }
         #endregion
 
@@ -75,60 +64,46 @@ namespace MeshNav.BoundaryMesh
         // TODO: Mull over the stuff in the comment above
         protected override void FinalizeHook()
         {
-            if (_boundaryCount == 0)
+            while (_boundaryEdges.Count > 0)
             {
-                BoundaryFace.HalfEdge = null;
-                return;
-            }
-            var edgeCount = 0;
-            var curEdge = BoundaryFace.HalfEdge;
-            if (curEdge.NextEdge != null)
-            {
-                // Don't think this can happen
-                throw new MeshNavException("Internal error");
-            }
-            do
-            {
-                var nextVertex = curEdge.Opposite.InitVertex;
-                var foundNextEdge = false;
-                foreach (var halfEdge in MapVerticesToEdges[nextVertex])
+                var curEdge = _boundaryEdges.First();
+                var boundaryFace = Factory.CreateFace();
+                BoundaryFaces.Add(boundaryFace);
+                // ReSharper disable once PossibleNullReferenceException
+                (boundaryFace as IBoundary).IsBoundaryAccessor = true;
+                boundaryFace.HalfEdge = curEdge;
+                if (curEdge.NextEdge != null)
                 {
-                    if (halfEdge.Face == BoundaryFace)
+                    // Don't think this can happen
+                    throw new MeshNavException("Internal error");
+                }
+                do
+                {
+                    _boundaryEdges.Remove(curEdge);
+                    var nextVertex = curEdge.Opposite.InitVertex;
+                    var foundNextEdge = false;
+                    foreach (var halfEdge in MapVerticesToEdges[nextVertex])
                     {
-                        if (foundNextEdge)
+                        if (halfEdge.Face == null)
                         {
-                            // Uh oh - found three outside edges at this vertex - not good
-                            throw new MeshNavException("Found three outside edges at a node");
+                            if (foundNextEdge)
+                            {
+                                // Uh oh - found three outside edges at this vertex - not good
+                                throw new MeshNavException("Found three outside edges at a node");
+                            }
+                            foundNextEdge = true;
+                            curEdge.NextEdge = halfEdge;
+                            curEdge = halfEdge;
+                            curEdge.Face = boundaryFace;
                         }
-                        foundNextEdge = true;
-                        edgeCount++;
-                        curEdge.NextEdge = halfEdge;
-                        curEdge = halfEdge;
                     }
-                }
-                if (!foundNextEdge)
-                {
-                    throw new MeshNavException("Outside Edge has no successor");
-                }
-            } while (curEdge != BoundaryFace.HalfEdge);
-
-            if (edgeCount != _boundaryCount)
-            {
-                throw new MeshNavException("More than one connected set of outside edges");
+                    if (!foundNextEdge)
+                    {
+                        throw new MeshNavException("Outside Edge has no successor");
+                    }
+                } while (curEdge != boundaryFace.HalfEdge);
             }
         }
 		#endregion
-
-		#region Validation
-	    public override bool Validate()
-	    {
-	        var boundaries = new HashSet<HalfEdge<T>>(BoundaryFace.Edges());
-	        if (HalfEdges.Any(halfEdge => halfEdge.Face == BoundaryFace && !boundaries.Contains(halfEdge)))
-	        {
-	            throw new MeshNavException("Multiple components not allowed in BoundaryMesh");
-	        }
-	        return base.Validate();
-	    }
-	    #endregion
 	}
 }

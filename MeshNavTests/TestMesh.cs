@@ -28,12 +28,13 @@ namespace MeshNavTests
             var face = BuildSquare(mesh);
             mesh.FinalizeMesh();
 
+            Assert.AreEqual(1, mesh.BoundaryFaces.Count);
             Assert.AreEqual(4, face.Edges().Count());
-            Assert.AreEqual(4, mesh.BoundaryFace.Edges().Count());
+            Assert.AreEqual(4, mesh.BoundaryFaces[0].Edges().Count());
             foreach (var halfEdge in face.Edges())
             {
                 Assert.AreEqual(face, halfEdge.Face);
-                Assert.AreEqual(mesh.BoundaryFace, halfEdge.OppositeFace);
+                Assert.AreEqual(mesh.BoundaryFaces[0], halfEdge.OppositeFace);
             }
 
             // Only real way to test the PreviousEdge is to debug and check that we use the
@@ -62,7 +63,7 @@ namespace MeshNavTests
             Assert.AreEqual(4, faceLeft.Edges().Count());
             Assert.AreEqual(4, faceRight.Edges().Count());
             Assert.AreEqual(14, mesh.HalfEdges.Count());
-            Assert.AreEqual(6, mesh.BoundaryFace.Edges().Count());
+            Assert.AreEqual(6, mesh.BoundaryFaces[0].Edges().Count());
         }
 
         [TestMethod]
@@ -121,7 +122,7 @@ namespace MeshNavTests
             Assert.AreEqual(4, front.Edges().Count());
             Assert.AreEqual(4, back.Edges().Count());
 
-            Assert.AreEqual(0, mesh.BoundaryFace.Edges().Count());
+            Assert.AreEqual(0, mesh.BoundaryFaces.Count());
 
             Assert.AreEqual(6, mesh.Faces.Count());
             Assert.AreEqual(8, mesh.Vertices.Count());
