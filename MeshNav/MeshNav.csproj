@@ -52,6 +52,7 @@
     <Compile Include="BoundaryMesh\BoundaryFace.cs" />
     <Compile Include="BoundaryMesh\BoundaryFactory.cs" />
     <Compile Include="Face.cs" />
+    <Compile Include="Geometry2D.cs" />
     <Compile Include="HalfEdge.cs" />
     <Compile Include="Import.cs" />
     <Compile Include="RayedMesh\RayedFace.cs" />

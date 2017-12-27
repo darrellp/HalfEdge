@@ -122,7 +122,7 @@ namespace MeshNavTests
             Assert.AreEqual(4, front.Edges().Count());
             Assert.AreEqual(4, back.Edges().Count());
 
-            Assert.AreEqual(0, mesh.BoundaryFaces.Count());
+            Assert.AreEqual(0, mesh.BoundaryFaces.Count);
 
             Assert.AreEqual(6, mesh.Faces.Count());
             Assert.AreEqual(8, mesh.Vertices.Count());

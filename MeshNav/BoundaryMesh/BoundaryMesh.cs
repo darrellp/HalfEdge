@@ -61,7 +61,6 @@ namespace MeshNav.BoundaryMesh
         ///             mulling over.
         ///             Darrell Plank, 12/7/2017. </remarks>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        // TODO: Mull over the stuff in the comment above
         protected override void FinalizeHook()
         {
             while (_boundaryEdges.Count > 0)

@@ -16,7 +16,6 @@ namespace MeshNav
         public bool IsBoundary
         {
             // ReSharper disable PossibleNullReferenceException
-			// TODO: Figure out how to handle boundaries and whether we can share that between BoundaryMesh and RayedMesh
             get => !Mesh.BoundaryTrait && (this as IBoundary).IsBoundaryAccessor;
             set
             {

@@ -10,9 +10,8 @@ namespace MeshNav
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A mesh. </summary>
     ///
-    /// <remarks>   All the elements of a single mesh are contained in this structure.  It must have it's
-    ///             dimension set before use.  It is created by adding vertices and then adding faces using
-    ///             those vertices.
+    /// <remarks>   All the elements of a single mesh are contained in this structure.  It is created by adding
+    ///              vertices and then adding faces using those vertices.
     ///             
     ///             We support various traits through the idea of Traits.  For each trait there is an interface
     ///             in the Traits namespace which applies to either a mesh, vertex, face or halfEdge.  Implementing
@@ -31,7 +30,7 @@ namespace MeshNav
     ///             
     ///             Darrell Plank, 12/7/2017. </remarks>
     ///
-    /// <typeparam name="T">    Generic type parameter. </typeparam>
+    /// <typeparam name="T">    Generic type parameter for coordinates - must be float or double. </typeparam>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     public class Mesh<T> where T : struct, IEquatable<T>, IFormattable
     {
@@ -279,7 +278,7 @@ namespace MeshNav
         }
 #endregion
 
-#region Validation
+        #region Validation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Validates this mesh. </summary>
         ///
@@ -309,9 +308,9 @@ namespace MeshNav
             }
             return true;
         }
-#endregion
+        #endregion
 
-#region Hooks
+        #region Hooks
 	    protected virtual void AddBoundaryEdgeHook(HalfEdge<T> opposite) { }
 	    protected virtual void FinalizeHook() { }
         protected virtual void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge) { }
@@ -327,6 +326,6 @@ namespace MeshNav
                 throw new MeshNavException("Degenerate polygon attempted");
             }
         }
-#endregion
+        #endregion
     }
 }
