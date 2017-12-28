@@ -3,6 +3,11 @@ using System;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using static MeshNav.Utilities;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 // ReSharper disable InconsistentNaming
 
 namespace MeshNav
@@ -13,7 +18,7 @@ namespace MeshNav
     /// <remarks>	Darrellp, 2/17/2011. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static class Geometry2D<T> where T : struct, IEquatable<T>, IFormattable
+    public static class Geometry2D
     {
 		/// Tolerance we use in "near enough" calculations
 		public const double Tolerance = 1e-10;
@@ -78,7 +83,7 @@ namespace MeshNav
 
 		public static double Dot(Vector<T> pt1, Vector<T> pt2)
 		{
-			return pt1.XD() * pt2.XD() + pt1.YD() * pt2.YD();
+			return pt1.X() * pt2.X() + pt1.Y() * pt2.Y();
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,17 +127,17 @@ namespace MeshNav
 		public static int IQuad(Vector<T> pt)
 		{
 			var iRet = 0;
-			if (pt.XD() < 0)
+			if (pt.X() < 0)
 			{
 				iRet += 2;
-				if (pt.YD() > 0)
+				if (pt.Y() > 0)
 				{
 					iRet += 1;
 				}
 			}
 			else
 			{
-				if (pt.YD() < 0)
+				if (pt.Y() < 0)
 				{
 					iRet += 1;
 				}
@@ -153,7 +158,8 @@ namespace MeshNav
 
 		public static Vector<T> MidPoint(Vector<T> pt1, Vector<T> pt2)
 		{
-			return (pt1 + pt2).ScalarDivide(2);
+		    // ReSharper disable once RedundantCast
+			return (pt1 + pt2) / (T)2;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,12 +180,12 @@ namespace MeshNav
 
 		public static double SignedArea(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
 		{
-		    var x1 = pt1.XD();
-		    var x2 = pt2.XD();
-		    var x3 = pt3.XD();
-		    var y1 = pt1.YD();
-		    var y2 = pt2.YD();
-		    var y3 = pt3.YD();
+		    var x1 = pt1.X();
+		    var x2 = pt2.X();
+		    var x3 = pt3.X();
+		    var y1 = pt1.Y();
+		    var y2 = pt2.Y();
+		    var y3 = pt3.Y();
 			return (x2 - x1) * (y3 - y1) -
 				(x3 - x1) * (y2 - y1);
 		}
@@ -295,19 +301,19 @@ namespace MeshNav
 		{
 			// ReSharper disable once RedundantAssignment
 			var code = (CrossingType)(-1);
-			pPt = Make<T>();
+			pPt = Make();
 
-			var denom = (seg1Pt1.XD() - seg1Pt2.XD())* (seg2Pt2.YD() - seg2Pt1.YD()) +
-						   (seg2Pt2.XD() - seg2Pt1.XD()) * (seg1Pt2.YD() - seg1Pt1.YD());
+			var denom = (seg1Pt1.X() - seg1Pt2.X())* (seg2Pt2.Y() - seg2Pt1.Y()) +
+						   (seg2Pt2.X() - seg2Pt1.X()) * (seg1Pt2.Y() - seg1Pt1.Y());
 
 			if (FNearZero(denom))
 			{
 				return ParallelInt(seg1Pt1, seg1Pt2, seg2Pt1, seg2Pt2, out pPt);
 			}
 
-			var num = seg1Pt1.XD() * (seg2Pt2.YD() - seg2Pt1.YD()) +
-						 seg2Pt1.XD() * (seg1Pt1.YD() - seg2Pt2.YD()) +
-						 seg2Pt2.XD() * (seg2Pt1.YD() - seg1Pt1.YD());
+			var num = seg1Pt1.X() * (seg2Pt2.Y() - seg2Pt1.Y()) +
+						 seg2Pt1.X() * (seg1Pt1.Y() - seg2Pt2.Y()) +
+						 seg2Pt2.X() * (seg2Pt1.Y() - seg1Pt1.Y());
 
 			if (FNearZero(num) || FCloseEnough(num, denom))
 			{
@@ -320,9 +326,9 @@ namespace MeshNav
 				return CrossingType.NonCrossing;
 			}
 
-			num = -(seg1Pt1.XD() * (seg2Pt1.YD() - seg1Pt2.YD()) +
-				   seg1Pt2.XD() * (seg1Pt1.YD() - seg2Pt1.YD()) +
-				   seg2Pt1.XD() * (seg1Pt2.YD() - seg1Pt1.YD()));
+			num = -(seg1Pt1.X() * (seg2Pt1.Y() - seg1Pt2.Y()) +
+				   seg1Pt2.X() * (seg1Pt1.Y() - seg2Pt1.Y()) +
+				   seg2Pt1.X() * (seg1Pt2.Y() - seg1Pt1.Y()));
 
 			if (FNearZero(num) || FCloseEnough(num, denom))
 			{
@@ -340,8 +346,8 @@ namespace MeshNav
 				code = CrossingType.NonCrossing;
 			}
 
-		    pPt = Make<T>(seg1Pt1.XD() + tSeg1 * (seg1Pt2.XD() - seg1Pt1.XD()),
-		        seg1Pt1.YD() + tSeg1 * (seg1Pt2.YD() - seg1Pt1.YD()));
+		    pPt = Make(seg1Pt1.X() + tSeg1 * (seg1Pt2.X() - seg1Pt1.X()),
+		        seg1Pt1.Y() + tSeg1 * (seg1Pt2.Y() - seg1Pt1.Y()));
 
 			return code;
 		}
@@ -370,19 +376,19 @@ namespace MeshNav
 			}
 
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
-			if (ptSegEndpoint1.XD() != ptSegmentEndpoint2.XD())
+			if (ptSegEndpoint1.X() != ptSegmentEndpoint2.X())
 			{
-				return ptSegEndpoint1.XD() <= ptTest.XD() && ptTest.XD() <= ptSegmentEndpoint2.XD() ||
-				       ptSegEndpoint1.XD() >= ptTest.XD() && ptTest.XD() >= ptSegmentEndpoint2.XD();
+				return ptSegEndpoint1.X() <= ptTest.X() && ptTest.X() <= ptSegmentEndpoint2.X() ||
+				       ptSegEndpoint1.X() >= ptTest.X() && ptTest.X() >= ptSegmentEndpoint2.X();
 			}
 
-			return ptSegEndpoint1.YD() <= ptTest.YD() && ptTest.YD() <= ptSegmentEndpoint2.YD() ||
-			       ptSegEndpoint1.YD() >= ptTest.YD() && ptTest.YD() >= ptSegmentEndpoint2.YD();
+			return ptSegEndpoint1.Y() <= ptTest.Y() && ptTest.Y() <= ptSegmentEndpoint2.Y() ||
+			       ptSegEndpoint1.Y() >= ptTest.Y() && ptTest.Y() >= ptSegmentEndpoint2.Y();
 		}
 
 		private static CrossingType ParallelInt(Vector<T> aPt, Vector<T> bPt, Vector<T> cPt, Vector<T> dPt, out Vector<T> pPt)
 		{
-			pPt = Make<T>();
+			pPt = Make();
 			if (!FCollinear(aPt, bPt, cPt))
 			{
 				return CrossingType.NonCrossing;
@@ -424,8 +430,8 @@ namespace MeshNav
 
 		public static double Distance(Vector<T> pt1, Vector<T> pt2)
 		{
-			var dx = pt1.XD() - pt2.XD();
-			var dy = pt1.YD() - pt2.YD();
+			var dx = pt1.X() - pt2.X();
+			var dy = pt1.Y() - pt2.Y();
 
 			return Math.Sqrt(dx * dx + dy * dy);
 		}
@@ -443,8 +449,8 @@ namespace MeshNav
 
 		public static double DistanceSq(Vector<T> pt1, Vector<T> pt2)
 		{
-			var dx = pt1.XD() - pt2.XD();
-			var dy = pt1.YD() - pt2.YD();
+			var dx = pt1.X() - pt2.X();
+			var dy = pt1.Y() - pt2.Y();
 
 			return dx * dx + dy * dy;
 		}
@@ -465,8 +471,8 @@ namespace MeshNav
 
 		public static double ManhattanDistance(Vector<T> pt1, Vector<T> pt2)
 		{
-			var dx = pt1.XD() - pt2.XD();
-			var dy = pt1.YD() - pt2.YD();
+			var dx = pt1.X() - pt2.X();
+			var dy = pt1.Y() - pt2.Y();
 
 			return Math.Abs(dx) + Math.Abs(dy);
 		}
@@ -492,16 +498,16 @@ namespace MeshNav
 		internal static double ParabolicCut(Vector<T> pt1, Vector<T> pt2, double ys)
 		{
 			// If the foci are identical
-			if(FCloseEnough(pt1.XD(), pt2.XD()) && FCloseEnough(pt1.YD(), pt2.YD()))
+			if(FCloseEnough(pt1.X(), pt2.X()) && FCloseEnough(pt1.Y(), pt2.Y()))
 			{
 				// Throw an exception
 				throw new InvalidOperationException("Identical datapoints are not allowed!");
 			}
 
 			// If the focii are at the same y coordinate, the intersection is halfway between them
-			if (FCloseEnough(pt1.YD(), pt2.YD()))
+			if (FCloseEnough(pt1.Y(), pt2.Y()))
 			{
-				return (pt1.XD() + pt2.XD()) / 2;
+				return (pt1.X() + pt2.X()) / 2;
 			}
 
 			// Handle degenerate vertical lines (y coordinate on the directrix)
@@ -512,15 +518,15 @@ namespace MeshNav
 			// it's own x coordinate...
 
 			// if pt1 is on the directrix
-			if (FCloseEnough(pt1.YD(), ys))
+			if (FCloseEnough(pt1.Y(), ys))
 			{
-				return pt1.XD();
+				return pt1.X();
 			}
 			
 			// if pt2 is on the directrix
-			if (FCloseEnough(pt2.YD(), ys))
+			if (FCloseEnough(pt2.Y(), ys))
 			{
-				return pt2.XD();
+				return pt2.X();
 			}
 
 			// Initialize for the general case
@@ -529,12 +535,12 @@ namespace MeshNav
 			// will be two places where the parabolas intersect so we have to compute
 			// both and pick the one we want.
 			//
-			var a1 = 1 / (2 * (pt1.YD() - ys));
-			var a2 = 1 / (2 * (pt2.YD() - ys));
+			var a1 = 1 / (2 * (pt1.Y() - ys));
+			var a2 = 1 / (2 * (pt2.Y() - ys));
 			var da = a1 - a2;
-			var s1 = 4 * a1 * pt1.XD() - 4 * a2 * pt2.XD();
-			var dx = pt1.XD() - pt2.XD();
-			var s2 = 2 * Math.Sqrt(2 * (2 * a1 * a2 * dx * dx - da * (pt1.YD() - pt2.YD())));
+			var s1 = 4 * a1 * pt1.X() - 4 * a2 * pt2.X();
+			var dx = pt1.X() - pt2.X();
+			var s2 = 2 * Math.Sqrt(2 * (2 * a1 * a2 * dx * dx - da * (pt1.Y() - pt2.Y())));
 			var m = 0.25 / da;
 			var xs1 = m * (s1 + s2);
 			var xs2 = m * (s1 - s2);
@@ -549,7 +555,7 @@ namespace MeshNav
 			}
 
 			// Get the solution we're looking for
-			return pt1.YD() >= pt2.YD() ? xs2 : xs1;
+			return pt1.Y() >= pt2.Y() ? xs2 : xs1;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -570,8 +576,8 @@ namespace MeshNav
 		public static int ICompareCw(Vector<T> ptCenter, Vector<T> pt1, Vector<T> pt2)
 		{
 			// Get values relative to the Center of rotation
-			var pt1Rel = Make<T>(pt1.XD() - ptCenter.XD(), pt1.YD() - ptCenter.YD());
-			var pt2Rel = Make<T>(pt2.XD() - ptCenter.XD(), pt2.YD() - ptCenter.YD());
+			var pt1Rel = Make(pt1.X() - ptCenter.X(), pt1.Y() - ptCenter.Y());
+			var pt2Rel = Make(pt2.X() - ptCenter.X(), pt2.Y() - ptCenter.Y());
 
 			// Determine quadrants of each point
 			var iQuad1 = IQuad(pt1Rel);
@@ -633,7 +639,7 @@ namespace MeshNav
 		/// <param name="pt3">		Third point. </param>
 		/// <param name="ptCenter">	[out] out parameter returning the circumcenter. </param>
 		///
-		/// <returns>	
+		/// <returns>	XD
 		/// False if the three points lie on a line in which case the circumcenter is not valid.  True
 		/// otherwise and the returned point is the circumcenter. 
 		/// </returns>
@@ -642,8 +648,8 @@ namespace MeshNav
 		public static bool FFindCircumcenter(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3, out Vector<T> ptCenter)
 		{
 			// Initialize for ugly math to follow
-			ptCenter = Make<T>();
-			var d = (pt1.XD() - pt3.XD()) * (pt2.YD() - pt3.YD()) - (pt2.XD() - pt3.XD()) * (pt1.YD() - pt3.YD());
+			ptCenter = Make();
+			var d = (pt1.X() - pt3.X()) * (pt2.Y() - pt3.Y()) - (pt2.X() - pt3.X()) * (pt1.Y() - pt3.Y());
 
 			// If we've got some points identical to others
 			if (Math.Abs(d) <= Tolerance)
@@ -651,15 +657,15 @@ namespace MeshNav
 				return false;
 			}
 
-			var centerX = (((pt1.XD() - pt3.XD()) * (pt1.XD() + pt3.XD()) + (pt1.YD() - pt3.YD()) * (pt1.YD() + pt3.YD())) / 2 * (pt2.YD() - pt3.YD()) 
-			    -  ((pt2.XD() - pt3.XD()) * (pt2.XD() + pt3.XD()) + (pt2.YD() - pt3.YD()) * (pt2.YD() + pt3.YD())) / 2 * (pt1.YD() - pt3.YD())) 
+			var centerX = (((pt1.X() - pt3.X()) * (pt1.X() + pt3.X()) + (pt1.Y() - pt3.Y()) * (pt1.Y() + pt3.Y())) / 2 * (pt2.Y() - pt3.Y()) 
+			    -  ((pt2.X() - pt3.X()) * (pt2.X() + pt3.X()) + (pt2.Y() - pt3.Y()) * (pt2.Y() + pt3.Y())) / 2 * (pt1.Y() - pt3.Y())) 
 			    / d;
 
-			var centerY = (((pt2.XD() - pt3.XD()) * (pt2.XD() + pt3.XD()) + (pt2.YD() - pt3.YD()) * (pt2.YD() + pt3.YD())) / 2 * (pt1.XD() - pt3.XD())
-				- ((pt1.XD() - pt3.XD()) * (pt1.XD() + pt3.XD()) + (pt1.YD() - pt3.YD()) * (pt1.YD() + pt3.YD())) / 2 * (pt2.XD() - pt3.XD()))
+			var centerY = (((pt2.X() - pt3.X()) * (pt2.X() + pt3.X()) + (pt2.Y() - pt3.Y()) * (pt2.Y() + pt3.Y())) / 2 * (pt1.X() - pt3.X())
+				- ((pt1.X() - pt3.X()) * (pt1.X() + pt3.X()) + (pt1.Y() - pt3.Y()) * (pt1.Y() + pt3.Y())) / 2 * (pt2.X() - pt3.X()))
 				/ d;
 
-		    ptCenter = Make<T>(centerX, centerY);
+		    ptCenter = Make(centerX, centerY);
 			return true;
 		}
 	}

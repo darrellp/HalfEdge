@@ -26,43 +26,6 @@ namespace MeshNav
 			return result;
 		}
 
-		public static Vector<T> CrossProduct<T>(Vector<T> v1, Vector<T> v2) where T : struct, IEquatable<T>, IFormattable
-		{
-			throw new MeshNavException("Invalid type in CrossProduct");
-		}
-
-        // Scalar Divide
-		public static Vector<double> ScalarDivide(this Vector<double> v, double d)
-		{
-			return DblBuilder.DenseOfEnumerable(v.Select(val => val / d));
-		}
-
-		public static Vector<float> ScalarDivide(this Vector<float> v, double d)
-		{
-			return FloatBuilder.DenseOfEnumerable(v.Select(val => (float)(val / d)));
-		}
-
-		public static Vector<T> ScalarDivide<T>(this Vector<T> v, double d) where T : struct, IEquatable<T>, IFormattable
-		{
-			throw new MeshNavException("Invalid type in CrossProduct");
-		}
-
-        // Scalar Multiply
-		public static Vector<double> ScalarMultiply(this Vector<double> v, double d)
-		{
-			return DblBuilder.DenseOfEnumerable(v.Select(val => val * d));
-		}
-
-		public static Vector<float> ScalarMultiply(this Vector<float> v, double d)
-		{
-			return FloatBuilder.DenseOfEnumerable(v.Select(val => (float)(val * d)));
-		}
-
-		public static Vector<T> ScalarMultiply<T>(this Vector<T> v, double d) where T : struct, IEquatable<T>, IFormattable
-		{
-			throw new MeshNavException("Invalid type in CrossProduct");
-		}
-
         // Linq
         public static T FirstOr(this IEnumerable<T> source, Func<T, bool> selector, T alternate)
         {
@@ -71,67 +34,25 @@ namespace MeshNav
             return alternate;
         }
 
-	    public static Vector<T> Make<T>(double x = 0, double y = 0) where T : struct, IEquatable<T>, IFormattable
+	    public static Vector<T> Make(T x = 0, T y = 0)
 	    {
-	        if (typeof(T) == typeof(double))
-	        {
-	            return DblBuilder.DenseOfArray(new[] {x, y}) as Vector<T>;
-	        }
-	        if (typeof(T) == typeof(float))
-	        {
-	            return FloatBuilder.DenseOfArray(new[] { (float)x, (float)y }) as Vector<T>;
-	        }
-	        throw new MeshNavException("Invalid type in Make");
+	        return Factory.Builder.DenseOfArray(new[] {x, y});
 	    }
 
         #region Extensions
         #region X
-        public static double X(this Vector<double> vec)
+        public static T X(this Vector<T> vec)
 	    {
 	        return vec[0];
-	    }
-
-	    public static float X(this Vector<float> vec)
-	    {
-	        return vec[0];
-	    }
-
-	    public static T X<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable
-        {
-	        throw new MeshNavException("Invalid type in X");
 	    }
         #endregion
 
 	    #region Y
-	    public static double Y(this Vector<double> vec)
+	    public static T Y(this Vector<T> vec)
 	    {
-	        return vec[0];
-	    }
-
-	    public static float Y(this Vector<float> vec)
-	    {
-	        return vec[0];
-	    }
-
-	    public static T Y<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable
-	    {
-	        throw new MeshNavException("Invalid type in Y");
+	        return vec[1];
 	    }
         #endregion
-
-        // ReSharper disable InconsistentNaming
-        #region XD
-        public static double XD(this Vector<double> vec) => vec[0];
-        public static double XD(this Vector<float> vec) => vec[0];
-        public static double XD<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable => throw new MeshNavException("Invalid type in YD");
-        #endregion
-
-        #region YD
-        public static double YD(this Vector<double> vec) => vec[1];
-        public static double YD(this Vector<float> vec) => vec[1];
-        public static double YD<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable => throw new MeshNavException("Invalid type in YD");
-        #endregion
-        // ReSharper restore InconsistentNaming
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 	    /// <summary>	Returns a vector 90 degrees in a CCW direction from the original. </summary>
@@ -141,9 +62,9 @@ namespace MeshNav
 	    /// <returns>	Vector 90 degrees from original. </returns>
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	    public static Vector<T> Flip90Ccw<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable
+	    public static Vector<T> Flip90Ccw(this Vector<T> vec)
         {
-	        return Make<T>(-vec.YD(), vec.XD());
+	        return Make(-vec.Y(), vec.X());
 	    }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,9 +75,9 @@ namespace MeshNav
         /// <returns>	Length of the point considered as a vector. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static double Length<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable
+        public static double Length(this Vector<T> vec)
 	    {
-            return Math.Sqrt(vec.XD() * vec.XD() + vec.YD() * vec.YD());
+            return Math.Sqrt(vec.X() * vec.X() + vec.Y() * vec.Y());
 	    }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,10 +86,12 @@ namespace MeshNav
         /// <remarks>	Darrellp, 2/27/2011. </remarks>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static Vector<T> Normalize<T>(this Vector<T> vec) where T : struct, IEquatable<T>, IFormattable
+        public static Vector<T> Normalize(this Vector<T> vec)
 	    {
-            var ln = vec.Length<T>();
-	        return Make<T>(vec.XD() / ln, vec.YD() / ln);
+            var ln = vec.Length();
+	        // ReSharper disable RedundantCast
+	        return Make(vec.X() / (T)ln, vec.Y() / (T)ln);
+	        // ReSharper restore RedundantCast
 	    }
         #endregion
     }

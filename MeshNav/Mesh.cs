@@ -33,8 +33,6 @@ namespace MeshNav
     ///             didn't need to information on all elements and wanted to save memory.
     ///             
     ///             Darrell Plank, 12/7/2017. </remarks>
-    ///
-    /// <typeparam name="T">    Generic type parameter. </typeparam>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     public class Mesh
     {
@@ -315,7 +313,7 @@ namespace MeshNav
         #endregion
 
 #region Hooks
-	    protected virtual void AddBoundaryEdgeHook(HalfEdge<T> opposite) { }
+	    protected virtual void AddBoundaryEdgeHook(HalfEdge opposite) { }
 	    protected virtual void FinalizeHook() { }
         protected virtual void ChangeBoundaryToInternalHook(HalfEdge halfEdge) { }
 
