@@ -1,9 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
+using static MeshNav.Utilities;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav
 {
@@ -17,16 +22,14 @@ namespace MeshNav
     ///             may or may not support.  For instance, if the tag supports the INormal interface
     ///             then we can place normals on this vertex.
     ///             Darrell Plank, 12/9/2017. </remarks>
-    ///
-    /// <typeparam name="T">    Generic type parameter for the coordinates. </typeparam>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class Vertex<T> where T : struct, IEquatable<T>, IFormattable
+    public class Vertex
     {
         #region Public Properties
         public Vector<T> Position { get; set; }
-        public HalfEdge<T> Edge { get; internal set; }
+        public HalfEdge Edge { get; internal set; }
         public int Dimension => Position.Count;
-        public Mesh<T> Mesh { get; }
+        public Mesh Mesh { get; }
         #endregion
 
         #region Traits
@@ -34,12 +37,12 @@ namespace MeshNav
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
-            get => Mesh.NormalsTrait ? null : (this as INormal<T>).NormalAccessor;
+            get => Mesh.NormalsTrait ? null : (this as INormal).NormalAccessor;
             set
             {
                 if (Mesh.NormalsTrait)
                 {
-                    (this as INormal<T>).NormalAccessor = value;
+                    (this as INormal).NormalAccessor = value;
                 }
             }
             // ReSharper restore PossibleNullReferenceException
@@ -91,7 +94,7 @@ namespace MeshNav
         #endregion
 
         #region Constructor
-        internal Vertex(Mesh<T> mesh, Vector<T> position)
+        internal Vertex(Mesh mesh, Vector<T> position)
         {
             Position = position;
             Mesh = mesh;
@@ -100,13 +103,13 @@ namespace MeshNav
 		#endregion
 
 		#region Virtual functions
-	    protected virtual void FillVertexTag(Vertex<T> vertex) { }
-		protected virtual void FillHalfEdgeTag(HalfEdge<T> halfEdge) { }
-		protected virtual void FillFaceTag(Face<T> face) { }
+	    protected virtual void FillVertexTag(Vertex vertex) { }
+		protected virtual void FillHalfEdgeTag(HalfEdge halfEdge) { }
+		protected virtual void FillFaceTag(Face face) { }
 		#endregion
 
 		#region Accessors
-		public IEnumerable<HalfEdge<T>> AdjacentEdges()
+		public IEnumerable<HalfEdge> AdjacentEdges()
         {
             if (Edge == null)
             {
@@ -128,12 +131,12 @@ namespace MeshNav
             } while (curEdge != Edge);
         }
 
-        public IEnumerable<Vertex<T>> AdjacentVertices()
+        public IEnumerable<Vertex> AdjacentVertices()
         {
             return AdjacentEdges().Select(adjacentEdge => adjacentEdge.NextVertex);
         }
 
-        public IEnumerable<Face<T>> AdjacentFaces()
+        public IEnumerable<Face> AdjacentFaces()
         {
             return AdjacentEdges().Select(adjacentEdge => adjacentEdge.Face);
         }
@@ -155,7 +158,7 @@ namespace MeshNav
         #region Traits
         internal void CalculateNormal()
         {
-            if (!(this is INormal<T>)|| Dimension != 3)
+            if (!(this is INormal)|| Dimension != 3)
             {
                 return;
             }
@@ -167,24 +170,24 @@ namespace MeshNav
                 sum = sum + FaceNormal(he);
                 faceCount++;
             }
-            Normal = sum.ScalarDivide(faceCount);
+            Normal = sum / faceCount;
             Normal.Normalize(2.0);
         }
 
-        private Vector<T> FaceNormal(HalfEdge<T> he)
+        private Vector<T> FaceNormal(HalfEdge he)
         {
             var pos = Position;
             var pos1 = he.NextVertex.Position;
             var pos2 = he.NextEdge.NextVertex.Position;
             var d1 = pos1 - pos;
             var d2 = pos2 - pos;
-            return Utilities.CrossProduct(d1, d2);
+            return CrossProduct(d1, d2);
         }
         #endregion
 
         #region Mesh Operations
 
-        public HalfEdge<T> SplitTo(Vertex<T> vtxOther, Face<T> face = null)
+        public HalfEdge SplitTo(Vertex vtxOther, Face face = null)
         {
             if (vtxOther == this)
             {
@@ -203,7 +206,7 @@ namespace MeshNav
             {
                 throw new MeshNavException("Can't split across the face at infinity");
             }
-            HalfEdge<T> hePrevThis = null, hePrevOther = null, heNextThis = null, heNextOther = null;
+            HalfEdge hePrevThis = null, hePrevOther = null, heNextThis = null, heNextOther = null;
             foreach (var halfEdge in face.Edges())
             {
 
@@ -238,7 +241,7 @@ namespace MeshNav
             }
             var heFromThis = Mesh.Factory.CreateHalfEdge(this, null, face, heNextOther);
             var heFromOther = Mesh.Factory.CreateHalfEdge(vtxOther, heFromThis, null, heNextThis);
-	        var newFace = new Face<T>() {HalfEdge = heFromOther};
+	        var newFace = new Face() {HalfEdge = heFromOther};
 	        heFromOther.Face = newFace;
             heFromThis.Opposite = heFromOther;
             hePrevThis.NextEdge = heFromThis;

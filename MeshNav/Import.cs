@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Assimp;
 
 namespace MeshNav
@@ -8,9 +7,9 @@ namespace MeshNav
     {
         #region Importing
 
-        public static List<Mesh<T>> ImportMesh<T>(Factory<T> factory, string filename) where T : struct, IEquatable<T>, IFormattable
+        public static List<Mesh> ImportMesh(Factory factory, string filename)
 		{
-			var ret = new List<Mesh<T>>();
+			var ret = new List<Mesh>();
             using (var importer = new AssimpContext())
             {
                 var model = importer.ImportFile(filename, PostProcessPreset.TargetRealTimeMaximumQuality);

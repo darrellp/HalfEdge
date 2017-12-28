@@ -1,9 +1,8 @@
-﻿using System;
-using MeshNav.TraitInterfaces;
+﻿using MeshNav.TraitInterfaces;
 
 namespace MeshNav.RayedMesh
 {
-	class RayedFace<T> : Face<T>, IBoundary where T : struct, IEquatable<T>, IFormattable
+	class RayedFace : Face, IBoundary
     {
         #region Public properties
         public bool IsBoundaryAccessor { get; set; }

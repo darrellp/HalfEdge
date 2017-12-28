@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshNav", "MeshNav\MeshNav.csproj", "{0BCF6FBD-4821-410D-A8C9-C11827B81992}"
 EndProject
@@ -10,15 +10,25 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		FLDebug|Any CPU = FLDebug|Any CPU
+		FLRelease|Any CPU = FLRelease|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.FLDebug|Any CPU.ActiveCfg = FLDebug|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.FLDebug|Any CPU.Build.0 = FLDebug|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.FLRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.FLRelease|Any CPU.Build.0 = Debug|Any CPU
 		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BCF6FBD-4821-410D-A8C9-C11827B81992}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.FLDebug|Any CPU.ActiveCfg = FLDebug|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.FLDebug|Any CPU.Build.0 = FLDebug|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.FLRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{8F010830-C921-4B7C-94BF-111620F5BF3A}.FLRelease|Any CPU.Build.0 = Release|Any CPU
 		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F010830-C921-4B7C-94BF-111620F5BF3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

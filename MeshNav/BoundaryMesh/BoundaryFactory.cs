@@ -1,14 +1,12 @@
-﻿using System;
-
-namespace MeshNav.BoundaryMesh
+﻿namespace MeshNav.BoundaryMesh
 {
-    internal class BoundaryFactory<T> : Factory<T> where T : struct, IEquatable<T>, IFormattable
+    internal class BoundaryFactory : Factory
     {
         public BoundaryFactory(int dimension) : base(dimension) { }
 
-        public override Face<T> CreateFace()
+        public override Face CreateFace()
         {
-            return new BoundaryFace<T>();
+            return new BoundaryFace();
         }
     }
 
