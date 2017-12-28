@@ -59,11 +59,16 @@ using MeshNav.TraitInterfaces;
 // summary:	Rename this if desired
 // 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-namespace MeshNav.TemplateFactory
+namespace Templates
 {
     public class __TEMPLATE__Factory : Factory
     {
         public __TEMPLATE__Factory(int dimension) : base(dimension) { }
+
+        public override Mesh CreateMesh()
+        {
+            return new __TEMPLATE__Mesh(Dimension);
+        }
 
         public override Face CreateFace()
         {
@@ -92,6 +97,11 @@ namespace MeshNav.TemplateFactory
 #endif
     {
         public __TEMPLATE__Mesh(int dimension) : base(dimension) { }
+
+        protected override Factory GetFactory(int dimension)
+        {
+            return new  __TEMPLATE__Factory(dimension);
+        }
     }
 
     public class __TEMPLATE__Face : Face

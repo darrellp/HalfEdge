@@ -37,7 +37,7 @@ namespace MeshNav
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
-            get => Mesh.NormalsTrait ? null : (this as INormal).NormalAccessor;
+            get => Mesh.NormalsTrait ? (this as INormal).NormalAccessor : null;
             set
             {
                 if (Mesh.NormalsTrait)
@@ -54,7 +54,7 @@ namespace MeshNav
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
-            get => Mesh.UvTrait ? null : (this as IUV).UvAccessor;
+            get => Mesh.UvTrait ? (this as IUV).UvAccessor : null;
             set
             {
                 if (Mesh.UvTrait)

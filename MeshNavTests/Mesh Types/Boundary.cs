@@ -65,6 +65,11 @@ namespace Templates
     {
         public BndFactory(int dimension) : base(dimension) { }
 
+        public override Mesh CreateMesh()
+        {
+            return new BndMesh(Dimension);
+        }
+
         public override Face CreateFace()
         {
             return new BndFace();
@@ -92,6 +97,11 @@ namespace Templates
 #endif
     {
         public BndMesh(int dimension) : base(dimension) { }
+
+        protected override Factory GetFactory(int dimension)
+        {
+            return new  BndFactory(dimension);
+        }
     }
 
     public class BndFace : Face

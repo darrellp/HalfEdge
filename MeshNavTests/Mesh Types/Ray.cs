@@ -65,6 +65,11 @@ namespace Templates
     {
         public RayFactory(int dimension) : base(dimension) { }
 
+        public override Mesh CreateMesh()
+        {
+            return new RayMesh(Dimension);
+        }
+
         public override Face CreateFace()
         {
             return new RayFace();
@@ -92,6 +97,11 @@ namespace Templates
 #endif
     {
         public RayMesh(int dimension) : base(dimension) { }
+
+        protected override Factory GetFactory(int dimension)
+        {
+            return new  RayFactory(dimension);
+        }
     }
 
     public class RayFace : Face
