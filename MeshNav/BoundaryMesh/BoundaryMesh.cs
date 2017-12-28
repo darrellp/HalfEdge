@@ -4,7 +4,7 @@ using MeshNav.TraitInterfaces;
 
 namespace MeshNav.BoundaryMesh
 {
-    class BoundaryMesh : Mesh
+    public class BoundaryMesh : Mesh
     {
         #region Private variables
         private readonly HashSet<HalfEdge> _boundaryEdges = new HashSet<HalfEdge>();

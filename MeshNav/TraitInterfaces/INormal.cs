@@ -7,6 +7,7 @@ using T = System.Double;
 
 namespace MeshNav.TraitInterfaces
 {
+    // Interface for vertices if normals are stored
     public interface INormal
 	{
         Vector<T> NormalAccessor { get; set; }

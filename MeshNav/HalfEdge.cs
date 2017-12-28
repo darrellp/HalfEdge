@@ -23,12 +23,12 @@ namespace MeshNav
         {
             // ReSharper disable PossibleNullReferenceException
             // ReSharper disable SuspiciousTypeConversion.Global
-            get => Mesh.PreviousEdgeTrait ? (this as IPreviousEdge<T>).PreviousEdgeAccessor : FindPreviousEdge();
+            get => Mesh.PreviousEdgeTrait ? (this as IPreviousEdge).PreviousEdgeAccessor : FindPreviousEdge();
             set
             {
                 if (Mesh.PreviousEdgeTrait)
                 {
-                    (this as IPreviousEdge<T>).PreviousEdgeAccessor = value;
+                    (this as IPreviousEdge).PreviousEdgeAccessor = value;
                 }
             }
             // ReSharper restore SuspiciousTypeConversion.Global

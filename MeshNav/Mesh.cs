@@ -97,7 +97,7 @@ namespace MeshNav
             BoundaryTrait = face is IBoundary;
             NormalsTrait = vertex is INormal;
             UvTrait = vertex is IUV;
-            PreviousEdgeTrait = halfEdge is IPreviousEdge<T>;
+            PreviousEdgeTrait = halfEdge is IPreviousEdge;
 	        RayedTrait = vertex is IRayed;
        }
 

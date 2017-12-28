@@ -50,7 +50,7 @@ namespace MeshNav
         }
 
 	    // ReSharper disable once InconsistentNaming
-        public Vector<double> UV
+        public Vector<T> UV
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException

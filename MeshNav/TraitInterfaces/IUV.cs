@@ -1,10 +1,15 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav.TraitInterfaces
 {
 	// ReSharper disable once InconsistentNaming
-    interface IUV
+    public interface IUV
     {
-        Vector<double> UvAccessor { get; set; }
+        Vector<T> UvAccessor { get; set; }
     }
 }

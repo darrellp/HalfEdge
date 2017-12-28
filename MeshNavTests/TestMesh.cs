@@ -2,8 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
-using MeshNav.BoundaryMesh;
-using MeshNav.RayedMesh;
+using Templates;
 
 namespace MeshNavTests
 {
@@ -24,7 +23,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestBuildSquare()
         {
-            var mesh = new BoundaryMesh(2);
+            var mesh = new BndMesh(2);
             var face = BuildSquare(mesh);
             mesh.FinalizeMesh();
 
@@ -47,7 +46,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestBuildAdjacentSquares()
         {
-            var mesh = new BoundaryMesh(2);
+            var mesh = new BndMesh(2);
 
             var ptL0 = mesh.AddVertex(0, 0);
             var ptU0 = mesh.AddVertex(0, 1);
@@ -69,7 +68,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestWrongOrdering()
         {
-            var mesh = new BoundaryMesh(2);
+            var mesh = new BndMesh(2);
 
             var ptL0 = mesh.AddVertex(0, 0);
             var ptU0 = mesh.AddVertex(0, 1);
@@ -95,7 +94,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestCube()
         {
-            var mesh = new BoundaryMesh(3);
+            var mesh = new BndMesh(3);
 
             var pt000 = mesh.AddVertex(0, 0, 0);
             var pt001 = mesh.AddVertex(0, 0, 1);
@@ -138,7 +137,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed1()
         {
-            var mesh = new RayedMesh(2);
+            var mesh = new RayMesh(2);
 
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
@@ -164,7 +163,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed2()
         {
-            var mesh = new RayedMesh(2);
+            var mesh = new RayMesh(2);
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
@@ -190,7 +189,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed3()
         {
-            var mesh = new RayedMesh(2);
+            var mesh = new RayMesh(2);
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
@@ -217,7 +216,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestValidSquareRayed()
         {
-            var mesh = new RayedMesh(2);
+            var mesh = new RayMesh(2);
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
