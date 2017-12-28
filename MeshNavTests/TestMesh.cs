@@ -10,7 +10,7 @@ namespace MeshNavTests
     [TestClass]
     public class TestMesh
     {
-        private Face<double> BuildSquare(Mesh<double> mesh)
+        private Face BuildSquare(Mesh mesh)
         {
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
@@ -24,7 +24,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestBuildSquare()
         {
-            var mesh = new BoundaryMesh<double>(2);
+            var mesh = new BoundaryMesh(2);
             var face = BuildSquare(mesh);
             mesh.FinalizeMesh();
 
@@ -47,7 +47,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestBuildAdjacentSquares()
         {
-            var mesh = new BoundaryMesh<double>(2);
+            var mesh = new BoundaryMesh(2);
 
             var ptL0 = mesh.AddVertex(0, 0);
             var ptU0 = mesh.AddVertex(0, 1);
@@ -69,7 +69,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestWrongOrdering()
         {
-            var mesh = new BoundaryMesh<double>(2);
+            var mesh = new BoundaryMesh(2);
 
             var ptL0 = mesh.AddVertex(0, 0);
             var ptU0 = mesh.AddVertex(0, 1);
@@ -95,7 +95,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestCube()
         {
-            var mesh = new BoundaryMesh<double>(3);
+            var mesh = new BoundaryMesh(3);
 
             var pt000 = mesh.AddVertex(0, 0, 0);
             var pt001 = mesh.AddVertex(0, 0, 1);
@@ -122,7 +122,7 @@ namespace MeshNavTests
             Assert.AreEqual(4, front.Edges().Count());
             Assert.AreEqual(4, back.Edges().Count());
 
-            Assert.AreEqual(0, mesh.BoundaryFaces.Count());
+            Assert.AreEqual(0, mesh.BoundaryFaces.Count);
 
             Assert.AreEqual(6, mesh.Faces.Count());
             Assert.AreEqual(8, mesh.Vertices.Count());
@@ -138,7 +138,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed1()
         {
-            var mesh = new RayedMesh<double>(2);
+            var mesh = new RayedMesh(2);
 
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
@@ -164,7 +164,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed2()
         {
-            var mesh = new RayedMesh<double>(2);
+            var mesh = new RayedMesh(2);
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
@@ -190,7 +190,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed3()
         {
-            var mesh = new RayedMesh<double>(2);
+            var mesh = new RayedMesh(2);
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
@@ -217,7 +217,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestValidSquareRayed()
         {
-            var mesh = new RayedMesh<double>(2);
+            var mesh = new RayedMesh(2);
             var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);

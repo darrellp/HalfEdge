@@ -1,15 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MeshNav.TraitInterfaces;
 
 namespace MeshNav
 {
-    public class Face<T> where T : struct, IEquatable<T>, IFormattable
+    public class Face
     {
         #region Public Properties
-        public HalfEdge<T> HalfEdge { get; internal set; }
-	    public Mesh<T> Mesh => HalfEdge.Mesh;
+        public HalfEdge HalfEdge { get; internal set; }
+	    public Mesh Mesh => HalfEdge.Mesh;
         #endregion
 
         #region Traits
@@ -34,7 +33,7 @@ namespace MeshNav
         #endregion
 
         #region Accessors
-        public IEnumerable<HalfEdge<T>> Edges()
+        public IEnumerable<HalfEdge> Edges()
         {
             if (HalfEdge == null)
             {
@@ -49,7 +48,7 @@ namespace MeshNav
             } while (curEdge != HalfEdge);
         }
 
-        public IEnumerable<Vertex<T>> Vertices()
+        public IEnumerable<Vertex> Vertices()
         {
             return Edges().Select(e => e.InitVertex);
         }
@@ -58,8 +57,8 @@ namespace MeshNav
         #region Validation
         internal bool Validate()
         {
-            var edges = new HashSet<HalfEdge<T>>();
-            var lastEdge = (HalfEdge<T>)null;
+            var edges = new HashSet<HalfEdge>();
+            var lastEdge = (HalfEdge)null;
             foreach (var halfEdge in Edges())
             {
                 if (edges.Contains(halfEdge))

@@ -1,21 +1,25 @@
-﻿using System;
-using MeshNav.TraitInterfaces;
+﻿using MeshNav.TraitInterfaces;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav
 {
-    public class HalfEdge<T> where T : struct, IEquatable<T>, IFormattable
+    public class HalfEdge
     {
         #region Public Properties
-        public Vertex<T> InitVertex { get; }                // InitVertex at the end of the half-edge
-        public HalfEdge<T> Opposite { get; internal set; }  // Half edge in opposite direction
-        public Face<T> Face { get; internal set; }          // Face the half edge borders
-        public HalfEdge<T> NextEdge { get; internal set; }  // Next half edge around the face
-	    public Mesh<T> Mesh => InitVertex.Mesh;
+        public Vertex InitVertex { get; }                // InitVertex at the end of the half-edge
+        public HalfEdge Opposite { get; internal set; }  // Half edge in opposite direction
+        public Face Face { get; internal set; }          // Face the half edge borders
+        public HalfEdge NextEdge { get; internal set; }  // Next half edge around the face
+	    public Mesh Mesh => InitVertex.Mesh;
         #endregion
 
         #region Traits
 
-        public HalfEdge<T> PreviousEdge
+        public HalfEdge PreviousEdge
         {
             // ReSharper disable PossibleNullReferenceException
             // ReSharper disable SuspiciousTypeConversion.Global
@@ -31,7 +35,7 @@ namespace MeshNav
             // ReSharper restore PossibleNullReferenceException
        }
 
-        private HalfEdge<T> FindPreviousEdge()
+        private HalfEdge FindPreviousEdge()
         {
             // We've got to have at least three edges to a face
             var curEdge = NextEdge.NextEdge;
@@ -45,7 +49,7 @@ namespace MeshNav
         #endregion
 
         #region Constructor
-        internal HalfEdge(Vertex<T> vertex, HalfEdge<T> opposite, Face<T> face, HalfEdge<T> nextEdge)
+        internal HalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
         {
             if (vertex != null)
             {
@@ -60,8 +64,8 @@ namespace MeshNav
         #endregion
 
         #region Accessors
-        public Vertex<T> NextVertex => Opposite/*NextEdge*/.InitVertex;
-        public Face<T> OppositeFace => Opposite.Face;
+        public Vertex NextVertex => Opposite/*NextEdge*/.InitVertex;
+        public Face OppositeFace => Opposite.Face;
         #endregion
     }
 }

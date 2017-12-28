@@ -1,25 +1,29 @@
-﻿using System;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav.RayedMesh
 {
-    public class RayedFactory<T> : Factory<T> where T : struct, IEquatable<T>, IFormattable
+    public class RayedFactory : Factory
     {
         public RayedFactory(int dimension) : base(dimension) { }
 
-        public override HalfEdge<T> CreateHalfEdge(Vertex<T> vertex, HalfEdge<T> opposite, Face<T> face, HalfEdge<T> nextEdge)
+        public override HalfEdge CreateHalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
         {
-            return new RayedHalfEdge<T>(vertex, opposite, face, nextEdge);
+            return new RayedHalfEdge(vertex, opposite, face, nextEdge);
         }
 
-        public override Vertex<T> CreateVertex(Mesh<T> mesh, Vector<T> vec)
+        public override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
         {
-            return new RayedVertex<T>(mesh, vec);
+            return new RayedVertex(mesh, vec);
         }
 
-        public override Face<T> CreateFace()
+        public override Face CreateFace()
         {
-            return new RayedFace<T>();
+            return new RayedFace();
         }
     }
 }

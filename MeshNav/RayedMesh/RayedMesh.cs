@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MeshNav.TraitInterfaces;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav.RayedMesh
 {
-    public class RayedMesh<T> : Mesh<T> where T : struct, IEquatable<T>, IFormattable
+    public class RayedMesh : Mesh
     {
         #region Private variables
         private int _boundaryCount;
         #endregion
 
         #region Properties
-        public override Face<T> BoundaryFace { get; }
+        public override Face BoundaryFace { get; }
         #endregion
 
         #region Constructor
@@ -26,32 +30,32 @@ namespace MeshNav.RayedMesh
         #endregion
 
         #region Building
-        public RayedVertex<T> AddRayedVertex(params T[] coords)
+        public RayedVertex AddRayedVertex(params T[] coords)
         {
             if (IsInitialized)
             {
                 throw new MeshNavException("Adding vertex to finalized mesh");
             }
-            var newVertex = AddVertex(coords) as RayedVertex<T>;
+            var newVertex = AddVertex(coords) as RayedVertex;
             // ReSharper disable once PossibleNullReferenceException
             newVertex.IsRayed = true;
-            MapVerticesToEdges[newVertex] = new List<HalfEdge<T>>();
+            MapVerticesToEdges[newVertex] = new List<HalfEdge>();
             return newVertex;
         }
 
-        internal RayedVertex<T> InternalAddRayedVertex(params T[] coords)
+        internal RayedVertex InternalAddRayedVertex(params T[] coords)
         {
             var newVertex = Factory.CreateVertex(this, coords);
             VerticesInternal.Add(newVertex);
-            return newVertex as RayedVertex<T>;
+            return newVertex as RayedVertex;
         }
 
         #endregion
 
         #region Factory
-        protected override Factory<T> GetFactory(int dimension)
+        protected override Factory GetFactory(int dimension)
         {
-            return new RayedFactory<T>(dimension);
+            return new RayedFactory(dimension);
         }
         #endregion
 
@@ -90,7 +94,7 @@ namespace MeshNav.RayedMesh
             {
                 var nextVertex = curEdge.Opposite.InitVertex;
                 // ReSharper disable once PossibleNullReferenceException
-                if (!(nextVertex as RayedVertex<T>).IsRayed)
+                if (!(nextVertex as RayedVertex).IsRayed)
                 {
                     throw new MeshNavException("Rayed Mesh has non-rayed vertex on border");
                 }
@@ -124,10 +128,10 @@ namespace MeshNav.RayedMesh
         #endregion
 
         #region Overrides
-        protected override void ValidatePolygon(Vertex<T>[] vertices)
+        protected override void ValidatePolygon(Vertex[] vertices)
         {
             base.ValidatePolygon(vertices);
-            var rayed = Enumerable.Range(0, vertices.Length).Where(i => ((RayedVertex<T>)vertices[i]).IsRayed).ToArray();
+            var rayed = Enumerable.Range(0, vertices.Length).Where(i => ((RayedVertex)vertices[i]).IsRayed).ToArray();
             if (rayed.Length > 0)
             {
                 if (rayed.Length != 2)
@@ -144,18 +148,18 @@ namespace MeshNav.RayedMesh
             }
         }
 
-        protected override void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge)
+        protected override void ChangeBoundaryToInternalHook(HalfEdge halfEdge)
         {
             // ReSharper disable PossibleNullReferenceException
-            if ((halfEdge as RayedHalfEdge<T>).IsAtInfinity)
+            if ((halfEdge as RayedHalfEdge).IsAtInfinity)
             {
                 throw new MeshNavException("Edge at infinity can only be created once");
             }
         }
 
-        protected override void AddBoundaryEdgeHook(HalfEdge<T> opposite)
+        protected override void AddBoundaryEdgeHook(HalfEdge opposite)
         {
-            if ((opposite as RayedHalfEdge<T>).IsAtInfinity)
+            if ((opposite as RayedHalfEdge).IsAtInfinity)
             {
                 _boundaryCount++;
                 BoundaryFace.HalfEdge = opposite;

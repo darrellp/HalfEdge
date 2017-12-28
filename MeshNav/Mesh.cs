@@ -1,9 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
+using static System.Diagnostics.Debug;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav
 {
@@ -30,10 +34,8 @@ namespace MeshNav
     ///             didn't need to information on all elements and wanted to save memory.
     ///             
     ///             Darrell Plank, 12/7/2017. </remarks>
-    ///
-    /// <typeparam name="T">    Generic type parameter. </typeparam>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class Mesh<T> where T : struct, IEquatable<T>, IFormattable
+    public class Mesh
     {
         #region Private variables
 
@@ -42,18 +44,18 @@ namespace MeshNav
         // Still, we need to verify which edges emanate from each vertex so during the construction we use a dictionary to
         // map the vertices to the edges which emanate from them.  When we finalize the mesh we can dereference the following
         // dictionary.
-        protected Dictionary<Vertex<T>, List<HalfEdge<T>>> MapVerticesToEdges = new Dictionary<Vertex<T>, List<HalfEdge<T>>>();
+        protected Dictionary<Vertex, List<HalfEdge>> MapVerticesToEdges = new Dictionary<Vertex, List<HalfEdge>>();
         #endregion
 
         #region Properties
         public object Tag { get; set; }
-        public IEnumerable<Vertex<T>> Vertices => VerticesInternal;
-        public IEnumerable<Face<T>> Faces => FacesInternal;
-        public IEnumerable<HalfEdge<T>> HalfEdges => HalfEdgesInternal;
+        public IEnumerable<Vertex> Vertices => VerticesInternal;
+        public IEnumerable<Face> Faces => FacesInternal;
+        public IEnumerable<HalfEdge> HalfEdges => HalfEdgesInternal;
         public bool IsInitialized { get; internal set; }
-        internal Factory<T> Factory { get; }
+        internal Factory Factory { get; }
 
-        public virtual Face<T> BoundaryFace => null;
+        public virtual Face BoundaryFace => null;
         #endregion
 
         #region Traits
@@ -67,9 +69,9 @@ namespace MeshNav
         #endregion
  
         #region Element collections
-        internal List<HalfEdge<T>> HalfEdgesInternal = new List<HalfEdge<T>>();
-        internal List<Vertex<T>> VerticesInternal = new List<Vertex<T>>();
-        internal List<Face<T>> FacesInternal = new List<Face<T>>();
+        internal List<HalfEdge> HalfEdgesInternal = new List<HalfEdge>();
+        internal List<Vertex> VerticesInternal = new List<Vertex>();
+        internal List<Face> FacesInternal = new List<Face>();
         #endregion
 
         #region Constructor
@@ -94,15 +96,15 @@ namespace MeshNav
             var halfEdge = Factory.CreateHalfEdge(null, null, null, null);
 
             BoundaryTrait = face is IBoundary;
-            NormalsTrait = vertex is INormal<T>;
+            NormalsTrait = vertex is INormal;
             UvTrait = vertex is IUV;
             PreviousEdgeTrait = halfEdge is IPreviousEdge<T>;
 	        RayedTrait = vertex is IRayed;
        }
 
-	    protected virtual Factory<T> GetFactory(int dimension)
+	    protected virtual Factory GetFactory(int dimension)
 	    {
-		    return new Factory<T>(dimension);
+		    return new Factory(dimension);
 	    }
         #endregion
 
@@ -121,7 +123,7 @@ namespace MeshNav
         ///
         /// <returns>   The new vertex with the given position </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public Vertex<T> AddVertex(params T[] coords)
+        public Vertex AddVertex(params T[] coords)
         {
             if (IsInitialized)
             {
@@ -130,7 +132,7 @@ namespace MeshNav
             return AddVertex(Factory.CreateVertex(this, coords));
         }
 
-        public Vertex<T> AddVertex(Vector<T> vec)
+        public Vertex AddVertex(Vector<T> vec)
         {
             if (IsInitialized)
             {
@@ -139,23 +141,23 @@ namespace MeshNav
             return AddVertex(Factory.CreateVertex(this, vec));
         }
 
-        internal Vertex<T> AddVertex(Vertex<T> vtx)
+        internal Vertex AddVertex(Vertex vtx)
         {
             if (IsInitialized)
             {
                 throw new MeshNavException("Adding vertex to finalized mesh");
             }
             VerticesInternal.Add(vtx);
-            MapVerticesToEdges[vtx] = new List<HalfEdge<T>>();
+            MapVerticesToEdges[vtx] = new List<HalfEdge>();
             return vtx;
         }
 
-        public Face<T> AddFace(IEnumerable<int> indices)
+        public Face AddFace(IEnumerable<int> indices)
 	    {
 		    return AddFaceEnumerable(indices.Select(i => VerticesInternal[i]));
 	    }
 
-	    public Face<T> AddFace(params Vertex<T>[] vertices)
+	    public Face AddFace(params Vertex[] vertices)
 	    {
 			return AddFaceEnumerable(vertices);
 
@@ -175,11 +177,11 @@ namespace MeshNav
         ///
         /// <returns>   The created Face </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public virtual Face<T> AddFaceEnumerable(IEnumerable<Vertex<T>> verticesEn)
+        public virtual Face AddFaceEnumerable(IEnumerable<Vertex> verticesEn)
         {
             var vertices = verticesEn.ToArray();
             ValidatePolygon(vertices);
-            HalfEdge<T> halfEdgePrev = null;
+            HalfEdge halfEdgePrev = null;
             var newFace = Factory.CreateFace();
             for (var i = 0; i < vertices.Length; i++)
             {
@@ -190,7 +192,7 @@ namespace MeshNav
                 }
                 var nextIndex = (i + 1) % vertices.Length;
                 var nextVertex = vertices[nextIndex];
-                HalfEdge<T> halfEdge = null;
+                HalfEdge halfEdge = null;
 
                 // See if we can find any previously constructed half edges here.  The only way that can happen is
                 // if the opposite face has already been constructed since there are only two faces that can
@@ -245,7 +247,7 @@ namespace MeshNav
                 }
                 halfEdgePrev = halfEdge;
             }
-            Debug.Assert(halfEdgePrev != null, "halfEdgePrev != null");
+            Assert(halfEdgePrev != null, "halfEdgePrev != null");
           
             halfEdgePrev.NextEdge = newFace.HalfEdge;
             newFace.HalfEdge.PreviousEdge = halfEdgePrev;
@@ -279,7 +281,7 @@ namespace MeshNav
         }
 #endregion
 
-#region Validation
+        #region Validation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Validates this mesh. </summary>
         ///
@@ -311,12 +313,12 @@ namespace MeshNav
         }
 #endregion
 
-#region Hooks
-	    protected virtual void AddBoundaryEdgeHook(HalfEdge<T> opposite) { }
+        #region Hooks
+	    protected virtual void AddBoundaryEdgeHook(HalfEdge opposite) { }
 	    protected virtual void FinalizeHook() { }
-        protected virtual void ChangeBoundaryToInternalHook(HalfEdge<T> halfEdge) { }
+        protected virtual void ChangeBoundaryToInternalHook(HalfEdge halfEdge) { }
 
-        protected virtual void ValidatePolygon(Vertex<T>[] vertices)
+        protected virtual void ValidatePolygon(Vertex[] vertices)
         {
             if (IsInitialized)
             {

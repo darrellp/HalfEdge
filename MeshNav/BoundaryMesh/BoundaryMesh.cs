@@ -1,35 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MeshNav.TraitInterfaces;
 
 namespace MeshNav.BoundaryMesh
 {
-    class BoundaryMesh<T> : Mesh<T> where T : struct, IEquatable<T>, IFormattable
+    class BoundaryMesh : Mesh
     {
         #region Private variables
-        private readonly HashSet<HalfEdge<T>> _boundaryEdges = new HashSet<HalfEdge<T>>();
+        private readonly HashSet<HalfEdge> _boundaryEdges = new HashSet<HalfEdge>();
         #endregion
 
         #region Properties
-        public List<Face<T>> BoundaryFaces { get; }
-        public override Face<T> BoundaryFace => null;
+        public List<Face> BoundaryFaces { get; }
+        public override Face BoundaryFace => null;
         #endregion
 
         #region Overrides
-        protected override void AddBoundaryEdgeHook(HalfEdge<T> edge)
+        protected override void AddBoundaryEdgeHook(HalfEdge edge)
         {
             _boundaryEdges.Add(edge);
         }
 
-        protected override void ChangeBoundaryToInternalHook(HalfEdge<T> edge)
+        protected override void ChangeBoundaryToInternalHook(HalfEdge edge)
         {
             _boundaryEdges.Remove(edge);
         }
 
-        protected override Factory<T> GetFactory(int dimension)
+        protected override Factory GetFactory(int dimension)
         {
-            return new BoundaryFactory<T>(dimension);
+            return new BoundaryFactory(dimension);
         }
 
         #endregion
@@ -45,7 +44,7 @@ namespace MeshNav.BoundaryMesh
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
 	    public BoundaryMesh(int dimension) : base(dimension)
 	    {
-            BoundaryFaces = new List<Face<T>>();
+            BoundaryFaces = new List<Face>();
 	    }
         #endregion
 

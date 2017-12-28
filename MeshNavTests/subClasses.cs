@@ -1,37 +1,41 @@
-﻿using System;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
 using MeshNav;
-using MeshNav.TraitInterfaces;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNavTests
 {
-	class VtxWithNormals<T> : Vertex<T>, INormal<T> where T : struct, IEquatable<T>, IFormattable
-	{
+	class VtxWithNormals : Vertex
+    { 
 	    public Vector<T> NormalAccessor { get; set; }
-	    public VtxWithNormals(Mesh<T> mesh, Vector<T> vec) : base(mesh, vec) { }
+	    public VtxWithNormals(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
 	}
 
-	class HalfEdgeFactoryWithNormals<T> : Factory<T> where T : struct, IEquatable<T>, IFormattable
+	class HalfEdgeFactoryWithNormals : Factory
 	{
 		public HalfEdgeFactoryWithNormals(int dimension) : base(dimension) { }
-		public override Vertex<T> CreateVertex(Mesh<T> mesh, Vector<T> vec)
+
+	    public override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
 		{
-			return new VtxWithNormals<T>(mesh, vec);
+			return new VtxWithNormals(mesh, vec);
 		}
 
-	    public override Mesh<T> CreateMesh()
+	    public override Mesh CreateMesh()
 	    {
-	        return new MeshWithNormals<T>(Dimension);
+	        return new MeshWithNormals(Dimension);
 	    }
 	}
 
-	class MeshWithNormals<T> : Mesh<T> where T : struct, IEquatable<T>, IFormattable
+    internal class MeshWithNormals : Mesh
 	{
 		public MeshWithNormals(int dimension) : base(dimension) {}
 
-		protected override Factory<T> GetFactory(int dimension)
+		protected override Factory GetFactory(int dimension)
 		{
-			return new HalfEdgeFactoryWithNormals<T>(dimension);
+			return new HalfEdgeFactoryWithNormals(dimension);
 		}
 	}
 }

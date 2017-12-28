@@ -1,14 +1,17 @@
-﻿using System;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
 using Assimp;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNav
 {
-    public class Factory<T> where T : struct, IEquatable<T>, IFormattable
+    public class Factory
     {
         #region Static Variables
-        protected static readonly VectorBuilder<T> Builder = Vector<T>.Build;
-        private readonly bool _fFloatType;
+        protected internal static readonly VectorBuilder<T> Builder = Vector<T>.Build;
         #endregion
 
         #region Private Variables
@@ -22,54 +25,45 @@ namespace MeshNav
         public Factory(int dimension)
         {
             Dimension = dimension;
-            if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            {
-                throw new MeshNavException("MeshNav only accepts types of float and double");
-            }
-            _fFloatType = typeof(T) == typeof(float);
         }
         #endregion
 
         #region Virtual functions
         internal Vector<T> FromVector3D(Vector3D vec)
         {
-            if (_fFloatType)
-            {
-                return Vector<float>.Build.DenseOfArray(new[] { vec.X, vec.Y, vec.Z }) as Vector<T>;
-            }
-	        // ReSharper disable RedundantCast
-            return Vector<double>.Build.DenseOfArray(new[] { (double)vec.X, (double)vec.Y, (double)vec.Z }) as Vector<T>;
-	        // ReSharper restore RedundantCast
+            // ReSharper disable RedundantCast
+            return Builder.DenseOfArray(new[] { (T)vec.X, (T)vec.Y, (T)vec.Z });
+            // ReSharper restore RedundantCast
         }
 
-        public virtual Mesh<T> CreateMesh()
+        public virtual Mesh CreateMesh()
         {
-            return new Mesh<T>(Dimension);
+            return new Mesh(Dimension);
         }
 
-        public Vertex<T> CreateVertex(Mesh<T> mesh, params T[] coords)
+        public Vertex CreateVertex(Mesh mesh, params T[] coords)
         {
             var vector = Builder.Dense(coords);
             return CreateVertex(mesh, vector);
         }
 
-        public virtual Vertex<T> CreateVertex(Mesh<T> mesh, Vector<T> vec)
+        public virtual Vertex CreateVertex(Mesh mesh, Vector<T> vec)
         {
             if (vec.Count != Dimension)
             {
                 throw new MeshNavException("Dimension mismatch");
             }
-            return new Vertex<T>(mesh, vec);
+            return new Vertex(mesh, vec);
         }
 
-        public virtual Face<T> CreateFace()
+        public virtual Face CreateFace()
 	    {
-		    return new Face<T>();
+		    return new Face();
 	    }
 
-	    public virtual HalfEdge<T> CreateHalfEdge(Vertex<T> vertex, HalfEdge<T> opposite, Face<T> face, HalfEdge<T> nextEdge)
+	    public virtual HalfEdge CreateHalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
 	    {
-		    return new HalfEdge<T>(vertex, opposite, face, nextEdge);
+		    return new HalfEdge(vertex, opposite, face, nextEdge);
 	    }
 
 		public static Vector<T> Vector(params T[] coords)
@@ -79,9 +73,7 @@ namespace MeshNav
 
 	    public Vector<T> ZeroVector()
 	    {
-		    return _fFloatType
-			    ? Utilities.FloatBuilder.Dense(Dimension) as Vector<T>
-			    : Utilities.DblBuilder.Dense(Dimension) as Vector<T>;
+			return Builder.Dense(Dimension);
 	    }
 		#endregion
 	}
