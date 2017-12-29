@@ -30,6 +30,24 @@ namespace MeshNav
         public HalfEdge Edge { get; internal set; }
         public int Dimension => Position.Count;
         public Mesh Mesh { get; }
+
+        public T X
+        {
+            get => this[0];
+            set => this[0] = value;
+        }
+
+        public T Y
+        {
+            get => this[1];
+            set => this[1] = value;
+        }
+
+        public T Z
+        {
+            get => this[2];
+            set => this[2] = value;
+        }
         #endregion
 
         #region Traits
@@ -72,24 +90,6 @@ namespace MeshNav
         {
             get => Position[index];
             set => Position[index] = value;
-        }
-
-        public T X
-        {
-            get => this[0];
-            set => this[0] = value;
-        }
-
-        public T Y
-        {
-            get => this[1];
-            set => this[1] = value;
-        }
-
-        public T Z
-        {
-            get => this[2];
-            set => this[2] = value;
         }
         #endregion
 
