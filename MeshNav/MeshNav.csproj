@@ -70,7 +70,6 @@
     <Compile Include="Import.cs" />
     <Compile Include="MasterTemplate\Template.cs" />
     <Compile Include="RayedMesh\RayedFace.cs" />
-    <Compile Include="RayedMesh\RayedHalfEdge.cs" />
     <Compile Include="RayedMesh\RayedFactory.cs" />
     <Compile Include="RayedMesh\RayedMesh.cs" />
     <Compile Include="RayedMesh\RayedVertex.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
+using MeshNav.TraitInterfaces;
 #if FLOAT
 using T = System.Single;
 #else
@@ -54,15 +55,16 @@ namespace MeshNav
 	    }
         #endregion
 
+        #region Vector Extensions
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-	    /// <summary>	Returns a vector 90 degrees in a CCW direction from the original. </summary>
-	    ///
-	    /// <remarks>	Darrellp, 2/27/2011. </remarks>
-	    ///
-	    /// <returns>	Vector 90 degrees from original. </returns>
-	    ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>	Returns a vector 90 degrees in a CCW direction from the original. </summary>
+        ///
+        /// <remarks>	Darrellp, 2/27/2011. </remarks>
+        ///
+        /// <returns>	Vector 90 degrees from original. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	    public static Vector<T> Flip90Ccw(this Vector<T> vec)
+        public static Vector<T> Flip90Ccw(this Vector<T> vec)
         {
 	        return Make(-vec.Y(), vec.X());
 	    }
@@ -93,6 +95,21 @@ namespace MeshNav
 	        return Make(vec.X() / (T)ln, vec.Y() / (T)ln);
 	        // ReSharper restore RedundantCast
 	    }
+        #endregion
+
+        #region Rayed HalfEdge
+
+	    public static bool IsAtInfinity(this IRayed iEdge)
+	    {
+	        var edge = iEdge as HalfEdge;
+	        if (edge == null)
+	        {
+	            throw new MeshNavException("Non-edge in IsAtInfinity");
+	        }
+		    return (edge.InitVertex as IRayed).IsRayed && (edge.NextVertex as IRayed).IsRayed;
+
+	    }
+        #endregion
         #endregion
     }
 }

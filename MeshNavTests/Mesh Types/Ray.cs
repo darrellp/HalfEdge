@@ -124,14 +124,6 @@ namespace Templates
         {
         }
 
-#if RAYED
-        // ReSharper disable PossibleNullReferenceException
-        public bool IsAtInfinity => (InitVertex as RayedVertex).IsRayed && (NextVertex as RayedVertex).IsRayed;
-        public bool IsInboundRay => (InitVertex as RayedVertex).IsRayed && !(NextVertex as RayedVertex).IsRayed;
-        public bool IsOutboundRay => !(InitVertex as RayedVertex).IsRayed && (NextVertex as RayedVertex).IsRayed;
-        // ReSharper restore PossibleNullReferenceException
-#endif
-
 #if PREVIOUSEDGE
         public HalfEdge PreviousEdgeAccessor { get; set; }
 #endif
@@ -139,10 +131,13 @@ namespace Templates
 
     public class RayVertex : Vertex
 #if NORMALS
-        ,INormal
+        , INormal
+#endif
+#if RAYED
+        , IRayed
 #endif
 #if UV
-        ,IUV
+        , IUV
 #endif
     {
         internal RayVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }

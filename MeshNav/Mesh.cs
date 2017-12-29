@@ -153,7 +153,14 @@ namespace MeshNav
 
         public Face AddFace(IEnumerable<int> indices)
 	    {
-		    return AddFaceEnumerable(indices.Select(i => VerticesInternal[i]));
+		    return AddFaceEnumerable(indices.Select(i =>
+		    {
+		        if (i < 0 || i >= VerticesInternal.Count)
+		        {
+		            throw new MeshNavException("Index out of bounds in AddFace");
+		        }
+		        return VerticesInternal[i];
+		    }));
 	    }
 
 	    public Face AddFace(params Vertex[] vertices)
@@ -185,6 +192,7 @@ namespace MeshNav
             for (var i = 0; i < vertices.Length; i++)
             {
                 var thisVertex = vertices[i];
+                
                 if (thisVertex.Mesh != this)
                 {
                     throw new MeshNavException("Using vertices which don't belong to this mesh is disallowed");

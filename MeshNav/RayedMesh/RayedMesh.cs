@@ -30,15 +30,15 @@ namespace MeshNav.RayedMesh
         #endregion
 
         #region Building
-        public RayedVertex AddRayedVertex(params T[] coords)
+        public Vertex AddRayedVertex(params T[] coords)
         {
             if (IsInitialized)
             {
                 throw new MeshNavException("Adding vertex to finalized mesh");
             }
-            var newVertex = AddVertex(coords) as RayedVertex;
+            var newVertex = AddVertex(coords);
             // ReSharper disable once PossibleNullReferenceException
-            newVertex.IsRayed = true;
+            (newVertex as IRayed).IsRayed = true;
             MapVerticesToEdges[newVertex] = new List<HalfEdge>();
             return newVertex;
         }
@@ -92,9 +92,9 @@ namespace MeshNav.RayedMesh
             }
             do
             {
-                var nextVertex = curEdge.Opposite.InitVertex;
+                var nextVertex = curEdge.NextVertex;
                 // ReSharper disable once PossibleNullReferenceException
-                if (!(nextVertex as RayedVertex).IsRayed)
+                if (!(nextVertex as IRayed).IsRayed)
                 {
                     throw new MeshNavException("Rayed Mesh has non-rayed vertex on border");
                 }
@@ -131,7 +131,7 @@ namespace MeshNav.RayedMesh
         protected override void ValidatePolygon(Vertex[] vertices)
         {
             base.ValidatePolygon(vertices);
-            var rayed = Enumerable.Range(0, vertices.Length).Where(i => ((RayedVertex)vertices[i]).IsRayed).ToArray();
+            var rayed = Enumerable.Range(0, vertices.Length).Where(i => ((IRayed)vertices[i]).IsRayed).ToArray();
             if (rayed.Length > 0)
             {
                 if (rayed.Length != 2)
@@ -151,7 +151,7 @@ namespace MeshNav.RayedMesh
         protected override void ChangeBoundaryToInternalHook(HalfEdge halfEdge)
         {
             // ReSharper disable PossibleNullReferenceException
-            if ((halfEdge as RayedHalfEdge).IsAtInfinity)
+            if (halfEdge.IsAtInfinity)
             {
                 throw new MeshNavException("Edge at infinity can only be created once");
             }
@@ -159,7 +159,7 @@ namespace MeshNav.RayedMesh
 
         protected override void AddBoundaryEdgeHook(HalfEdge opposite)
         {
-            if ((opposite as RayedHalfEdge).IsAtInfinity)
+            if (opposite.IsAtInfinity)
             {
                 _boundaryCount++;
                 BoundaryFace.HalfEdge = opposite;

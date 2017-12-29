@@ -46,10 +46,51 @@ namespace MeshNav
             return curEdge;
         }
 
+	    public bool IsAtInfinity
+	    {
+		    get
+		    {
+			    if (!Mesh.RayedTrait)
+			    {
+				    return false;
+			    }
+			    // ReSharper disable PossibleNullReferenceException
+			    return (InitVertex as IRayed).IsRayed && (NextVertex as IRayed).IsRayed;
+			    // ReSharper restore PossibleNullReferenceException
+		    }
+	    }
+
+	    public bool IsInboundRay
+		{
+		    get
+		    {
+			    if (!Mesh.RayedTrait)
+			    {
+				    return false;
+			    }
+			    // ReSharper disable PossibleNullReferenceException
+			    return (InitVertex as IRayed).IsRayed && !(NextVertex as IRayed).IsRayed;
+			    // ReSharper restore PossibleNullReferenceException
+		    }
+	    }
+
+	    public bool IsOutboundRay
+		{
+		    get
+		    {
+			    if (!Mesh.RayedTrait)
+			    {
+				    return false;
+			    }
+			    // ReSharper disable PossibleNullReferenceException
+			    return !(InitVertex as IRayed).IsRayed && (NextVertex as IRayed).IsRayed;
+				// ReSharper restore PossibleNullReferenceException
+			}
+	    }
         #endregion
 
-        #region Constructor
-        internal HalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
+		#region Constructor
+		internal HalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
         {
             if (vertex != null)
             {

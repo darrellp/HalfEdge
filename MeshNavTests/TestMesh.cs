@@ -222,7 +222,6 @@ namespace MeshNavTests
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
             mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
-            // Adding one ray is invalid
             var ptllRayed = mesh.AddRayedVertex(-1, -1);
             var ptlrRayed = mesh.AddRayedVertex(1, -1);
             var pturRayed = mesh.AddRayedVertex(1, 1);
@@ -235,7 +234,6 @@ namespace MeshNavTests
             var failed = false;
             try
             {
-                // One face with two rays doesn't complete the boundary
                 mesh.FinalizeMesh();
             }
             catch (Exception)
