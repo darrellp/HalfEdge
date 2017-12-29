@@ -67,7 +67,6 @@
   <ItemGroup>
     <Compile Include="Mesh Types\Boundary.cs" />
     <Compile Include="Mesh Types\Ray.cs" />
-    <Compile Include="subClasses.cs" />
     <Compile Include="TestMesh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestImport.cs" />
