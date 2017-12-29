@@ -38,7 +38,7 @@ namespace MeshNav
 
         public virtual Mesh CreateMesh()
         {
-            return new Mesh(Dimension);
+            return new Mesh(Dimension, this);
         }
 
         public Vertex CreateVertex(Mesh mesh, params T[] coords)

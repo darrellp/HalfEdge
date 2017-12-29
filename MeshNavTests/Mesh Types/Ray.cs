@@ -67,7 +67,7 @@ namespace Templates
 
         public override Mesh CreateMesh()
         {
-            return new RayMesh(Dimension);
+            return new RayMesh(Dimension, this);
         }
 
         public override Face CreateFace()
@@ -96,12 +96,7 @@ namespace Templates
         Mesh
 #endif
     {
-        public RayMesh(int dimension) : base(dimension) { }
-
-        protected override Factory GetFactory(int dimension)
-        {
-            return new  RayFactory(dimension);
-        }
+        public RayMesh(int dimension, Factory factory) : base(dimension, factory) { }
     }
 
     public class RayFace : Face
@@ -131,13 +126,13 @@ namespace Templates
 
     public class RayVertex : Vertex
 #if NORMALS
-        , INormal
+        ,INormal
 #endif
 #if RAYED
-        , IRayed
+        ,IRayed
 #endif
 #if UV
-        , IUV
+        ,IUV
 #endif
     {
         internal RayVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }

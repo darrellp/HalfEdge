@@ -67,7 +67,7 @@ namespace Templates
 
         public override Mesh CreateMesh()
         {
-            return new __TEMPLATE__Mesh(Dimension);
+            return new __TEMPLATE__Mesh(Dimension, this);
         }
 
         public override Face CreateFace()
@@ -96,12 +96,7 @@ namespace Templates
         Mesh
 #endif
     {
-        public __TEMPLATE__Mesh(int dimension) : base(dimension) { }
-
-        protected override Factory GetFactory(int dimension)
-        {
-            return new  __TEMPLATE__Factory(dimension);
-        }
+        public __TEMPLATE__Mesh(int dimension, Factory factory) : base(dimension, factory) { }
     }
 
     public class __TEMPLATE__Face : Face

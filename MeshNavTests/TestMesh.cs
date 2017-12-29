@@ -6,6 +6,7 @@ using Templates;
 
 namespace MeshNavTests
 {
+	// ReSharper disable PossibleNullReferenceException
     [TestClass]
     public class TestMesh
     {
@@ -23,7 +24,8 @@ namespace MeshNavTests
         [TestMethod]
         public void TestBuildSquare()
         {
-            var mesh = new BndMesh(2);
+            var mesh = new BndFactory(2).CreateMesh() as BndMesh;
+
             var face = BuildSquare(mesh);
             mesh.FinalizeMesh();
 
@@ -46,7 +48,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestBuildAdjacentSquares()
         {
-            var mesh = new BndMesh(2);
+            var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
             var ptL0 = mesh.AddVertex(0, 0);
             var ptU0 = mesh.AddVertex(0, 1);
@@ -68,9 +70,9 @@ namespace MeshNavTests
         [TestMethod]
         public void TestWrongOrdering()
         {
-            var mesh = new BndMesh(2);
+            var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
-            var ptL0 = mesh.AddVertex(0, 0);
+			var ptL0 = mesh.AddVertex(0, 0);
             var ptU0 = mesh.AddVertex(0, 1);
             var ptL1 = mesh.AddVertex(1, 0);
             var ptU1 = mesh.AddVertex(1, 1);
@@ -94,9 +96,9 @@ namespace MeshNavTests
         [TestMethod]
         public void TestCube()
         {
-            var mesh = new BndMesh(3);
+            var mesh = new BndFactory(3).CreateMesh() as BndMesh;
 
-            var pt000 = mesh.AddVertex(0, 0, 0);
+			var pt000 = mesh.AddVertex(0, 0, 0);
             var pt001 = mesh.AddVertex(0, 0, 1);
             var pt010 = mesh.AddVertex(0, 1, 0);
             var pt011 = mesh.AddVertex(0, 1, 1);
@@ -137,7 +139,7 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed1()
         {
-            var mesh = new RayMesh(2);
+            var mesh = new RayFactory(2).CreateMesh() as RayMesh;
 
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
@@ -160,11 +162,12 @@ namespace MeshNavTests
             Assert.IsTrue(failed);
         }
 
+	    // ReSharper disable InconsistentNaming
         [TestMethod]
         public void TestInvalidSquareRayed2()
         {
-            var mesh = new RayMesh(2);
-            var ptLL = mesh.AddVertex(0, 0);
+            var mesh = new RayFactory(2).CreateMesh() as RayMesh;
+			var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
@@ -189,8 +192,8 @@ namespace MeshNavTests
         [TestMethod]
         public void TestInvalidSquareRayed3()
         {
-            var mesh = new RayMesh(2);
-            var ptLL = mesh.AddVertex(0, 0);
+            var mesh = new RayFactory(2).CreateMesh() as RayMesh;
+			var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
@@ -216,8 +219,8 @@ namespace MeshNavTests
         [TestMethod]
         public void TestValidSquareRayed()
         {
-            var mesh = new RayMesh(2);
-            var ptLL = mesh.AddVertex(0, 0);
+            var mesh = new RayFactory(2).CreateMesh() as RayMesh;
+			var ptLL = mesh.AddVertex(0, 0);
             var ptLR = mesh.AddVertex(1, 0);
             var ptUL = mesh.AddVertex(0, 1);
             var ptUR = mesh.AddVertex(1, 1);
@@ -242,6 +245,7 @@ namespace MeshNavTests
             }
             Assert.IsFalse(failed);
         }
-
-    }
+		// ReSharper restore InconsistentNaming
+		// ReSharper restore PossibleNullReferenceException
+	}
 }

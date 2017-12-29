@@ -15,22 +15,22 @@ namespace MeshNav
     /// <summary>   A mesh. </summary>
     ///
     /// <remarks>   All the elements of a single mesh are contained in this structure.  It is created by adding
-    ///              vertices and then adding faces using those vertices.
+    ///             vertices and then adding faces using those vertices.
     ///             
     ///             We support various traits through the idea of Traits.  For each trait there is an interface
     ///             in the Traits namespace which applies to either a mesh, vertex, face or halfEdge.  Implementing
     ///             these interfaces in a subclass of the appropriate type enables that trait.  These subclassed
-    ///             types must be returned by a Factory so it needs to also be subclassed.
+    ///             types must be returned by a Factory so it also needs to also be subclassed.
     ///             
     ///             For instance, to allow PreviousEdges to be stored in HalfEdges, you need to create a new HalfEdge
     ///             class that implements IPreviousEdge.  You also need to subclass Factory with a factory
-    ///             that returns the new HalfEdges.  Finally, Mesh must be subclassed so that Mesh.GetFactory()
-    ///             returns the new factory.
-    ///             
-    ///             Originally I included an object "Tag" on all elements but this should be superseded by subclassing.
-    ///             If you want particular information to be stored on particular elements, subclass those elements
-    ///             and include that information in the subclass.  Of course, this could include a tag itself if you
-    ///             didn't need to information on all elements and wanted to save memory.
+    ///             that returns the new HalfEdges.
+    /// 
+    ///				The intention here is to be "factory" centric.  Create everything through properly subclassed factories.
+    ///				In order to make this easier there is a "template.cs" file which can be copied into a project and with
+    ///				a bit of defining the desired traits and one search and replace, you can usually create the mesh with
+    ///				all the desired traits you'd like.  If you want something beyond the supported traits you may have to
+    ///				do a little extra work.  There are simple instructions in the comments at the top of template.cs.
     ///             
     ///             Darrell Plank, 12/7/2017. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,17 +75,18 @@ namespace MeshNav
 
         #region Constructor
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Constructor. </summary>
-        ///
-        /// <remarks>   Construct a mesh whose points have a given dimension
-        ///             Darrell Plank, 12/7/2017. </remarks>
-        ///
-        /// <param name="dimension">    The dimension. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public Mesh(int dimension)
+	    ///  <summary>   Constructor. </summary>
+	    /// 
+	    ///  <remarks>   Construct a mesh whose points have a given dimension
+	    ///              Darrell Plank, 12/7/2017. </remarks>
+	    /// 
+	    ///  <param name="dimension">    The dimension. </param>
+	    ///  <param name="factory">		The factory for this mesh subclass </param>
+	    ////////////////////////////////////////////////////////////////////////////////////////////////////
+	    internal Mesh(int dimension, Factory factory)
         {
             // ReSharper disable once VirtualMemberCallInConstructor
-            Factory = GetFactory(dimension);
+            Factory = factory;
 
             // Determine supported traits by checking what Interfaces are supported by the elements
 
@@ -99,12 +100,7 @@ namespace MeshNav
             UvTrait = vertex is IUV;
             PreviousEdgeTrait = halfEdge is IPreviousEdge;
 	        RayedTrait = vertex is IRayed;
-       }
-
-	    protected virtual Factory GetFactory(int dimension)
-	    {
-		    return new Factory(dimension);
-	    }
+		}
         #endregion
 
         #region Build Methods
@@ -320,7 +316,7 @@ namespace MeshNav
         }
         #endregion
 
-#region Hooks
+		#region Hooks
 	    protected virtual void AddBoundaryEdgeHook(HalfEdge opposite) { }
 	    protected virtual void FinalizeHook() { }
         protected virtual void ChangeBoundaryToInternalHook(HalfEdge halfEdge) { }

@@ -1,5 +1,4 @@
-﻿using System;
-#if FLOAT
+﻿#if FLOAT
 using T = System.Single;
 #else
 using T = System.Double;

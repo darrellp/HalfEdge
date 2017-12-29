@@ -20,7 +20,7 @@ namespace MeshNav.RayedMesh
         #endregion
 
         #region Constructor
-        public RayedMesh(int dimension) : base(dimension)
+        public RayedMesh(int dimension, Factory factory) : base(dimension, factory)
         {
             BoundaryFace = Factory.CreateFace();
             // ReSharper disable once PossibleNullReferenceException
@@ -50,13 +50,6 @@ namespace MeshNav.RayedMesh
             return newVertex as RayedVertex;
         }
 
-        #endregion
-
-        #region Factory
-        protected override Factory GetFactory(int dimension)
-        {
-            return new RayedFactory(dimension);
-        }
         #endregion
 
         #region Finalization

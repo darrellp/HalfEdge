@@ -25,24 +25,19 @@ namespace MeshNav.BoundaryMesh
         {
             _boundaryEdges.Remove(edge);
         }
-
-        protected override Factory GetFactory(int dimension)
-        {
-            return new BoundaryFactory(dimension);
-        }
-
         #endregion
 
         #region Constructor
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-	    /// <summary>   Constructor. </summary>
-	    ///
-	    /// <remarks>   Construct a mesh whose points have a given dimension
-	    ///             Darrell Plank, 12/7/2017. </remarks>
-	    ///
-	    /// <param name="dimension">    The dimension. </param>
+	    ///  <summary>   Constructor. </summary>
+	    /// 
+	    ///  <remarks>   Construct a mesh whose points have a given dimension
+	    ///              Darrell Plank, 12/7/2017. </remarks>
+	    /// 
+	    ///  <param name="dimension">    The dimension. </param>
+	    ///  <param name="factory">			Factory for the subclass of this mesh </param>
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
-	    public BoundaryMesh(int dimension) : base(dimension)
+	    internal BoundaryMesh(int dimension, Factory factory) : base(dimension, factory)
 	    {
             BoundaryFaces = new List<Face>();
 	    }

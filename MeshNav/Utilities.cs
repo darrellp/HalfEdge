@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using MeshNav.TraitInterfaces;
 #if FLOAT
 using T = System.Single;
 #else
@@ -94,20 +93,6 @@ namespace MeshNav
 	        // ReSharper disable RedundantCast
 	        return Make(vec.X() / (T)ln, vec.Y() / (T)ln);
 	        // ReSharper restore RedundantCast
-	    }
-        #endregion
-
-        #region Rayed HalfEdge
-
-	    public static bool IsAtInfinity(this IRayed iEdge)
-	    {
-	        var edge = iEdge as HalfEdge;
-	        if (edge == null)
-	        {
-	            throw new MeshNavException("Non-edge in IsAtInfinity");
-	        }
-		    return (edge.InitVertex as IRayed).IsRayed && (edge.NextVertex as IRayed).IsRayed;
-
 	    }
         #endregion
         #endregion
