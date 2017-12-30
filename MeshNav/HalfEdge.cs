@@ -7,7 +7,7 @@ using T = System.Double;
 
 namespace MeshNav
 {
-    public class HalfEdge
+    public class HalfEdge : MeshComponent
     {
         #region Public Properties
         public Vertex InitVertex { get; }                // InitVertex at the end of the half-edge

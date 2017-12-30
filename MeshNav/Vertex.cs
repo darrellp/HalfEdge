@@ -23,7 +23,7 @@ namespace MeshNav
     ///             then we can place normals on this vertex.
     ///             Darrell Plank, 12/9/2017. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class Vertex
+    public class Vertex : MeshComponent
     {
         #region Public Properties
         public Vector<T> Position { get; set; }

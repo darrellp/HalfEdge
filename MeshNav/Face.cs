@@ -4,7 +4,7 @@ using MeshNav.TraitInterfaces;
 
 namespace MeshNav
 {
-    public class Face
+    public class Face : MeshComponent
     {
         #region Public Properties
         public HalfEdge HalfEdge { get; internal set; }

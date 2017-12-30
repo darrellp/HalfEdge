@@ -312,6 +312,21 @@ namespace MeshNav
             {
                 throw new MeshNavException("Faces with less than three sides not allowed");
             }
+
+            if (Faces.Where(f => f.IsAlive).Any(f => !f.HalfEdge.IsAlive))
+            {
+                throw new MeshNavException("Live faces point to dead halfedges");
+            }
+
+            if (Vertices.Where(v => v.IsAlive).Any(v => !v.Edge.IsAlive))
+            {
+                throw new MeshNavException("Live vertices point at dead half edges");
+            }
+
+            if (HalfEdges.Where(he => he.IsAlive).Any(he => !he.InitVertex.IsAlive || he.Face != null && !he.Face.IsAlive))
+            {
+                throw new MeshNavException("Live halfedge points at dead component");
+            }
             return true;
         }
         #endregion
