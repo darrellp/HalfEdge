@@ -68,7 +68,6 @@
     <Compile Include="Geometry2D.cs" />
     <Compile Include="HalfEdge.cs" />
     <Compile Include="Import.cs" />
-    <Compile Include="MasterTemplate\Template.cs" />
     <Compile Include="RayedMesh\RayedFace.cs" />
     <Compile Include="RayedMesh\RayedFactory.cs" />
     <Compile Include="RayedMesh\RayedMesh.cs" />
@@ -87,6 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MasterTemplate\MasterTemplate" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.2\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.2\build\AssimpNet.targets')" />
