@@ -23,6 +23,8 @@ namespace MeshNav.RayedMesh
         public RayedMesh(int dimension, Factory factory) : base(dimension, factory)
         {
             BoundaryFace = Factory.CreateFace();
+            // ReSharper disable once VirtualMemberCallInConstructor
+            FacesInternal.Add(BoundaryFace);
             // ReSharper disable once PossibleNullReferenceException
             // ReSharper disable once VirtualMemberCallInConstructor
             (BoundaryFace as IBoundary).IsBoundaryAccessor = true;
@@ -49,7 +51,6 @@ namespace MeshNav.RayedMesh
             VerticesInternal.Add(newVertex);
             return newVertex as RayedVertex;
         }
-
         #endregion
 
         #region Finalization

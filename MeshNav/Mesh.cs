@@ -282,7 +282,94 @@ namespace MeshNav
             }
             IsInitialized = true;
         }
-#endregion
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Makes a deep copy of this object. </summary>
+        ///
+        /// <remarks>   Darrell Plank, 12/31/2017. </remarks>
+        ///
+        /// <returns>   A copy of this object. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+	    public Mesh Clone()
+	    {
+		    var newMesh = Factory.CreateMesh();
+
+			var oldToNewVertex = new Dictionary<Vertex, Vertex>();
+			var oldToNewHalfEdge = new Dictionary<HalfEdge, HalfEdge>();
+			var oldToNewFace = new Dictionary<Face, Face>();
+		    var newVertices = new List<Vertex>();
+		    var newHalfEdges = new List<HalfEdge>();
+		    var newFaces = new List<Face>();
+
+		    foreach (var vertex in Vertices.Where(v => v.IsAlive))
+		    {
+			    var newVertex = Factory.CreateVertex(newMesh, vertex.Position.Clone());
+			    Factory.CloneVertex(newVertex, vertex);
+			    newVertices.Add(newVertex);
+			    oldToNewVertex[vertex] = newVertex;
+		    }
+
+		    foreach (var halfEdge in HalfEdges.Where(he => he.IsAlive))
+		    {
+			    var newHalfEdge = Factory.CreateHalfEdge(oldToNewVertex[halfEdge.InitVertex],
+					null, null, null);
+				Factory.CloneHalfEdge(newHalfEdge, halfEdge, oldToNewVertex);
+			    newHalfEdges.Add(newHalfEdge);
+			    oldToNewHalfEdge[halfEdge] = newHalfEdge;
+		    }
+
+		    foreach (var face in Faces.Where(f => f.IsAlive))
+		    {
+			    var newFace = Factory.CreateFace();
+			    newFace.HalfEdge = oldToNewHalfEdge[face.HalfEdge];
+				Factory.CloneFace(newFace, face, oldToNewHalfEdge, oldToNewVertex);
+			    newFaces.Add(newFace);
+			    oldToNewFace[face] = newFace;
+		    }
+
+		    newMesh.VerticesInternal = newVertices;
+		    newMesh.HalfEdgesInternal = newHalfEdges;
+		    newMesh.FacesInternal = newFaces;
+
+		    newMesh.PatchClone(
+                this,
+			    oldToNewVertex,
+			    oldToNewHalfEdge,
+			    oldToNewFace);
+#if DEBUG
+	        newMesh.Validate();
+#endif
+            return newMesh;
+	    }
+
+        /// <summary>
+        /// Final patching of components in the mesh
+        /// </summary>
+        /// 
+        /// <remarks> We don't have all the information necessary to finalize the components when
+        /// we first clone so this gives us a final pass to patch everything up. The order of cloning
+        /// is vertices, then halfedges and finally faces.  This means that vertices don't have any
+        /// access to any other components, halfedges don't have access to other halfedges or faces
+        /// and faces don't have any access to other faces.  Any of these components need to be patched
+        /// up here. </remarks>
+        /// <param name="oldToNewVertex"> Mapping </param>
+        /// <param name="oldToNewHalfEdge"> Mapping </param>
+        /// <param name="oldToNewFace"> Mapping </param>
+        protected virtual void PatchClone(Mesh oldMesh, Dictionary<Vertex, Vertex> oldToNewVertex, Dictionary<HalfEdge, HalfEdge> oldToNewHalfEdge, Dictionary<Face, Face> oldToNewFace)
+	    {
+            // Vertex edges got set up in Edge constructor so no need to patch that here
+
+		    foreach (var halfEdge in HalfEdges)
+		    {
+                // These components were unavailable during the first pass through cloning and we stored the
+                // old components in their place - time to fix that.
+			    halfEdge.Face = oldToNewFace[halfEdge.Face];
+			    halfEdge.NextEdge = oldToNewHalfEdge[halfEdge.NextEdge];
+		        halfEdge.Opposite = oldToNewHalfEdge[halfEdge.Opposite];
+		    }
+	    }
+
+	    #endregion
 
         #region Validation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,9 +405,9 @@ namespace MeshNav
                 throw new MeshNavException("Live faces point to dead halfedges");
             }
 
-            if (Vertices.Where(v => v.IsAlive).Any(v => !v.Edge.IsAlive))
+            if (Vertices.Where(v => v.IsAlive).Any(v => v.Mesh != this || !v.Edge.IsAlive))
             {
-                throw new MeshNavException("Live vertices point at dead half edges");
+                throw new MeshNavException("Live vertices point at dead half edges or don't belong to this mesh");
             }
 
             if (HalfEdges.Where(he => he.IsAlive).Any(he => !he.InitVertex.IsAlive || he.Face != null && !he.Face.IsAlive))

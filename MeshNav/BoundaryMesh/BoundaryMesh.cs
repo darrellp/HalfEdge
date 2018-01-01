@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MeshNav.TraitInterfaces;
+using static System.Diagnostics.Debug;
 
 namespace MeshNav.BoundaryMesh
 {
@@ -11,7 +12,7 @@ namespace MeshNav.BoundaryMesh
         #endregion
 
         #region Properties
-        public List<Face> BoundaryFaces { get; }
+        public List<Face> BoundaryFaces { get; internal set; }
         public override Face BoundaryFace => null;
         #endregion
 
@@ -61,6 +62,7 @@ namespace MeshNav.BoundaryMesh
             {
                 var curEdge = _boundaryEdges.First();
                 var boundaryFace = Factory.CreateFace();
+                FacesInternal.Add(boundaryFace);
                 BoundaryFaces.Add(boundaryFace);
                 // ReSharper disable once PossibleNullReferenceException
                 (boundaryFace as IBoundary).IsBoundaryAccessor = true;
@@ -73,11 +75,11 @@ namespace MeshNav.BoundaryMesh
                 do
                 {
                     _boundaryEdges.Remove(curEdge);
-                    var nextVertex = curEdge.Opposite.InitVertex;
+                    var nextVertex = curEdge.NextVertex;
                     var foundNextEdge = false;
-                    foreach (var halfEdge in MapVerticesToEdges[nextVertex])
+                    foreach (var nextEdge in MapVerticesToEdges[nextVertex])
                     {
-                        if (halfEdge.Face == null)
+                        if (nextEdge.Face == null)
                         {
                             if (foundNextEdge)
                             {
@@ -85,8 +87,10 @@ namespace MeshNav.BoundaryMesh
                                 throw new MeshNavException("Found three outside edges at a node");
                             }
                             foundNextEdge = true;
-                            curEdge.NextEdge = halfEdge;
-                            curEdge = halfEdge;
+                            curEdge.NextEdge = nextEdge;
+                            nextEdge.PreviousEdge = curEdge;
+
+                            curEdge = nextEdge;
                             curEdge.Face = boundaryFace;
                         }
                     }

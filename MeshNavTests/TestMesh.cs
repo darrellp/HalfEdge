@@ -38,6 +38,17 @@ namespace MeshNavTests
                 Assert.AreEqual(mesh.BoundaryFaces[0], halfEdge.OppositeFace);
             }
 
+            mesh = (BndMesh)mesh.Clone();
+            face = mesh.Faces.First(f => !f.IsBoundary);
+            Assert.AreEqual(1, mesh.BoundaryFaces.Count);
+            Assert.AreEqual(4, face.Edges().Count());
+            Assert.AreEqual(4, mesh.BoundaryFaces[0].Edges().Count());
+            foreach (var halfEdge in face.Edges())
+            {
+                Assert.AreEqual(face, halfEdge.Face);
+                Assert.AreEqual(mesh.BoundaryFaces[0], halfEdge.OppositeFace);
+            }
+
             // Only real way to test the PreviousEdge is to debug and check that we use the
             // PreviousEdge stored in the HalfEdge rather than calculating by walking around
             // the face.

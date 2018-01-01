@@ -38,6 +38,7 @@ namespace MeshNav
 	                {
 		                mesh.AddFace(face.Indices);
 	                }
+                    mesh.FinalizeMesh();
 	                mesh.Validate();
                 }
             }

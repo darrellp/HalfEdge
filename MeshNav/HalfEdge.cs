@@ -17,6 +17,13 @@ namespace MeshNav
 	    public Mesh Mesh => InitVertex.Mesh;
         #endregion
 
+        #region DEBUGGING
+#if DEBUG
+        private static int _idNext = 0;
+        private readonly int _id;
+#endif
+#endregion
+
         #region Traits
 
         public HalfEdge PreviousEdge
@@ -100,6 +107,9 @@ namespace MeshNav
             Opposite = opposite;
             Face = face;
             NextEdge = nextEdge;
+#if DEBUG
+            _id = _idNext++;
+#endif
         }
 		internal HalfEdge(){}
         #endregion
@@ -107,6 +117,19 @@ namespace MeshNav
         #region Accessors
         public Vertex NextVertex => Opposite/*NextEdge*/.InitVertex;
         public Face OppositeFace => Opposite.Face;
+        #endregion
+
+        #region Overrides
+
+        public override string ToString()
+        {
+            var tag = string.Empty;
+#if DEBUG
+            tag = $" - {_id}";
+#endif
+            return $"{InitVertex} - {NextVertex}{tag}";
+        }
+
         #endregion
     }
 }

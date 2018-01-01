@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra;
+﻿using System.Collections.Generic;
+using MathNet.Numerics.LinearAlgebra;
 using Assimp;
 #if FLOAT
 using T = System.Single;
@@ -12,9 +13,6 @@ namespace MeshNav
     {
         #region Static Variables
         protected internal static readonly VectorBuilder<T> Builder = Vector<T>.Build;
-        #endregion
-
-        #region Private Variables
         #endregion
 
         #region Public properties
@@ -76,5 +74,51 @@ namespace MeshNav
 			return Builder.Dense(Dimension);
 	    }
 		#endregion
-	}
+
+		/// <summary>
+		/// Clone the new vertex from the old vertex.
+		/// </summary>
+		/// 
+		/// <remarks> The position has been set.  No new HalfEdges are available yet and should be
+		/// set in Mesh.PatchClone(). We have to set the old edge though so we can reference it
+		/// in PatchClone. </remarks>
+		/// 
+		/// <param name="newVertex"> The vertex being cloned into </param>
+		/// <param name="oldVertex"> The vertex being cloned from </param>
+	    protected internal virtual void CloneVertex(Vertex newVertex, Vertex oldVertex)
+		{
+			newVertex.Edge = oldVertex.Edge;
+		}
+
+		/// <summary>
+		/// Clone the new halfedge from the old halfedge.
+		/// </summary>
+		/// 
+		/// <remarks> The only thing set to this point is the initial vertex.  No new halfedges
+		/// or faces are available yet and should be set in Mesh.PatchClone.  We have to set the
+		/// face. opposite and nextEdge however so they can be references in PatchClone. </remarks>
+		/// 
+		/// <param name="newHalfEdge"> New halfedge to clone into </param>
+		/// <param name="halfEdge"> Old halfedge we're cloning from </param>
+		/// <param name="oldToNewVertex"> Mapping from old vertices to new vertices </param>
+		protected internal virtual void CloneHalfEdge(HalfEdge newHalfEdge, HalfEdge halfEdge, Dictionary<Vertex, Vertex> oldToNewVertex)
+		{
+			newHalfEdge.NextEdge = halfEdge.NextEdge;
+			newHalfEdge.Face = halfEdge.Face;
+		    newHalfEdge.Opposite = halfEdge.Opposite;
+		}
+
+		/// <summary>
+		/// Clone the new face from the old face.
+		/// </summary>
+		/// 
+		/// <remarks> This has already had it's halfedge set so really nothing to do for normal mesh </remarks>
+		/// <param name="newFace"> New face to clone to </param>
+		/// <param name="face"> Face we're cloning from </param>
+		/// <param name="oldToNewHalfEdge"> Mapping from old HalfEdges to new </param>
+		/// <param name="oldToNewVertex"> Mapping from old vertices to new </param>
+		protected internal virtual void CloneFace(Face newFace, Face face, Dictionary<HalfEdge, HalfEdge> oldToNewHalfEdge, Dictionary<Vertex, Vertex> oldToNewVertex)
+	    {
+	    }
+    }
 }

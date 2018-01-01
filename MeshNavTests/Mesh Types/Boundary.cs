@@ -36,6 +36,9 @@
 #error Precisely one boundary condition should be defined in the template
 #endif
 
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 #if FLOAT
 using T = System.Single;
 #else
@@ -85,6 +88,37 @@ namespace Templates
             return new BndVertex(mesh, vec);
         }
 
+	    protected internal override void CloneVertex(Vertex newVertex, Vertex oldVertex)
+		{
+			base.CloneVertex(newVertex, oldVertex);
+            
+		    // ReSharper disable PossibleNullReferenceException
+#if NORMALS
+			(newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
+#endif
+#if UV
+			(newVertex as IUV).UvAccessor = (oldVertex as IUV).UvAccessor;
+#endif
+		    // ReSharper restore PossibleNullReferenceException
+		}
+
+		protected internal override void CloneHalfEdge(HalfEdge newHalfEdge, HalfEdge halfEdge, Dictionary<Vertex, Vertex> oldToNewVertex)
+		{
+			base.CloneHalfEdge(newHalfEdge, halfEdge, oldToNewVertex);
+		    // ReSharper disable PossibleNullReferenceException
+#if PREVIOUSEDGE
+			(newHalfEdge as IPreviousEdge).PreviousEdgeAccessor = (halfEdge as IPreviousEdge).PreviousEdgeAccessor;
+#endif
+		    // ReSharper restore PossibleNullReferenceException
+		}
+
+        [Conditional("NORMALS")]
+        private static void FactoryNormalsCloneVertex(Vertex newVertex, Vertex oldVertex)
+        {
+            // ReSharper disable PossibleNullReferenceException
+            (newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
+            // ReSharper restore PossibleNullReferenceException
+        }
     }
 
     public class BndMesh :
@@ -97,7 +131,37 @@ namespace Templates
 #endif
     {
         public BndMesh(int dimension, Factory factory) : base(dimension, factory) { }
-    }
+
+        protected override void PatchClone(Mesh oldMesh, Dictionary<Vertex, Vertex> oldToNewVertex, Dictionary<HalfEdge, HalfEdge> oldToNewHalfEdge, Dictionary<Face, Face> oldToNewFace)
+        {
+            base.PatchClone(oldMesh, oldToNewVertex, oldToNewHalfEdge, oldToNewFace);
+#if BOUNDARY
+            BoundaryFaces = ((BoundaryMesh) oldMesh).BoundaryFaces.Select(f => oldToNewFace[f]).ToList();
+#endif
+#if PREVIOUSEDGE
+            foreach (var halfEdge in HalfEdges)
+            {
+                // ReSharper disable PossibleNullReferenceException
+                (halfEdge as IPreviousEdge).PreviousEdgeAccessor = oldToNewHalfEdge[(halfEdge as IPreviousEdge).PreviousEdgeAccessor];
+                // ReSharper restore PossibleNullReferenceException
+            }
+#endif
+        }
+#if PREVIOUSEDGE
+	    public override bool Validate()
+	    {
+		    base.Validate();
+		    foreach (var edge in HalfEdges)
+		    {
+			    if ((edge as IPreviousEdge).PreviousEdgeAccessor == null)
+			    {
+				    throw new MeshNavException("Edge doesn't contain a previous edge");
+			    }
+		    }
+		    return true;
+	    }
+#endif
+	}
 
     public class BndFace : Face
 #if BOUNDARY || RAYED
