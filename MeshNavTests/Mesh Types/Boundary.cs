@@ -22,7 +22,7 @@
 
 // Define only ONE of the following three defines to specify how boundary conditions are handled
 
-//#define NULLBND
+//#define NULLBnd
 #define BOUNDARY
 //#define RAYED
 
@@ -32,29 +32,29 @@
 #define UV
 
 #region Template Definition
-#if (RAYED && BOUNDARY) || (RAYED && NULLBND) || (BOUNDAY && NULLBND) || (!BOUNDARY && !NULLBND && !RAYED)
+#if (RAYED && BOUNDARY) || (RAYED && NULLBnd) || (BOUNDAY && NULLBnd) || (!BOUNDARY && !NULLBnd && !RAYED)
 #error Precisely one boundary condition should be defined in the template
 #endif
 
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 #if FLOAT
 using T = System.Single;
 #else
 using T = System.Double;
 #endif
 
-// ReSharper disable once RedundantUsingDirective
+// ReSharper disable RedundantUsingDirective
 using MeshNav;
 using MathNet.Numerics.LinearAlgebra;
-// ReSharper disable RedundantUsingDirective
 using MeshNav.RayedMesh;
 using MeshNav.BoundaryMesh;
 using MeshNav.TraitInterfaces;
 // ReSharper restore RedundantUsingDirective
-
-
+// ReSharper disable PossibleNullReferenceException
+// ReSharper disable InconsistentNaming
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // namespace: MeshNav.TemplateFactory
@@ -64,7 +64,7 @@ using MeshNav.TraitInterfaces;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace Templates
 {
-    public class BndFactory : Factory
+    public partial class BndFactory : Factory
     {
         public BndFactory(int dimension) : base(dimension) { }
 
@@ -88,40 +88,21 @@ namespace Templates
             return new BndVertex(mesh, vec);
         }
 
-	    protected internal override void CloneVertex(Vertex newVertex, Vertex oldVertex)
-		{
-			base.CloneVertex(newVertex, oldVertex);
-            
-		    // ReSharper disable PossibleNullReferenceException
-#if NORMALS
-			(newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
-#endif
-#if UV
-			(newVertex as IUV).UvAccessor = (oldVertex as IUV).UvAccessor;
-#endif
-		    // ReSharper restore PossibleNullReferenceException
-		}
-
-		protected internal override void CloneHalfEdge(HalfEdge newHalfEdge, HalfEdge halfEdge, Dictionary<Vertex, Vertex> oldToNewVertex)
-		{
-			base.CloneHalfEdge(newHalfEdge, halfEdge, oldToNewVertex);
-		    // ReSharper disable PossibleNullReferenceException
-#if PREVIOUSEDGE
-			(newHalfEdge as IPreviousEdge).PreviousEdgeAccessor = (halfEdge as IPreviousEdge).PreviousEdgeAccessor;
-#endif
-		    // ReSharper restore PossibleNullReferenceException
-		}
-
-        [Conditional("NORMALS")]
-        private static void FactoryNormalsCloneVertex(Vertex newVertex, Vertex oldVertex)
+        protected internal override void CloneVertex(Vertex newVertex, Vertex oldVertex)
         {
-            // ReSharper disable PossibleNullReferenceException
-            (newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
-            // ReSharper restore PossibleNullReferenceException
+            base.CloneVertex(newVertex, oldVertex);
+            FactoryNormalsCloneVertex(newVertex, oldVertex);
+            FactoryUVCloneVertex(newVertex, oldVertex);
+        }
+
+        protected internal override void CloneHalfEdge(HalfEdge newHalfEdge, HalfEdge halfEdge, Dictionary<Vertex, Vertex> oldToNewVertex)
+        {
+            base.CloneHalfEdge(newHalfEdge, halfEdge, oldToNewVertex);
+            FactoryPreviousEdgeCloneHalfedge(newHalfEdge, halfEdge);
         }
     }
 
-    public class BndMesh :
+    public partial class BndMesh :
 #if BOUNDARY
         BoundaryMesh
 #elif RAYED
@@ -135,33 +116,17 @@ namespace Templates
         protected override void PatchClone(Mesh oldMesh, Dictionary<Vertex, Vertex> oldToNewVertex, Dictionary<HalfEdge, HalfEdge> oldToNewHalfEdge, Dictionary<Face, Face> oldToNewFace)
         {
             base.PatchClone(oldMesh, oldToNewVertex, oldToNewHalfEdge, oldToNewFace);
-#if BOUNDARY
-            BoundaryFaces = ((BoundaryMesh) oldMesh).BoundaryFaces.Select(f => oldToNewFace[f]).ToList();
-#endif
-#if PREVIOUSEDGE
-            foreach (var halfEdge in HalfEdges)
-            {
-                // ReSharper disable PossibleNullReferenceException
-                (halfEdge as IPreviousEdge).PreviousEdgeAccessor = oldToNewHalfEdge[(halfEdge as IPreviousEdge).PreviousEdgeAccessor];
-                // ReSharper restore PossibleNullReferenceException
-            }
-#endif
+            MeshBoundaryHalfClone(oldMesh, oldToNewFace);
+            MeshPreviousEdgeHalfClone(oldToNewHalfEdge);
         }
-#if PREVIOUSEDGE
-	    public override bool Validate()
-	    {
-		    base.Validate();
-		    foreach (var edge in HalfEdges)
-		    {
-			    if ((edge as IPreviousEdge).PreviousEdgeAccessor == null)
-			    {
-				    throw new MeshNavException("Edge doesn't contain a previous edge");
-			    }
-		    }
-		    return true;
-	    }
-#endif
-	}
+
+        public override bool Validate()
+        {
+            base.Validate();
+            MeshPreviousEdgeValidate();
+            return true;
+        }
+    }
 
     public class BndFace : Face
 #if BOUNDARY || RAYED
@@ -190,13 +155,13 @@ namespace Templates
 
     public class BndVertex : Vertex
 #if NORMALS
-        ,INormal
+        , INormal
 #endif
 #if RAYED
         ,IRayed
 #endif
 #if UV
-        ,IUV
+        , IUV
 #endif
     {
         internal BndVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
@@ -212,6 +177,65 @@ namespace Templates
         public Vector<T> UvAccessor { get; set; }
 #endif
     }
+
+    #region Conditionals
+    public partial class BndFactory
+    {
+        [Conditional("NORMALS")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void FactoryNormalsCloneVertex(Vertex newVertex, Vertex oldVertex)
+        {
+            (newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
+        }
+
+        [Conditional("UV")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void FactoryUVCloneVertex(Vertex newVertex, Vertex oldVertex)
+        {
+            (newVertex as IUV).UvAccessor = (oldVertex as IUV).UvAccessor;
+        }
+
+        [Conditional("UV")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void FactoryPreviousEdgeCloneHalfedge(HalfEdge newHalfEdge, HalfEdge halfEdge)
+        {
+            (newHalfEdge as IPreviousEdge).PreviousEdgeAccessor = (halfEdge as IPreviousEdge).PreviousEdgeAccessor;
+        }
+    }
+
+    public partial class BndMesh
+    {
+        [Conditional("BOUNDARY")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void MeshBoundaryHalfClone(Mesh oldMesh, Dictionary<Face, Face> oldToNewFace)
+        {
+            BoundaryFaces = ((BoundaryMesh)oldMesh).BoundaryFaces.Select(f => oldToNewFace[f]).ToList();
+        }
+
+        [Conditional("PREVIOUSEDGE")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void MeshPreviousEdgeHalfClone(Dictionary<HalfEdge, HalfEdge> oldToNewHalfEdge)
+        {
+            foreach (var halfEdge in HalfEdges)
+            {
+                (halfEdge as IPreviousEdge).PreviousEdgeAccessor = oldToNewHalfEdge[(halfEdge as IPreviousEdge).PreviousEdgeAccessor];
+            }
+        }
+
+        [Conditional("PREVIOUSEDGE")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void MeshPreviousEdgeValidate()
+        {
+            foreach (var edge in HalfEdges)
+            {
+                if ((edge as IPreviousEdge).PreviousEdgeAccessor == null)
+                {
+                    throw new MeshNavException("Edge doesn't contain a previous edge");
+                }
+            }
+        }
+    }
+    #endregion
 }
 #endregion
 #endif

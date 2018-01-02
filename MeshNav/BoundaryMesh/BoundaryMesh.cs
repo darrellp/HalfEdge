@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MeshNav.TraitInterfaces;
-using static System.Diagnostics.Debug;
 
 namespace MeshNav.BoundaryMesh
 {

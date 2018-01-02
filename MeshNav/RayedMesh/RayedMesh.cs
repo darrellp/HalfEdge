@@ -93,9 +93,9 @@ namespace MeshNav.RayedMesh
                     throw new MeshNavException("Rayed Mesh has non-rayed vertex on border");
                 }
                 var foundNextEdge = false;
-                foreach (var halfEdge in MapVerticesToEdges[nextVertex])
+                foreach (var nextEdge in MapVerticesToEdges[nextVertex])
                 {
-                    if (halfEdge.Face == BoundaryFace)
+                    if (nextEdge.Face == BoundaryFace)
                     {
                         if (foundNextEdge)
                         {
@@ -104,8 +104,9 @@ namespace MeshNav.RayedMesh
                         }
                         foundNextEdge = true;
                         edgeCount++;
-                        curEdge.NextEdge = halfEdge;
-                        curEdge = halfEdge;
+                        curEdge.NextEdge = nextEdge;
+                        nextEdge.PreviousEdge = curEdge;
+                        curEdge = nextEdge;
                     }
                 }
                 if (!foundNextEdge)

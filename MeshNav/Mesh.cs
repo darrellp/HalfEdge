@@ -352,6 +352,7 @@ namespace MeshNav
         /// access to any other components, halfedges don't have access to other halfedges or faces
         /// and faces don't have any access to other faces.  Any of these components need to be patched
         /// up here. </remarks>
+        /// <param name="oldMesh"> Previous mesh we're cloning from </param>
         /// <param name="oldToNewVertex"> Mapping </param>
         /// <param name="oldToNewHalfEdge"> Mapping </param>
         /// <param name="oldToNewFace"> Mapping </param>

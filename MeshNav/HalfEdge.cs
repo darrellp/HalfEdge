@@ -19,7 +19,7 @@ namespace MeshNav
 
         #region DEBUGGING
 #if DEBUG
-        private static int _idNext = 0;
+        private static int _idNext;
         private readonly int _id;
 #endif
 #endregion
@@ -123,6 +123,7 @@ namespace MeshNav
 
         public override string ToString()
         {
+            // ReSharper disable once RedundantAssignment
             var tag = string.Empty;
 #if DEBUG
             tag = $" - {_id}";
