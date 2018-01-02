@@ -81,7 +81,7 @@ namespace MeshNav
 		/// <returns>	Dot product. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static double Dot(Vector<T> pt1, Vector<T> pt2)
+		public static T Dot(Vector<T> pt1, Vector<T> pt2)
 		{
 			return pt1.X() * pt2.X() + pt1.Y() * pt2.Y();
 		}
@@ -103,7 +103,7 @@ namespace MeshNav
         /// <returns>	Distance from the point to the line. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static double PtToLineDistance(Vector<T> ptTest, Vector<T> ptLine1, Vector<T> ptLine2)
+        public static T PtToLineDistance(Vector<T> ptTest, Vector<T> ptLine1, Vector<T> ptLine2)
 		{
 			var ptVec12 = (ptLine2 - ptLine1).Flip90Ccw().Normalize();
 			var ptRel = ptTest - ptLine1;
@@ -178,7 +178,7 @@ namespace MeshNav
 		/// <returns>	Signed area of the triangle. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static double SignedArea(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
+		public static T SignedArea(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
 		{
 		    var x1 = pt1.X();
 		    var x2 = pt2.X();
@@ -186,9 +186,33 @@ namespace MeshNav
 		    var y1 = pt1.Y();
 		    var y2 = pt2.Y();
 		    var y3 = pt3.Y();
-			return (x2 - x1) * (y3 - y1) -
-				(x3 - x1) * (y2 - y1);
+			return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
 		}
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Signed area of a polygon.
+        /// </summary>
+        ///
+        /// <remarks>   It's positive if the points are in counterclockwise order,
+        ///             negative otherwise and it's absolute value is the area of the polygon.
+        ///             Darrell Plank, 1/1/2018. </remarks>
+        ///
+        /// <param name="polyPoints">   The polygon points. </param>
+        ///
+        /// <returns>   Signed area of a polygon. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        public static T SignedArea(List<Vector<T>> polyPoints)
+        {
+            T area = 0;
+            for (var i = 0; i < polyPoints.Count - 2; i++)
+            {
+                var pti = polyPoints[i];
+                var ptip1 = polyPoints[i + 1];
+                area += (pti.X() + ptip1.X()) * (ptip1.Y() - pti.Y());
+            }
+            return area;
+        }
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Determine if pt1, pt2, pt3 occur in Counter Clockwise order. </summary>
