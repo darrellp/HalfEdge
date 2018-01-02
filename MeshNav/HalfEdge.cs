@@ -10,10 +10,10 @@ namespace MeshNav
     public class HalfEdge : MeshComponent
     {
         #region Public Properties
-        public Vertex InitVertex { get; }                // InitVertex at the end of the half-edge
-        public HalfEdge Opposite { get; internal set; }  // Half edge in opposite direction
-        public Face Face { get; internal set; }          // Face the half edge borders
-        public HalfEdge NextEdge { get; internal set; }  // Next half edge around the face
+        public Vertex InitVertex { get; internal set; }     // InitVertex at the end of the half-edge
+        public HalfEdge Opposite { get; internal set; }     // Half edge in opposite direction
+        public Face Face { get; internal set; }             // Face the half edge borders
+        public HalfEdge NextEdge { get; internal set; }     // Next half edge around the face
 	    public Mesh Mesh => InitVertex.Mesh;
         #endregion
 

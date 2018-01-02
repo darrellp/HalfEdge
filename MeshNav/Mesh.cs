@@ -370,7 +370,40 @@ namespace MeshNav
 		    }
 	    }
 
-	    #endregion
+        #endregion
+
+        #region Modification
+        public void SetOrientation(bool fCcw)
+        {
+            if (Factory.Dimension != 2)
+            {
+                throw new MeshNavException("Can't perform SetOrientation on non-planar mesh");
+            }
+            foreach (var face in Faces)
+            {
+                // It would be nice if we could eliminate the call to ICcw here and if
+                // it weren't for the possibility of different components we could.  Even in
+                // the presence of components, we could do it if we had the ability to identify
+                // each component and step through all it's faces since all faces of individual
+                // components will be oriented the same way.  Something to think about for the
+                // future, but right now we don't have this facility.  In the case of rayed
+                // meshes we could since we're always guaranteed exactly one component.  In the
+                // case of Boundary meshes it might be possible with a bit more analysis since
+                // we have one boundary per components except for the presence of holes.
+                // In the case of a null boundary, this would be difficult to impossible.  I may
+                // have to revisit and make this virtual so the different cases handle it their own
+                // way.
+                if (face.ICcw() == (fCcw ? 1 : -1))
+                {
+                    continue;
+                }
+                face.Reverse();
+#if DEBUG
+	            Validate();
+#endif
+			}
+        }
+        #endregion
 
         #region Validation
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -415,6 +448,11 @@ namespace MeshNav
             {
                 throw new MeshNavException("Live halfedge points at dead component");
             }
+
+	        if (HalfEdges.Where(he => he.IsAlive).Any(he => he.InitVertex == he.Opposite.InitVertex))
+	        {
+		        throw new MeshNavException("Edge and opposite oriented identically");
+	        }
             return true;
         }
         #endregion
