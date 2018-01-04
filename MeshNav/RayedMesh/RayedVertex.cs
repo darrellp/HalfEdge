@@ -46,7 +46,20 @@ namespace MeshNav.RayedMesh
 			    var unrayed = AdjacentEdges().First(he => he.IsInboundRay).NextVertex;
 			    return unrayed.Position + Ray * MaxLength;
 		    }
-		    set => throw new MeshNavException("Trying to set position of rayed vertex - use Mesh.AddRayedVertex or Ray property");
+	        set
+	        {
+	            if (!IsRayed)
+	            {
+	                base.Position = value;
+	            }
+	            else
+	            {
+                    // Not a good idea to set rayed values through position.  You should know distinctly what
+                    // you're doing and use Ray rather than position.
+	                throw new MeshNavException(
+	                    "Trying to set position of rayed vertex - use Mesh.AddRayedVertex or Ray property");
+	            }
+	        }
 	    }
     }
 }
