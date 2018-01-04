@@ -21,12 +21,7 @@ namespace MeshNav.RayedMesh
 		// that it gets clipped off the edge of your drawing surface.
         public T MaxLength = 1000000;
 
-        internal RayedVertex(Mesh mesh, Vector<T> vec)
-        {
-            Mesh = mesh;
-            Ray = vec;
-        }
-
+        internal RayedVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
         public bool IsRayed { get; set; }
 
 	    public Vector<T> Ray
