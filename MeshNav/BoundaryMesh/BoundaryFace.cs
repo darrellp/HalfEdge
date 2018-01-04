@@ -2,7 +2,7 @@
 
 namespace MeshNav.BoundaryMesh
 {
-    class BoundaryFace : Face, IBoundary
+    public class BoundaryFace : Face, IBoundary
     {
         #region Public Properties
         // This distinguishes between an outer boundary and a boundary which represents an internal hole.  This

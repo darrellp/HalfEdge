@@ -28,7 +28,23 @@ namespace MeshNav.BoundaryMesh
         {
             _boundaryEdges.Remove(edge);
         }
-        #endregion
+
+	    public override void SetOrientation(bool fCcw)
+	    {
+			// We have to deal with boundary faces first.  Outer boundaries have the opposite orientation of all
+			// other faces while interior hole boundaries have the same orientation
+		    foreach (var face in BoundaryFaces)
+		    {
+				if (face.ICcw() == (fCcw ? 1 : -1) * (((BoundaryFace)face).IsOuterBoundary ? -1 : 1))
+			    {
+				    continue;
+			    }
+			    face.Reverse();
+
+			}
+			base.SetOrientation(fCcw);
+	    }
+	    #endregion
 
         #region Constructor
         ////////////////////////////////////////////////////////////////////////////////////////////////////

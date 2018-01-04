@@ -29,7 +29,7 @@ namespace MeshNav
         public virtual Vector<T> Position { get; set; }
         public HalfEdge Edge { get; internal set; }
         public int Dimension => Position.Count;
-        public Mesh Mesh { get; }
+        public Mesh Mesh { get; internal set; }
 
         public T X
         {

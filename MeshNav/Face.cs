@@ -22,7 +22,7 @@ namespace MeshNav
         public bool IsBoundary
         {
             // ReSharper disable PossibleNullReferenceException
-            get => !Mesh.BoundaryTrait && (this as IBoundary).IsBoundaryAccessor;
+            get => Mesh.BoundaryTrait && (this as IBoundary).IsBoundaryAccessor;
             set
             {
                 if (Mesh.BoundaryTrait)

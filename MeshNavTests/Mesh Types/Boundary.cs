@@ -22,7 +22,7 @@
 
 // Define only ONE of the following three defines to specify how boundary conditions are handled
 
-//#define NULLBnd
+//#define NULLBOUNDARY
 #define BOUNDARY
 //#define RAYED
 
@@ -32,7 +32,7 @@
 #define UV
 
 #region Template Definition
-#if (RAYED && BOUNDARY) || (RAYED && NULLBnd) || (BOUNDAY && NULLBnd) || (!BOUNDARY && !NULLBnd && !RAYED)
+#if (RAYED && BOUNDARY) || (RAYED && NULLBOUNDARY) || (BOUNDAY && NULLBOUNDARY) || (!BOUNDARY && !NULLBOUNDARY && !RAYED)
 #error Precisely one boundary condition should be defined in the template
 #endif
 
@@ -128,15 +128,18 @@ namespace Templates
         }
     }
 
-    public class BndFace : Face
+    public class BndFace :
+#if BOUNDARY
+        BoundaryFace
+#elif RAYED
+        RayedFace
+#else
+        Face
+#endif
 #if BOUNDARY || RAYED
         , IBoundary
 #endif
-    {
-#if BOUNDARY || RAYED
-        public bool IsBoundaryAccessor { get; set; }
-#endif
-    }
+    { }
 
     public class BndHalfEdge : HalfEdge
 #if PREVIOUSEDGE
@@ -153,7 +156,13 @@ namespace Templates
 #endif
     }
 
-    public class BndVertex : Vertex
+    public class BndVertex :
+#if RAYED
+        RayedVertex
+#else
+        Vertex
+#endif
+
 #if NORMALS
         , INormal
 #endif
@@ -207,9 +216,13 @@ namespace Templates
     {
         [Conditional("BOUNDARY")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // ReSharper disable UnusedParameter.Local
         private void MeshBoundaryHalfClone(Mesh oldMesh, Dictionary<Face, Face> oldToNewFace)
+        // ReSharper restore UnusedParameter.Local
         {
+#if BOUNDARY
             BoundaryFaces = ((BoundaryMesh)oldMesh).BoundaryFaces.Select(f => oldToNewFace[f]).ToList();
+#endif
         }
 
         [Conditional("PREVIOUSEDGE")]
@@ -226,12 +239,9 @@ namespace Templates
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void MeshPreviousEdgeValidate()
         {
-            foreach (var edge in HalfEdges)
+            if (HalfEdges.Any(edge => (edge as IPreviousEdge).PreviousEdgeAccessor == null))
             {
-                if ((edge as IPreviousEdge).PreviousEdgeAccessor == null)
-                {
-                    throw new MeshNavException("Edge doesn't contain a previous edge");
-                }
+                throw new MeshNavException("Edge doesn't contain a previous edge");
             }
         }
     }

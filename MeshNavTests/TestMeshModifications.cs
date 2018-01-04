@@ -65,12 +65,19 @@ namespace MeshNavTests
 		    var face = BuildSquare(mesh);
 		    mesh.FinalizeMesh();
 		    var vertsCcw = face.Vertices().ToList();
+	        var boundaryFace = mesh.Faces.First(f => f != face);
+	        Assert.IsTrue(boundaryFace.IsBoundary);
+            Assert.IsFalse(face.IsBoundary);
 		    Assert.IsTrue(face.Vertices().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
 			mesh.SetOrientation(true);
 		    Assert.IsTrue(face.Vertices().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
 			mesh.SetOrientation(false);
-		    Assert.IsTrue(face.Vertices().Reverse().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
+            // We are reversed, but in flipping the first edge to point (0,0)->(0,1) so that it
+            // points (0,1)->(0,0) the initial vertex of the face has been changed to (0,1) so
+            // we have to shift to account for that.
+	        vertsCcw = vertsCcw.Skip(2).Concat(vertsCcw.Take(2)).ToList();
 
+		    Assert.IsTrue(face.Vertices().Reverse().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
 		}
 	}
 }

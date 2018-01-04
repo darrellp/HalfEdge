@@ -128,15 +128,18 @@ namespace Templates
         }
     }
 
-    public class __TEMPLATE__Face : Face
+    public class __TEMPLATE__Face :
+#if BOUNDARY
+        BoundaryFace
+#elif RAYED
+        RayedFace
+#else
+        Face
+#endif
 #if BOUNDARY || RAYED
         , IBoundary
 #endif
-    {
-#if BOUNDARY || RAYED
-        public bool IsBoundaryAccessor { get; set; }
-#endif
-    }
+    {}
 
     public class __TEMPLATE__HalfEdge : HalfEdge
 #if PREVIOUSEDGE
@@ -153,7 +156,13 @@ namespace Templates
 #endif
     }
 
-    public class __TEMPLATE__Vertex : Vertex
+    public class __TEMPLATE__Vertex :
+#if RAYED
+        RayedVertex
+#else
+        Vertex
+#endif
+
 #if NORMALS
         , INormal
 #endif

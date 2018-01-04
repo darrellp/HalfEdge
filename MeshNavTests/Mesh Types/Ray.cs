@@ -22,7 +22,7 @@
 
 // Define only ONE of the following three defines to specify how boundary conditions are handled
 
-//#define NULLRay
+//#define NULLBOUNDARY
 //#define BOUNDARY
 #define RAYED
 
@@ -32,7 +32,7 @@
 #define UV
 
 #region Template Definition
-#if (RAYED && BOUNDARY) || (RAYED && NULLRay) || (BOUNDAY && NULLRay) || (!BOUNDARY && !NULLRay && !RAYED)
+#if (RAYED && BOUNDARY) || (RAYED && NULLBOUNDARY) || (BOUNDAY && NULLBOUNDARY) || (!BOUNDARY && !NULLBOUNDARY && !RAYED)
 #error Precisely one boundary condition should be defined in the template
 #endif
 
@@ -128,15 +128,18 @@ namespace Templates
         }
     }
 
-    public class RayFace : Face
+    public class RayFace :
+#if BOUNDARY
+        BoundaryFace
+#elif RAYED
+        RayedFace
+#else
+        Face
+#endif
 #if BOUNDARY || RAYED
         , IBoundary
 #endif
-    {
-#if BOUNDARY || RAYED
-        public bool IsBoundaryAccessor { get; set; }
-#endif
-    }
+    { }
 
     public class RayHalfEdge : HalfEdge
 #if PREVIOUSEDGE
@@ -153,7 +156,13 @@ namespace Templates
 #endif
     }
 
-    public class RayVertex : Vertex
+    public class RayVertex :
+#if RAYED
+        RayedVertex
+#else
+        Vertex
+#endif
+
 #if NORMALS
         , INormal
 #endif
@@ -165,10 +174,6 @@ namespace Templates
 #endif
     {
         internal RayVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
-#if RAYED
-        public bool IsRayed { get; set; }
-#endif
-
 #if NORMALS
         public Vector<T> NormalAccessor { get; set; }
 #endif
@@ -209,7 +214,7 @@ namespace Templates
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         // ReSharper disable UnusedParameter.Local
         private void MeshBoundaryHalfClone(Mesh oldMesh, Dictionary<Face, Face> oldToNewFace)
-            // ReSharper restore UnusedParameter.Local
+        // ReSharper restore UnusedParameter.Local
         {
 #if BOUNDARY
             BoundaryFaces = ((BoundaryMesh)oldMesh).BoundaryFaces.Select(f => oldToNewFace[f]).ToList();
@@ -236,7 +241,7 @@ namespace Templates
             }
         }
     }
-#endregion
+    #endregion
 }
 #endregion
 #endif

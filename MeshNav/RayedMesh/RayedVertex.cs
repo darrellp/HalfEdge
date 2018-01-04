@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using MeshNav.TraitInterfaces;
 #if FLOAT
 using T = System.Single;
 #else
@@ -16,18 +14,25 @@ namespace MeshNav.RayedMesh
 		// points for rayed vertices - just infinite rays - so if we need a real point we
 		// have to just move out some large distance from the fixed end of the ray.  It's
 		// not a great solution but I'm not sure of a better one unless we somehow deal
-		// directly with rays for some half edges and segments for others.  It's a public
+		// directly with rays for some half edges and segments for others. That would affect
+		// pretty much every piece of code that dealt with halfEdges.  MaxLength is a public
 		// value so if it's too low clients can set it higher.  For calculation purposes
 		// it's not that important.  If you'd like to "draw" then you want it large enough
 		// that it gets clipped off the edge of your drawing surface.
-        public static T MaxLength = 1000000;
-        internal RayedVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
+        public T MaxLength = 1000000;
+
+        internal RayedVertex(Mesh mesh, Vector<T> vec)
+        {
+            Mesh = mesh;
+            Ray = vec;
+        }
+
         public bool IsRayed { get; set; }
 
 	    public Vector<T> Ray
 	    {
 		    get => base.Position;
-		    set => base.Position = Ray;
+		    set => base.Position = value;
 	    }
 
 	    public override Vector<T> Position
@@ -36,10 +41,10 @@ namespace MeshNav.RayedMesh
 		    {
 			    if (!IsRayed)
 			    {
-				    return Position;
+				    return base.Position;
 			    }
 			    var unrayed = AdjacentEdges().First(he => he.IsInboundRay).NextVertex;
-			    return unrayed.Position + Position * MaxLength;
+			    return unrayed.Position + Ray * MaxLength;
 		    }
 		    set => throw new MeshNavException("Trying to set position of rayed vertex - use Mesh.AddRayedVertex or Ray property");
 	    }

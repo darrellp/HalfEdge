@@ -16,6 +16,10 @@ namespace MeshNav.RayedMesh
         #endregion
 
         #region Properties
+		// TODO: The fact that we allow for only one boundary face means we don't allow for holes in the mesh
+		// Probably should take care of this at some point.  Perhaps one face for the sole face at infinity
+		// but a list of boundary faces for any holes we find.  I really don't know how useful this would ever
+		// be but it just feels wrong not to do it.
         public override Face BoundaryFace { get; }
         #endregion
 
@@ -125,6 +129,7 @@ namespace MeshNav.RayedMesh
         #region Overrides
         protected override void ValidatePolygon(Vertex[] vertices)
         {
+            // TODO: Check for simpleness
             base.ValidatePolygon(vertices);
             var rayed = Enumerable.Range(0, vertices.Length).Where(i => ((IRayed)vertices[i]).IsRayed).ToArray();
             if (rayed.Length > 0)
@@ -160,6 +165,19 @@ namespace MeshNav.RayedMesh
                 BoundaryFace.HalfEdge = opposite;
             }
         }
-        #endregion
-    }
+
+
+	    public override void SetOrientation(bool fCcw)
+	    {
+		    // We have to deal with the boundary face as it has an opposite orientation to all
+			// the other faces
+			if (BoundaryFace.ICcw() == (fCcw ? 1 : -1))
+			{
+				BoundaryFace.Reverse();
+			}
+		    base.SetOrientation(fCcw);
+	    }
+
+		#endregion
+	}
 }

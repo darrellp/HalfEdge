@@ -379,6 +379,7 @@ namespace MeshNav
             {
                 throw new MeshNavException("Can't perform SetOrientation on non-planar mesh");
             }
+			
             foreach (var face in Faces)
             {
                 if (face.IsBoundary)
@@ -403,10 +404,10 @@ namespace MeshNav
                     continue;
                 }
                 face.Reverse();
-#if DEBUG
-	            Validate();
-#endif
 			}
+#if DEBUG
+	        Validate();
+#endif
         }
         #endregion
 

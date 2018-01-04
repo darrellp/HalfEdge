@@ -204,14 +204,14 @@ namespace MeshNav
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         public static T SignedArea(List<Vector<T>> polyPoints)
         {
-            T area = 0;
-            for (var i = 0; i < polyPoints.Count - 2; i++)
+            T areaTimes2 = 0;
+            for (var i = 0; i < polyPoints.Count; i++)
             {
                 var pti = polyPoints[i];
-                var ptip1 = polyPoints[i + 1];
-                area += (pti.X() + ptip1.X()) * (ptip1.Y() - pti.Y());
+                var ptip1 = polyPoints[(i + 1) % polyPoints.Count];
+                areaTimes2 += (pti.X() + ptip1.X()) * (ptip1.Y() - pti.Y());
             }
-            return area;
+            return areaTimes2/2;
         }
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////

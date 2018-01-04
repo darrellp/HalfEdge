@@ -19,6 +19,19 @@ namespace MeshNavTests
     {
 #pragma warning disable 1591
         [TestMethod]
+        public void TestSignedArea()
+        {
+            var poly = new List<Vector<T>>()
+            {
+                Make(1, 0),
+                Make(0, 0),
+                Make(0, 1),
+                Make(1, 1)
+            };
+            Assert.AreEqual(-1, SignedArea(poly));
+        }
+
+        [TestMethod]
         public void TestMake()
         {
             var v = Make(1, 2);
