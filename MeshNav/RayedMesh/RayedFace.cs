@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using MeshNav.TraitInterfaces;
+﻿using MeshNav.TraitInterfaces;
 
 namespace MeshNav.RayedMesh
 {

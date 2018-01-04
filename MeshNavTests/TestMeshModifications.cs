@@ -52,6 +52,7 @@ namespace MeshNavTests
             var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
             var face = BuildSquare(mesh);
+            // ReSharper disable once PossibleNullReferenceException
             mesh.FinalizeMesh();
 
             Assert.AreEqual(1, face.ICcw());
@@ -63,6 +64,7 @@ namespace MeshNavTests
 		    var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
 		    var face = BuildSquare(mesh);
+	        // ReSharper disable PossibleNullReferenceException
 		    mesh.FinalizeMesh();
 		    var vertsCcw = face.Vertices().ToList();
 	        var boundaryFace = mesh.Faces.First(f => f != face);
@@ -76,6 +78,7 @@ namespace MeshNavTests
             // points (0,1)->(0,0) the initial vertex of the face has been changed to (0,1) so
             // we have to shift to account for that.
 	        vertsCcw = vertsCcw.Skip(2).Concat(vertsCcw.Take(2)).ToList();
+	        // ReSharper restore PossibleNullReferenceException
 
 		    Assert.IsTrue(face.Vertices().Reverse().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
 		}

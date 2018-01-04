@@ -136,9 +136,6 @@ namespace Templates
 #else
         Face
 #endif
-#if BOUNDARY || RAYED
-        , IBoundary
-#endif
     {}
 
     public class __TEMPLATE__HalfEdge : HalfEdge

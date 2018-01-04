@@ -96,6 +96,7 @@ namespace MeshNav
         #region Constructor
         internal Vertex(Mesh mesh, Vector<T> position)
         {
+            // ReSharper disable once VirtualMemberCallInConstructor
             Position = position;
             Mesh = mesh;
         }
