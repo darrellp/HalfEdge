@@ -130,7 +130,7 @@ namespace MeshNav
         ////////////////////////////////////////////////////////////////////////////////////////////////////
  
         // ReSharper disable once InconsistentNaming
-        public int ICcw()
+        public virtual int ICcw()
         {
             if (Mesh.Factory.Dimension != 2)
             {

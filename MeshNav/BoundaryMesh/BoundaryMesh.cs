@@ -12,6 +12,9 @@ namespace MeshNav.BoundaryMesh
 
         #region Properties
         public List<Face> BoundaryFaces { get; internal set; }
+        // This boundary face is used only while building the mesh when we don't have any idea how
+        // many boundaries may be contained in the mesh.  That will be determined in FinalizeMesh
+        // when the list of BoundaryFaces above will be constructed.
         public override Face BoundaryFace => null;
         #endregion
 

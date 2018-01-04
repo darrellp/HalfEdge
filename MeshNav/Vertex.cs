@@ -26,27 +26,27 @@ namespace MeshNav
     public class Vertex : MeshComponent
     {
         #region Public Properties
-        public Vector<T> Position { get; set; }
+        public virtual Vector<T> Position { get; set; }
         public HalfEdge Edge { get; internal set; }
         public int Dimension => Position.Count;
         public Mesh Mesh { get; }
 
         public T X
         {
-            get => this[0];
-            set => this[0] = value;
+            get => Position[0];
+            set => Position[0] = value;
         }
 
         public T Y
         {
-            get => this[1];
-            set => this[1] = value;
+            get => Position[1];
+            set => Position[1] = value;
         }
 
         public T Z
         {
-            get => this[2];
-            set => this[2] = value;
+            get => Position[2];
+            set => Position[2] = value;
         }
         #endregion
 

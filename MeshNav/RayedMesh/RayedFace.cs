@@ -1,4 +1,6 @@
-﻿using MeshNav.TraitInterfaces;
+﻿using System;
+using System.Linq;
+using MeshNav.TraitInterfaces;
 
 namespace MeshNav.RayedMesh
 {
@@ -7,5 +9,11 @@ namespace MeshNav.RayedMesh
         #region Public properties
         public bool IsBoundaryAccessor { get; set; }
         #endregion
+
+        public override int ICcw()
+        {
+            // We just skip the rayed vertices
+            return Math.Sign(Geometry2D.SignedArea(Vertices().Where(v => !(v as IRayed).IsRayed).Select(v => v.Position).ToList()));
+        }
     }
 }

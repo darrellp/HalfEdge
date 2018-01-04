@@ -373,7 +373,7 @@ namespace MeshNav
         #endregion
 
         #region Modification
-        public void SetOrientation(bool fCcw)
+        public virtual void SetOrientation(bool fCcw)
         {
             if (Factory.Dimension != 2)
             {
@@ -381,6 +381,11 @@ namespace MeshNav
             }
             foreach (var face in Faces)
             {
+                if (face.IsBoundary)
+                {
+                    // We have to take care of boundary faces individually.
+                    continue;
+                }
                 // It would be nice if we could eliminate the call to ICcw here and if
                 // it weren't for the possibility of different components we could.  Even in
                 // the presence of components, we could do it if we had the ability to identify
@@ -462,8 +467,19 @@ namespace MeshNav
 	    protected virtual void FinalizeHook() { }
         protected virtual void ChangeBoundaryToInternalHook(HalfEdge halfEdge) { }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Validates the polygon described by vertices. </summary>
+        ///
+        /// <remarks>   Darrell Plank, 1/3/2018. </remarks>
+        ///
+        /// <exception cref="MeshNavException"> Thrown when a Mesh Navigation error condition occurs. </exception>
+        ///
+        /// <param name="vertices"> The vertices. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         protected virtual void ValidatePolygon(Vertex[] vertices)
         {
+            // TODO: Check that the polygon is simple
+            // http://geomalgorithms.com/a09-_intersect-3.html#simple_Polygon
             if (IsInitialized)
             {
                 throw new MeshNavException("Adding face to finalized mesh");
