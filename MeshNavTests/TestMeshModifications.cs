@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
+using MeshNav.BoundaryMesh;
 using Templates;
 
 namespace MeshNavTests
@@ -35,7 +36,7 @@ namespace MeshNavTests
 
         #endregion
 
-        private Face BuildSquare(Mesh mesh)
+        private Face BuildCcwSquare(Mesh mesh)
         {
             // ReSharper disable InconsistentNaming
             var ptLL = mesh.AddVertex(0, 0);
@@ -46,12 +47,23 @@ namespace MeshNavTests
             return mesh.AddFace(ptLL, ptLR, ptUR, ptUL);
         }
 
+        private Face BuildCwSquare(Mesh mesh)
+        {
+            // ReSharper disable InconsistentNaming
+            var ptLL = mesh.AddVertex(3, 3);
+            var ptLR = mesh.AddVertex(4, 3);
+            var ptUL = mesh.AddVertex(3, 4);
+            var ptUR = mesh.AddVertex(4, 4);
+            // ReSharper restore InconsistentNaming
+            return mesh.AddFace(ptLL, ptUL, ptUR, ptLR);
+        }
+
         [TestMethod]
         public void TestFaceCcw()
         {
             var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
-            var face = BuildSquare(mesh);
+            var face = BuildCcwSquare(mesh);
             // ReSharper disable once PossibleNullReferenceException
             mesh.FinalizeMesh();
 
@@ -63,7 +75,7 @@ namespace MeshNavTests
 	    {
 		    var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
-		    var face = BuildSquare(mesh);
+		    var face = BuildCcwSquare(mesh);
 	        // ReSharper disable PossibleNullReferenceException
 		    mesh.FinalizeMesh();
 		    var vertsCcw = face.Vertices().ToList();
@@ -82,5 +94,33 @@ namespace MeshNavTests
 
 		    Assert.IsTrue(face.Vertices().Reverse().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
 		}
-	}
+
+        [TestMethod]
+        public void TestSetOrientationTwoBnds()
+        {
+            var mesh = new BndFactory(2).CreateMesh() as BndMesh;
+
+            var faceCcw = BuildCcwSquare(mesh) as BoundaryFace;
+            var faceCw = BuildCwSquare(mesh) as BoundaryFace;
+
+            // ReSharper disable PossibleNullReferenceException
+            mesh.FinalizeMesh();
+            var vertsCcw = faceCcw.Vertices().ToList();
+            var vertsCw = faceCw.Vertices().ToList();
+            // This is the outer face surrounding faceCcw
+            var boundaryFaceCw = mesh.Faces.First(f => f.IsBoundary &&  f.ICcw() == 1);
+            // This is the outer face surrounding faceCw
+            var boundaryFaceCcw = mesh.Faces.First(f => f.IsBoundary && f.ICcw() == -1);
+
+            Assert.IsFalse(faceCcw.IsBoundary);
+            Assert.IsFalse(faceCw.IsBoundary);
+
+            Assert.IsTrue(faceCcw.Vertices().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
+            Assert.IsTrue(faceCw.Vertices().Zip(vertsCw, (v1, v2) => v1 == v2).All(f => f));
+            mesh.SetOrientation(true);
+            Assert.IsTrue(faceCcw.Vertices().Zip(vertsCcw, (v1, v2) => v1 == v2).All(f => f));
+            vertsCw = vertsCw.Skip(2).Concat(vertsCw.Take(2)).ToList();
+            Assert.IsTrue(faceCw.Vertices().Reverse().Zip(vertsCw, (v1, v2) => v1 == v2).All(f => f));
+        }
+    }
 }
