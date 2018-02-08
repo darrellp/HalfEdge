@@ -28,7 +28,8 @@ namespace MeshNav
 
 		public RbLineSegment(Vector<T> left, Vector<T> right, Func<T> sweepPos)
 		{
-			if (left.X() > right.X())
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if (left.X() > right.X() || (left.X() == right.X() && left.Y() > right.Y()))
 			{
 				(left, right) = (right, left);
 			}
@@ -42,13 +43,23 @@ namespace MeshNav
 			get
 			{
 				var pos = _sweepPos();
-				// ReSharper disable once CompareOfFloatsByEqualityOperator
+				// ReSharper disable CompareOfFloatsByEqualityOperator
 				if (pos == _sweepPosLast)
 				{
 					return _valLast;
 				}
 
-				_valLast = (pos - _left.X()) / (_right.X() - _left.X()) * (_right.Y() - _left.Y()) + _left.Y();
+				// TODO: Should we be using CloseEnough() here?
+				// Seems possible that they could still cause a NAN in the calculation below if they are close enough.
+				if (_right.X() == _left.X())
+				{
+					_valLast = _left.X();
+				}
+				else
+				{
+					_valLast = (pos - _left.X()) * (_right.Y() - _left.Y()) / (_right.X() - _left.X()) + _left.Y();
+				}
+				// ReSharper restore CompareOfFloatsByEqualityOperator
 				_sweepPosLast = pos;
 				return _valLast;
 			}
@@ -90,9 +101,11 @@ namespace MeshNav
 				// We don't intersect non-existent segments.
 				return false;
 			}
-			(Geometry2D.CrossingType ct, Vector<T> pt) = SegSegInt(_left, _right, ls._left, ls._right);
+			(CrossingType ct, Vector<T> pt) = SegSegInt(_left, _right, ls._left, ls._right);
 			// TODO: Think about the various crossing types more carefully
-			return ct == Geometry2D.CrossingType.Normal;
+			// ReSharper disable PossibleUnintendedReferenceComparison
+			return ct == CrossingType.Normal || ct == CrossingType.Edge || ct == CrossingType.Vertex;
+			// ReSharper restore PossibleUnintendedReferenceComparison
 		}
 
 		public override string ToString()

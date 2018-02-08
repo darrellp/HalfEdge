@@ -27,6 +27,28 @@ namespace MeshNavTests
 				Make(2, 1)
 			};
 			Assert.IsTrue(SimplePolygon.FTestSimplePolygon(polylist));
+
+			// Square
+			polylist = new List<Vector<T>>
+			{
+				Make(0, 0),
+				Make(0, 1),
+				Make(1, 1),
+				Make(1, 0)
+			};
+			Assert.IsTrue(SimplePolygon.FTestSimplePolygon(polylist));
+
+			// Almost the same as second case in TestNonSimple except we don't quite touch
+			// the line
+			polylist = new List<Vector<T>>
+			{
+				Make(0, 0),
+				Make(1, 1),
+				Make(0.01, 1),
+				Make(1, 2),
+				Make(0, 2)
+			};
+			Assert.IsTrue(SimplePolygon.FTestSimplePolygon(polylist));
 		}
 
 		[TestMethod]
@@ -40,6 +62,17 @@ namespace MeshNavTests
 				Make(5, 2),
 				Make(1, 2),
 				Make(3, 1),
+			};
+			Assert.IsFalse(SimplePolygon.FTestSimplePolygon(polylist));
+
+			// Just barely touching the line
+			polylist = new List<Vector<T>>
+			{
+				Make(0, 0),
+				Make(1, 1),
+				Make(0, 1),
+				Make(1, 2),
+				Make(0, 2)
 			};
 			Assert.IsFalse(SimplePolygon.FTestSimplePolygon(polylist));
 		}

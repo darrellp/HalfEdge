@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using Assimp;
 using MathNet.Numerics.LinearAlgebra;
-using Priority_Queue;
 using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
@@ -297,12 +295,14 @@ namespace MeshNav
 		{
 			/// <summary> Segments overlap and are collinear.  </summary>
 			Edge,
-			/// <summary> The endpoing of one segment lies on the other and they are not collinear.  </summary>
+			/// <summary> The endpoint of one segment lies on the other and they are not collinear.  </summary>
 			Vertex,
 			/// <summary> Normal crossing.  </summary>
 			Normal,
 			/// <summary> Segments are parallel and do not cross.  </summary>
-			NonCrossing
+			NonCrossing,
+			/// <summary>	Segments meet at the endpoints. </summary>
+			EndToEnd
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,6 +344,7 @@ namespace MeshNav
 			{
 				code = CrossingType.Vertex;
 			}
+			// tSeg1 is t value where seg2 intersects seg1
 			var tSeg1 = num/denom;
 
 			if (tSeg1 < 0 || tSeg1 > 1)
@@ -359,6 +360,7 @@ namespace MeshNav
 			{
 				code = CrossingType.Vertex;
 			}
+			// tSeg2 is t value where seg1 intersects seg2
 			var tSeg2 = num/denom;
 
 
@@ -369,6 +371,13 @@ namespace MeshNav
 			else if (code != CrossingType.Vertex)
 			{
 				code = CrossingType.NonCrossing;
+			}
+
+			if (code == CrossingType.Vertex &&
+			    (FCloseEnough(tSeg1, 0) || FCloseEnough(tSeg1, 1)) &&
+			    (FCloseEnough(tSeg2, 0) || FCloseEnough(tSeg2, 1)))
+			{
+				code = CrossingType.EndToEnd;
 			}
 
 		    pPt = Make(seg1Pt1.X() + tSeg1 * (seg1Pt2.X() - seg1Pt1.X()),
