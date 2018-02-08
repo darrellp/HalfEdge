@@ -67,7 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RbType.cs" />
+    <Compile Include="RbLineSegment.cs" />
     <Compile Include="MeshNavRbTree.cs" />
     <Compile Include="RedBlack\Color.cs" />
     <Compile Include="RedBlack\RedBlackNode.cs" />

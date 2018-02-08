@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Common.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.RedBlack;
 #if FLOAT
 using T = System.Single;
@@ -12,14 +9,14 @@ using T = System.Double;
 
 namespace MeshNav
 {
-	class MeshNavRbTree : RedBlackTree<RbType>
+	class MeshNavRbTree : RedBlackTree<RbLineSegment>
 	{
-		internal (RbType higher, RbType lower) InsertBracketed(RbType val)
+		internal (RbLineSegment higher, RbLineSegment lower) InsertBracketed(RbLineSegment val)
 		{
-			RbType higher;
-			RbType lower;
+			RbLineSegment higher;
+			RbLineSegment lower;
 
-			(Root, higher, lower) = InsertBracketed(Root, new RedBlackNode<RbType>(val));
+			(Root, higher, lower) = InsertBracketed(Root, new RedBlackNode<RbLineSegment>(val));
 
 			if (Root.IsRed)
 			{
@@ -36,10 +33,10 @@ namespace MeshNav
 		/// <param name="root">The root node of the tree</param>
 		/// <param name="node">The node to insert</param>
 		/// <returns>The new root of the tree as it may have changed</returns>
-		private (RedBlackNode<RbType> root, RbType higher, RbType lower) InsertBracketed(RedBlackNode<RbType> root, RedBlackNode<RbType> node)
+		private (RedBlackNode<RbLineSegment> root, RbLineSegment higher, RbLineSegment lower) InsertBracketed(RedBlackNode<RbLineSegment> root, RedBlackNode<RbLineSegment> node)
 		{
-			RbType higher = null;
-			RbType lower = null;
+			RbLineSegment higher = null;
+			RbLineSegment lower = null;
 
 			if (root == null)
 			{
@@ -53,10 +50,10 @@ namespace MeshNav
 				if (compareResult > 0)
 				{
 					(root.Left, higher, lower) = InsertBracketed(root.Left, node);
-					if (higher == null)
+					if (higher == null && lower == null)
 					{
-						higher = root.Value;
-						lower = root.Value.NextLower;
+						node.Value.NextHigher = higher = root.Value;
+						node.Value.NextLower = lower = root.Value.NextLower;
 						higher.NextLower = node.Value;
 						if (lower != null)
 						{
@@ -67,10 +64,10 @@ namespace MeshNav
 				else if (compareResult < 0)
 				{
 					(root.Right, higher, lower) = InsertBracketed(root.Right, node);
-					if (lower == null)
+					if (higher == null && lower == null)
 					{
-						lower = root.Value;
-						higher = root.Value.NextHigher;
+						node.Value.NextLower = lower = root.Value;
+						node.Value.NextHigher = higher = root.Value.NextHigher;
 						lower.NextHigher = node.Value;
 						if (higher != null)
 						{
@@ -87,6 +84,21 @@ namespace MeshNav
 			root = PostInsertCleanup(root, node);
 
 			return (root, higher, lower);
+		}
+
+		internal bool DeleteBracketed(RbLineSegment value)
+		{
+			if (value.NextLower != null)
+			{
+				value.NextLower.NextHigher = value.NextHigher;
+			}
+
+			if (value.NextHigher != null)
+			{
+				value.NextHigher.NextLower = value.NextLower;
+			}
+
+			return Delete(value);
 		}
 	}
 }

@@ -17,25 +17,31 @@ namespace MeshNav
 
         public static bool FTestSimplePolygon(IEnumerable<Vector<T>> poly)
         {
-            var firstPt = poly.FirstOrDefault();
-            if (firstPt == null)
+            var polyList = poly?.ToList();
+	        var sweep = T.MinValue;
+
+	        if (polyList == null)
+	        {
+				throw new ArgumentException($"poly is null in {nameof(FTestSimplePolygon)}");
+	        }
+
+            if (polyList.Count == 0)
             {
                 return true;
             }
-            if (firstPt.Count() != 2)
+
+            if (polyList[0].Count() != 2)
             {
-                throw new MeshNavException("Calling FTestSimplePolygon with non-2D points");
+                throw new ArgumentException("Calling FTestSimplePolygon with non-2D points");
             }
 
-            var _edgeList = new List<LineSegment>();
-            var eventQueue = new BinaryPriorityQueue<SimplePolygonEvent>((e1, e2) => cmpVectors(e1.Vertex, e2.Vertex));
-
-            var polyList = poly.ToList();
+            var edgeList = new List<RbLineSegment>();
+            var eventQueue = new BinaryPriorityQueue<SimplePolygonEvent>((e1, e2) => CmpVectors(e1.Vertex, e2.Vertex));
             for (var iVtx = 0; iVtx < polyList.Count; iVtx++)
             {
                 var vtxLow = polyList[iVtx];
                 var vtxHigh = polyList[(iVtx + 1) % polyList.Count];
-                var cmp = cmpVectors(vtxLow, vtxHigh);
+                var cmp = CmpVectors(vtxLow, vtxHigh);
                 if (cmp == 0)
                 {
                     // We ignore zero length sides
@@ -45,34 +51,38 @@ namespace MeshNav
                 {
                     (vtxLow, vtxHigh) = (vtxHigh, vtxLow);
                 }
-                _edgeList.Add(new LineSegment(vtxLow, vtxHigh));
-                eventQueue.Add(new SimplePolygonEvent(vtxLow, iVtx, cmpVectors(vtxLow, vtxHigh) == 1));
+	            // ReSharper disable once AccessToModifiedClosure
+                edgeList.Add(new RbLineSegment(vtxLow, vtxHigh, () => sweep));
+                eventQueue.Add(new SimplePolygonEvent(vtxLow, iVtx, false));
+	            eventQueue.Add(new SimplePolygonEvent(vtxHigh, iVtx, true));
             }
 
-            var segTable = new SegTable();
+			var segTable = new MeshNavRbTree();
             while (eventQueue.Count != 0)
             {
                 var nextEvent = eventQueue.Pop();
+	            Console.WriteLine(nextEvent);
                 if (nextEvent.IsRightEndpoint)
                 {
                     // We have to remove the corresponding line segment from consideration
-                    segTable.RemoveSegment(_edgeList[nextEvent.SegIndex]);
+                    segTable.DeleteBracketed(edgeList[nextEvent.SegIndex]);
                 }
                 else
                 {
-                    // Insert the corresponding line segment
-                    (Interval low, Interval high) = segTable.Insert(nextEvent.Vertex.Y(), nextEvent.SegIndex);
-                    var lsCur = _edgeList[nextEvent.SegIndex];
-                    if (lsCur.Intersects(_edgeList[high.LowSegmentIndex]) ||
-                        lsCur.Intersects(_edgeList[low.HighSegmentIndex]))
+	                sweep = nextEvent.Vertex.X();
+                    var lsCur = edgeList[nextEvent.SegIndex];
+
+					// Insert the corresponding line segment
+					(RbLineSegment high, RbLineSegment low) = segTable.InsertBracketed(lsCur);
+                    if (lsCur.Intersects(low) || lsCur.Intersects(high))
                     {
-                        return true;
+                        return false;
                     }
                 }
             }
             return true;
 
-            int cmpVectors(Vector<T> v1, Vector<T> v2)
+            int CmpVectors(Vector<T> v1, Vector<T> v2)
             {
                 var cmp = v1.X().CompareTo(v2.X());
                 if (cmp == 0)
@@ -83,66 +93,11 @@ namespace MeshNav
             }
         }
 
-        private struct LineSegment
+	    private struct SimplePolygonEvent
         {
-            private Vector<T> LowPoint { get; }
-            private Vector<T> HighPoint { get; }
-
-            public LineSegment(Vector<double> lowPoint, Vector<double> highPoint)
-            {
-                LowPoint = lowPoint;
-                HighPoint = highPoint;
-            }
-
-            public bool Intersects(LineSegment ls)
-            {
-                (CrossingType ct, Vector<T> pt) = SegSegInt(LowPoint, HighPoint, ls.LowPoint, ls.HighPoint);
-                // TODO: Think about the various crossing types more carefully
-                return ct == CrossingType.Normal;
-            }
-        }
-
-        private struct Interval
-        {
-            public int LowSegmentIndex { get; }
-            public int HighSegmentIndex { get; }
-            private readonly T _low;
-            private readonly T _high;
-
-            private Interval(T low, int lowSegmentIndex, T high, int highSegmentIndex)
-            {
-                _low = low;
-                LowSegmentIndex = lowSegmentIndex;
-                _high = high;
-                HighSegmentIndex = highSegmentIndex;
-            }
-
-            (Interval, Interval) Split(T val, int segmentIndex)
-            {
-                if (val < _low || val > _high)
-                {
-                    throw new MeshNavException("Internal error in Interval class");
-                }
-                return (new Interval(_low, LowSegmentIndex, val, segmentIndex), new Interval(val, segmentIndex, _high, HighSegmentIndex));
-            }
-        }
-        private class SegTable
-        {
-            public void RemoveSegment(LineSegment segment)
-            {
-            }
-
-            public (Interval, Interval) Insert(T val, int segmentIndex)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private struct SimplePolygonEvent
-        {
-            internal Vector<T> Vertex;
-            internal int SegIndex;
-            internal bool IsRightEndpoint;
+            internal readonly Vector<T> Vertex;
+            internal readonly int SegIndex;
+            internal readonly bool IsRightEndpoint;
 
             public SimplePolygonEvent(Vector<double> vertex, int segIndex, bool isRightEndpoint)
             {
@@ -150,6 +105,11 @@ namespace MeshNav
                 SegIndex = segIndex;
                 IsRightEndpoint = isRightEndpoint;
             }
+
+	        public override string ToString()
+	        {
+		        return $"({Vertex.X()}, {Vertex.Y()}) in seg index {SegIndex} : {(IsRightEndpoint ? "Right" : "Left")}";
+	        }
         }
     }
 }
