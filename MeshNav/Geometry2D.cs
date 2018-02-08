@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Assimp;
 using MathNet.Numerics.LinearAlgebra;
+using Priority_Queue;
 using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
@@ -316,23 +318,22 @@ namespace MeshNav
 		/// <param name="seg1Pt2">	The second point of the segment 1. </param>
 		/// <param name="seg2Pt1">	The first point of segment 2. </param>
 		/// <param name="seg2Pt2">	The second point of segment 2. </param>
-		/// <param name="pPt">		[out] The intersection if any. </param>
 		///
 		/// <returns>	A crossing type as outlined above. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static CrossingType SegSegInt(Vector<T> seg1Pt1, Vector<T> seg1Pt2, Vector<T> seg2Pt1, Vector<T> seg2Pt2, out Vector<T> pPt)
+		public static (CrossingType, Vector<T>) SegSegInt(Vector<T> seg1Pt1, Vector<T> seg1Pt2, Vector<T> seg2Pt1, Vector<T> seg2Pt2)
 		{
 			// ReSharper disable once RedundantAssignment
 			var code = (CrossingType)(-1);
-			pPt = Make();
+			var pPt = Make();
 
 			var denom = (seg1Pt1.X() - seg1Pt2.X())* (seg2Pt2.Y() - seg2Pt1.Y()) +
 						   (seg2Pt2.X() - seg2Pt1.X()) * (seg1Pt2.Y() - seg1Pt1.Y());
 
 			if (FNearZero(denom))
 			{
-				return ParallelInt(seg1Pt1, seg1Pt2, seg2Pt1, seg2Pt2, out pPt);
+				return ParallelInt(seg1Pt1, seg1Pt2, seg2Pt1, seg2Pt2);
 			}
 
 			var num = seg1Pt1.X() * (seg2Pt2.Y() - seg2Pt1.Y()) +
@@ -347,7 +348,7 @@ namespace MeshNav
 
 			if (tSeg1 < 0 || tSeg1 > 1)
 			{
-				return CrossingType.NonCrossing;
+				return (CrossingType.NonCrossing, pPt);
 			}
 
 			num = -(seg1Pt1.X() * (seg2Pt1.Y() - seg1Pt2.Y()) +
@@ -373,7 +374,7 @@ namespace MeshNav
 		    pPt = Make(seg1Pt1.X() + tSeg1 * (seg1Pt2.X() - seg1Pt1.X()),
 		        seg1Pt1.Y() + tSeg1 * (seg1Pt2.Y() - seg1Pt1.Y()));
 
-			return code;
+			return (code, pPt);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,35 +411,35 @@ namespace MeshNav
 			       ptSegEndpoint1.Y() >= ptTest.Y() && ptTest.Y() >= ptSegmentEndpoint2.Y();
 		}
 
-		private static CrossingType ParallelInt(Vector<T> aPt, Vector<T> bPt, Vector<T> cPt, Vector<T> dPt, out Vector<T> pPt)
+		private static (CrossingType, Vector<T>) ParallelInt(Vector<T> aPt, Vector<T> bPt, Vector<T> cPt, Vector<T> dPt)
 		{
-			pPt = Make();
+			var pPt = Make();
 			if (!FCollinear(aPt, bPt, cPt))
 			{
-				return CrossingType.NonCrossing;
+				return (CrossingType.NonCrossing, pPt);
 			}
 
 			if (Between(aPt, bPt, cPt))
 			{
 				pPt = cPt;
-				return CrossingType.Edge;
+				return (CrossingType.Edge, pPt);
 			}
 			if (Between(aPt, bPt, dPt))
 			{
 				pPt = dPt;
-				return CrossingType.Edge;
+				return (CrossingType.Edge, pPt);
 			}
 			if (Between(cPt, dPt, aPt))
 			{
 				pPt = aPt;
-				return CrossingType.Edge;
+				return (CrossingType.Edge, pPt);
 			}
 			if (Between(cPt, dPt, bPt))
 			{
 				pPt = cPt;
-				return CrossingType.Edge;
+				return (CrossingType.Edge, pPt);
 			}
-			return CrossingType.NonCrossing;
+			return (CrossingType.NonCrossing, pPt);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,14 +462,14 @@ namespace MeshNav
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Euclidean distance between two points. </summary>
+		/// <summary>	Squared euclidean distance between two points. </summary>
 		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
 		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
 		///
-		/// <returns>	Distance between the two points. </returns>
+		/// <returns>	Squared distance between the two points. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		public static double DistanceSq(Vector<T> pt1, Vector<T> pt2)
@@ -623,7 +624,7 @@ namespace MeshNav
 		///
 		/// <remarks>	
 		/// No check is made for the convexity of the polygon and it must be enumerated in CCW order.
-		/// Points on the border are not considered to be in the interior.
+		/// Points on the border are not considered to be in the interior - i.e., it's an open set.
 		/// 
 		/// Darrellp, 2/25/2011. 
 		/// </remarks>
@@ -671,9 +672,16 @@ namespace MeshNav
 
 		public static bool FFindCircumcenter(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3, out Vector<T> ptCenter)
 		{
+		    var x1 = pt1.X();
+		    var y1 = pt1.Y();
+		    var x2 = pt2.X();
+		    var y2 = pt2.Y();
+		    var x3 = pt3.X();
+		    var y3 = pt3.Y();
+
 			// Initialize for ugly math to follow
 			ptCenter = Make();
-			var d = (pt1.X() - pt3.X()) * (pt2.Y() - pt3.Y()) - (pt2.X() - pt3.X()) * (pt1.Y() - pt3.Y());
+			var d = (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
 
 			// If we've got some points identical to others
 			if (Math.Abs(d) <= Tolerance)
@@ -681,16 +689,16 @@ namespace MeshNav
 				return false;
 			}
 
-			var centerX = (((pt1.X() - pt3.X()) * (pt1.X() + pt3.X()) + (pt1.Y() - pt3.Y()) * (pt1.Y() + pt3.Y())) / 2 * (pt2.Y() - pt3.Y()) 
-			    -  ((pt2.X() - pt3.X()) * (pt2.X() + pt3.X()) + (pt2.Y() - pt3.Y()) * (pt2.Y() + pt3.Y())) / 2 * (pt1.Y() - pt3.Y())) 
+			var centerX = (((x1 - x3) * (x1 + x3) + (y1 - y3) * (y1 + y3)) / 2 * (y2 - y3) 
+			    -  ((x2 - x3) * (x2 + x3) + (y2 - y3) * (y2 + y3)) / 2 * (y1 - y3)) 
 			    / d;
 
-			var centerY = (((pt2.X() - pt3.X()) * (pt2.X() + pt3.X()) + (pt2.Y() - pt3.Y()) * (pt2.Y() + pt3.Y())) / 2 * (pt1.X() - pt3.X())
-				- ((pt1.X() - pt3.X()) * (pt1.X() + pt3.X()) + (pt1.Y() - pt3.Y()) * (pt1.Y() + pt3.Y())) / 2 * (pt2.X() - pt3.X()))
+			var centerY = (((x2 - x3) * (x2 + x3) + (y2 - y3) * (y2 + y3)) / 2 * (x1 - x3)
+				- ((x1 - x3) * (x1 + x3) + (y1 - y3) * (y1 + y3)) / 2 * (x2 - x3))
 				/ d;
 
 		    ptCenter = Make(centerX, centerY);
 			return true;
 		}
-	}
+    }
 }

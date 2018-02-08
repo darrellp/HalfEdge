@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MeshNav</RootNamespace>
     <AssemblyName>MeshNav</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,6 +53,10 @@
     <Reference Include="MathNet.Numerics, Version=3.20.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.3.20.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
+    <Reference Include="Priority Queue, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Local Refs\Priority Queue.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -61,6 +67,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RbType.cs" />
+    <Compile Include="MeshNavRbTree.cs" />
+    <Compile Include="RedBlack\Color.cs" />
+    <Compile Include="RedBlack\RedBlackNode.cs" />
+    <Compile Include="RedBlack\RedBlackTree.cs" />
+    <Compile Include="SimplePolygon.cs" />
     <Compile Include="BoundaryMesh\BoundaryMesh.cs" />
     <Compile Include="BoundaryMesh\BoundaryFace.cs" />
     <Compile Include="BoundaryMesh\BoundaryFactory.cs" />
@@ -73,6 +85,7 @@
     <Compile Include="RayedMesh\RayedFactory.cs" />
     <Compile Include="RayedMesh\RayedMesh.cs" />
     <Compile Include="RayedMesh\RayedVertex.cs" />
+    <Compile Include="Scanline.cs" />
     <Compile Include="TraitInterfaces\IBoundary.cs" />
     <Compile Include="TraitInterfaces\INormal.cs" />
     <Compile Include="Mesh.cs" />
@@ -90,6 +103,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MasterTemplate\MasterTemplate.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Local Refs\Priority Queue.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.2\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.2\build\AssimpNet.targets')" />
