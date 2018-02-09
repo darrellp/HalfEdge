@@ -48,14 +48,13 @@ namespace MeshNav
 
         #region Properties
         public object Tag { get; set; }
-		// Should we cache these if IsInitialized?  We need to return ReadOnlyCollection because
+		// TODO: Should we cache these if IsInitialized?  We need to return ReadOnlyCollection because
 		// otherwise the caller could feasibly cast the IEnumerable as a list and then alter its
 		// contents.
         public IEnumerable<Vertex> Vertices => new ReadOnlyCollection<Vertex>(VerticesInternal);
         public IEnumerable<Face> Faces => new ReadOnlyCollection<Face>(FacesInternal);
         public IEnumerable<HalfEdge> HalfEdges => new ReadOnlyCollection<HalfEdge>(HalfEdgesInternal);
         public bool IsInitialized { get; internal set; }
-
 
 	    public (T Top, T Bottom, T Left, T Right) VertexBounds
 	    {
@@ -94,9 +93,7 @@ namespace MeshNav
 			    return (top, bottom, left, right);
 		    }
 	    }
-
         internal Factory Factory { get; }
-
         public virtual Face BoundaryFace => null;
         #endregion
 

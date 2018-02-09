@@ -4,6 +4,7 @@ using Common.Collections.Generic;
 
 namespace MeshNav.RedBlack
 {
+	// Mostly lifted from the excellect code at https://github.com/ArsenShnurkov/Common
 	public class RedBlackTree<T> where T : IComparable<T>
 	{
 		#region Constructors
