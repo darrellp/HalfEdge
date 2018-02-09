@@ -32,7 +32,9 @@ namespace MeshNav
             }
             // ReSharper restore PossibleNullReferenceException
         }
-        #endregion
+
+	    public bool IsSimple => IsBoundary || SimplePolygon.FTestSimplePolygon(Vertices().Select(v => v.Position));
+	    #endregion
 
         #region Constructor
         internal Face() {}

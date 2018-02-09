@@ -83,7 +83,7 @@ namespace Templates
             return new BndHalfEdge(vertex, opposite, face, nextEdge);
         }
 
-        public override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
         {
             return new BndVertex(mesh, vec);
         }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using Assimp;
 #if FLOAT
@@ -45,7 +46,13 @@ namespace MeshNav
             return CreateVertex(mesh, vector);
         }
 
-        public virtual Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+	    public Vertex CreateVertex(Mesh mesh, IList<T> coords)
+	    {
+		    var vector = Builder.Dense(coords.ToArray());
+		    return CreateVertex(mesh, vector);
+	    }
+
+        internal virtual Vertex CreateVertex(Mesh mesh, Vector<T> vec)
         {
             if (vec.Count != Dimension)
             {

@@ -30,7 +30,7 @@ namespace MeshNav.RayedMesh
 		    set => base.Position = value;
 	    }
 
-	    public override Vector<T> Position
+	    internal override Vector<T> Position
 	    {
 		    get
 		    {

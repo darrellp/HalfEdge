@@ -26,29 +26,15 @@ namespace MeshNav
     public class Vertex : MeshComponent
     {
         #region Public Properties
-        public virtual Vector<T> Position { get; set; }
+        internal virtual Vector<T> Position { get; set; }
         public HalfEdge Edge { get; internal set; }
         public int Dimension => Position.Count;
         public Mesh Mesh { get; internal set; }
 
-        public T X
-        {
-            get => Position[0];
-            set => Position[0] = value;
-        }
-
-        public T Y
-        {
-            get => Position[1];
-            set => Position[1] = value;
-        }
-
-        public T Z
-        {
-            get => Position[2];
-            set => Position[2] = value;
-        }
-        #endregion
+        public T X => Position[0];
+	    public T Y => Position[1];
+	    public T Z => Position[2];
+	    #endregion
 
         #region Traits
         public Vector<T> Normal
@@ -86,12 +72,8 @@ namespace MeshNav
         #endregion
 
         #region Operator overrides
-        public T this[int index]
-        {
-            get => Position[index];
-            set => Position[index] = value;
-        }
-        #endregion
+        public T this[int index] => Position[index];
+	    #endregion
 
         #region Constructor
         internal Vertex(Mesh mesh, Vector<T> position)

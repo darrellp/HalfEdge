@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
@@ -37,7 +38,6 @@ namespace MeshNav
     public class Mesh
     {
         #region Private variables
-
         // During the construction of the mesh, we can't guarantee valid topologies which means that a lot of the iterators, etc.
         // that we can eventually rely on won't work during construction.  In particular, we can't use AdjacentEdges for vertices.
         // Still, we need to verify which edges emanate from each vertex so during the construction we use a dictionary to
@@ -48,10 +48,53 @@ namespace MeshNav
 
         #region Properties
         public object Tag { get; set; }
-        public IEnumerable<Vertex> Vertices => VerticesInternal;
-        public IEnumerable<Face> Faces => FacesInternal;
-        public IEnumerable<HalfEdge> HalfEdges => HalfEdgesInternal;
+		// Should we cache these if IsInitialized?  We need to return ReadOnlyCollection because
+		// otherwise the caller could feasibly cast the IEnumerable as a list and then alter its
+		// contents.
+        public IEnumerable<Vertex> Vertices => new ReadOnlyCollection<Vertex>(VerticesInternal);
+        public IEnumerable<Face> Faces => new ReadOnlyCollection<Face>(FacesInternal);
+        public IEnumerable<HalfEdge> HalfEdges => new ReadOnlyCollection<HalfEdge>(HalfEdgesInternal);
         public bool IsInitialized { get; internal set; }
+
+
+	    public (T Top, T Bottom, T Left, T Right) VertexBounds
+	    {
+		    get
+		    {
+			    var top = T.MinValue;
+			    var bottom = T.MinValue;
+			    var right = T.MinValue;
+			    var left = T.MaxValue;
+
+			    foreach (var vertex in Vertices)
+			    {
+				    var x = vertex.X;
+				    var y = vertex.Y;
+				    if (x > right)
+				    {
+					    right = x;
+				    }
+
+				    if (x < left)
+				    {
+					    left = x;
+				    }
+
+				    if (y > top)
+				    {
+					    top = y;
+				    }
+
+				    if (y < bottom)
+				    {
+					    bottom = y;
+				    }
+			    }
+
+			    return (top, bottom, left, right);
+		    }
+	    }
+
         internal Factory Factory { get; }
 
         public virtual Face BoundaryFace => null;

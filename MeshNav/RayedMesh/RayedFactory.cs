@@ -13,7 +13,7 @@ namespace MeshNav.RayedMesh
     {
         public RayedFactory(int dimension) : base(dimension) { }
 
-        public override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
         {
             return new RayedVertex(mesh, vec);
         }

@@ -83,7 +83,7 @@ namespace Templates
             return new RayHalfEdge(vertex, opposite, face, nextEdge);
         }
 
-        public override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
         {
             return new RayVertex(mesh, vec);
         }
