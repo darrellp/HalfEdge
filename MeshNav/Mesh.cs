@@ -8,6 +8,7 @@ using static System.Diagnostics.Debug;
 using T = System.Single;
 #else
 using T = System.Double;
+// ReSharper disable BuiltInTypeReferenceStyle
 #endif
 
 namespace MeshNav
@@ -32,6 +33,11 @@ namespace MeshNav
     ///				a bit of defining the desired traits and one search and replace, you can usually create the mesh with
     ///				all the desired traits you'd like.  If you want something beyond the supported traits you may have to
     ///				do a little extra work.  There are simple instructions in the comments at the top of template.cs.
+    /// 
+    ///				TODO: We should probably make Mesh and a distinct ImmutableMesh for initialized meshes
+    ///				That way we could partially construct a Mesh and produce the finalized version and then add more
+    ///				faces and produce another mesh.  Also, it would distinguish more readily initialized meshes and
+    ///				uninitialized ones and emphasize that the former are immutable.
     ///             
     ///             Darrell Plank, 12/7/2017. </remarks>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,52 +55,17 @@ namespace MeshNav
         #region Properties
         public object Tag { get; set; }
 		// TODO: Should we cache these if IsInitialized?  We need to return ReadOnlyCollection because
-		// otherwise the caller could feasibly cast the IEnumerable as a list and then alter its
-		// contents.
+
+		// We need to wrap these in ReadOnlyCollection or else the caller could feasibly cast the
+		// IEnumerable as a list and then alter its contents.
         public IEnumerable<Vertex> Vertices => new ReadOnlyCollection<Vertex>(VerticesInternal);
         public IEnumerable<Face> Faces => new ReadOnlyCollection<Face>(FacesInternal);
         public IEnumerable<HalfEdge> HalfEdges => new ReadOnlyCollection<HalfEdge>(HalfEdgesInternal);
-        public bool IsInitialized { get; internal set; }
+        public bool IsInitialized { get; private set; }
 
-	    public (T Top, T Bottom, T Left, T Right) VertexBounds
-	    {
-		    get
-		    {
-			    var top = T.MinValue;
-			    var bottom = T.MinValue;
-			    var right = T.MinValue;
-			    var left = T.MaxValue;
-
-			    foreach (var vertex in Vertices)
-			    {
-				    var x = vertex.X;
-				    var y = vertex.Y;
-				    if (x > right)
-				    {
-					    right = x;
-				    }
-
-				    if (x < left)
-				    {
-					    left = x;
-				    }
-
-				    if (y > top)
-				    {
-					    top = y;
-				    }
-
-				    if (y < bottom)
-				    {
-					    bottom = y;
-				    }
-			    }
-
-			    return (top, bottom, left, right);
-		    }
-	    }
         internal Factory Factory { get; }
         public virtual Face BoundaryFace => null;
+	    public int Dimension => Factory.Dimension;
         #endregion
 
         #region Traits
@@ -111,6 +82,22 @@ namespace MeshNav
         internal List<HalfEdge> HalfEdgesInternal = new List<HalfEdge>();
         internal List<Vertex> VerticesInternal = new List<Vertex>();
         internal List<Face> FacesInternal = new List<Face>();
+
+		// Returns only one representative of every halfedge pair
+	    public IEnumerable<HalfEdge> Edges()
+	    {
+			var alreadyInserted = new HashSet<HalfEdge>();
+		    foreach (var halfEdge in HalfEdgesInternal)
+		    {
+			    if (alreadyInserted.Contains(halfEdge))
+			    {
+				    continue;
+			    }
+
+			    yield return halfEdge;
+			    alreadyInserted.Add(halfEdge.Opposite);
+		    }
+	    }
         #endregion
 
         #region Constructor
@@ -141,24 +128,61 @@ namespace MeshNav
             PreviousEdgeTrait = halfEdge is IPreviousEdge;
 	        RayedTrait = vertex is IRayed;
 		}
-        #endregion
+		#endregion
 
-        #region Build Methods
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Adds a vertex to the mesh. </summary>
-        ///
-        /// <remarks>   The constructor for InitVertex is internal so this should be the only way a user
-        ///             can create a vertex which ensures that any vertices are part of the mesh (well,
-        ///             strictly speaking "a" mesh - not specifically this one, but I'm not checking
-        ///             on that - I suppose we could add an _containingMesh to InitVertex but it seems like
-        ///             a bit of memory hit that is not necessary).
-        ///             Darrell Plank, 12/7/2017. </remarks>
-        ///
-        /// <param name="coords">   A variable-length parameters list containing coordinates. </param>
-        ///
-        /// <returns>   The new vertex with the given position </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public Vertex AddVertex(params T[] coords)
+		#region Queries
+	    public (T Top, T Bottom, T Left, T Right) VertexBounds(T expansion = 0)
+	    {
+			var top = T.MinValue;
+			var bottom = T.MinValue;
+			var right = T.MinValue;
+			var left = T.MaxValue;
+
+			foreach (var vertex in Vertices)
+			{
+				var x = vertex.X;
+				var y = vertex.Y;
+				if (x > right)
+				{
+					right = x;
+				}
+
+				if (x < left)
+				{
+					left = x;
+				}
+
+				if (y > top)
+				{
+					top = y;
+				}
+
+				if (y < bottom)
+				{
+					bottom = y;
+				}
+			}
+
+			return (top + expansion, bottom - expansion, left - expansion, right + expansion);
+	    }
+		#endregion
+
+		#region Build Methods
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>   Adds a vertex to the mesh. </summary>
+		///
+		/// <remarks>   The constructor for InitVertex is internal so this should be the only way a user
+		///             can create a vertex which ensures that any vertices are part of the mesh (well,
+		///             strictly speaking "a" mesh - not specifically this one, but I'm not checking
+		///             on that - I suppose we could add an _containingMesh to InitVertex but it seems like
+		///             a bit of memory hit that is not necessary).
+		///             Darrell Plank, 12/7/2017. </remarks>
+		///
+		/// <param name="coords">   A variable-length parameters list containing coordinates. </param>
+		///
+		/// <returns>   The new vertex with the given position </returns>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		public Vertex AddVertex(params T[] coords)
         {
             if (IsInitialized)
             {
@@ -439,11 +463,10 @@ namespace MeshNav
                 // In the case of a null boundary, this would be difficult to impossible.  I may
                 // have to revisit and make this virtual so the different cases handle it their own
                 // way.
-                if (face.ICcw() == (fCcw ? 1 : -1))
+                if (fCcw ^ face.IsCcw)
                 {
-                    continue;
+	                face.Reverse();
                 }
-                face.Reverse();
 			}
 #if DEBUG
 	        Validate();

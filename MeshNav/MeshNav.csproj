@@ -67,6 +67,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Placement\PlaceementTree.cs" />
+    <Compile Include="Placement\PlacementNode.cs" />
+    <Compile Include="Placement\Trapezoid.cs" />
+    <Compile Include="Placement\TrapezoidalMap.cs" />
+    <Compile Include="Placement\TrapNode.cs" />
+    <Compile Include="Placement\XNode.cs" />
+    <Compile Include="Placement\YNode.cs" />
     <Compile Include="RbLineSegment.cs" />
     <Compile Include="MeshNavRbTree.cs" />
     <Compile Include="RedBlack\Color.cs" />
@@ -94,6 +101,7 @@
     <Compile Include="TraitInterfaces\IPreviousEdge.cs" />
     <Compile Include="TraitInterfaces\IRayed.cs" />
     <Compile Include="TraitInterfaces\IUV.cs" />
+    <Compile Include="Placement\Placement.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="Factory.cs" />

@@ -39,9 +39,27 @@ namespace MeshNav
 	        return Factory.Builder.DenseOfArray(new[] {x, y});
 	    }
 
+
+		public static T Slope(Vector<T> left, Vector<T> right)
+		{
+			T slope;
+
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if (left.X() == right.X())
+			{
+				slope = left.Y() > right.Y() ? T.MinValue : T.MaxValue;
+			}
+			else
+			{
+				slope = (right.Y() - left.Y()) / (right.X() - left.X());
+			}
+
+			return slope;
+		}
+
         #region Extensions
-        #region X
-        public static T X(this Vector<T> vec)
+		#region X
+		public static T X(this Vector<T> vec)
 	    {
 	        return vec[0];
 	    }

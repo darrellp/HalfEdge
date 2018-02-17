@@ -171,7 +171,7 @@ namespace MeshNav.RayedMesh
 	    {
 		    // We have to deal with the boundary face as it has an opposite orientation to all
 			// the other faces
-			if (BoundaryFace.ICcw() == (fCcw ? 1 : -1))
+			if (BoundaryFace.IsCcw != fCcw)
 			{
 				BoundaryFace.Reverse();
 			}

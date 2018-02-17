@@ -67,7 +67,7 @@ namespace MeshNavTests
             // ReSharper disable once PossibleNullReferenceException
             mesh.FinalizeMesh();
 
-            Assert.AreEqual(1, face.ICcw());
+            Assert.IsTrue(face.IsCcw);
         }
 
 	    [TestMethod]
@@ -108,9 +108,9 @@ namespace MeshNavTests
             var vertsCcw = faceCcw.Vertices().ToList();
             var vertsCw = faceCw.Vertices().ToList();
             // This is the outer face surrounding faceCcw
-            var boundaryFaceCw = mesh.Faces.First(f => f.IsBoundary &&  f.ICcw() == 1);
+            var boundaryFaceCw = mesh.Faces.First(f => f.IsBoundary &&  f.IsCcw);
             // This is the outer face surrounding faceCw
-            var boundaryFaceCcw = mesh.Faces.First(f => f.IsBoundary && f.ICcw() == -1);
+            var boundaryFaceCcw = mesh.Faces.First(f => f.IsBoundary && f.IsCcw);
 
             Assert.IsFalse(faceCcw.IsBoundary);
             Assert.IsFalse(faceCw.IsBoundary);

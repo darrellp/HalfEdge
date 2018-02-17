@@ -77,6 +77,7 @@
     <Compile Include="TestRedBlackTrees.cs" />
     <Compile Include="TestMeshNavRbTree.cs" />
     <Compile Include="TestSimplePolygon.cs" />
+    <Compile Include="TestPlacement.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
