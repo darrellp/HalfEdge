@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +8,20 @@ namespace MeshNav.Placement
 	public static class Placement
 	{
 		#region Placement Tree
+		private static int _seed;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>	Sets edge order. </summary>
+		///
+		/// <remarks>	Darrell Plank, 2/18/2018. </remarks>
+		///
+		/// <param name="seed">	The seed: -1 => mesh edge order, 0 => new random order, >0 => random seed. </param>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		public static void SetEdgeOrder(int seed)
+		{
+			_seed = seed;
+		}
+
 		public static PlacementTree GetPlacementTree(Mesh mesh)
 		{
 			if (!mesh.IsInitialized)
@@ -25,8 +40,10 @@ namespace MeshNav.Placement
 
 			var placementTree = new PlacementTree();
 
+			IEnumerable<HalfEdge> edges = _seed == -1 ? mesh.Edges() : GetShuffledEdges(mesh);
+
 			// TODO: We need to pass Rayed Faces so that placement may be extended to them.
-			foreach (var edge in mesh.Edges())
+			foreach (var edge in edges)
 			{
 				placementTree.AddEdge(edge);
 			}
@@ -39,7 +56,7 @@ namespace MeshNav.Placement
 		#region Utilities
 		private static IEnumerable<HalfEdge> GetShuffledEdges(Mesh mesh)
 		{
-			var random = new Random();
+			var random = _seed == 0 ? new Random() : new Random(_seed);
 			var edgeList = mesh.Edges().Where(e => !e.IsRayed).ToList();
 			for (var i = 0; i < edgeList.Count; i++)
 			{

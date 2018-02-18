@@ -33,6 +33,9 @@ namespace MeshNavTests
 		[TestMethod]
 		public void TestPlacementGeneralEndpointCase()
 		{
+			// Use mesh order for edges
+			Placement.SetEdgeOrder(-1);
+
 			// No two points share the same X position
 			var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
@@ -56,6 +59,9 @@ namespace MeshNavTests
 		[TestMethod]
 		public void TestPlacementGeneralMiddleCase()
 		{
+			// Use mesh order for edges
+			Placement.SetEdgeOrder(-1);
+
 			// No two points share the same X position
 			var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
@@ -79,6 +85,9 @@ namespace MeshNavTests
 		[TestMethod]
 		public void TestPlacementDegenerate()
 		{
+			// Use mesh order for edges
+			Placement.SetEdgeOrder(-1);
+
 			var mesh = new BndFactory(2).CreateMesh() as BndMesh;
 
 			// ReSharper disable PossibleNullReferenceException
