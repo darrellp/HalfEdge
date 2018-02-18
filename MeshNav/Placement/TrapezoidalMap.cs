@@ -52,55 +52,60 @@ namespace MeshNav.Placement
 			return (belowFace, aboveFace);
 		}
 
-		public PlacementNode UpdateMiddleTrapezoid(TrapNode trapNode, HalfEdge edge, ref Trapezoid lNeighborTop, ref Trapezoid lNeighborBottom)
+		public PlacementNode UpdateMiddleTrapezoid(Trapezoid oldTrap, HalfEdge edge, ref Trapezoid lNeighborTop, ref Trapezoid lNeighborBottom)
 		{
 			(var belowFace, var aboveFace) = GetFaces(edge);
-			var trap = trapNode.Trapezoid;
 
 			Trapezoid above, below;
-			TrapNode aboveNode, belowNode;
+			TrapNode aboveNode = null, belowNode = null;
 
-			Debug.Assert(trap.LeftTop == null ^ trap.LeftBottom == null);
+			Debug.Assert(oldTrap.LeftTop == null ^ oldTrap.LeftBottom == null);
 
-			if (trap.LeftTop == null)
+			if (oldTrap.LeftTop == null)
 			{
+				// Left side originates above so merge bottom trapezoids
 				below = lNeighborBottom;
 				belowNode = below.Node;
+				below.RightVtx = oldTrap.RightVtx;
 			}
 			else
 			{
 				below = new Trapezoid
 				{
-					RightVtx = trap.RightVtx,
-					LeftVtx = trap.LeftVtx,
-					BottomEdge = trap.BottomEdge,
+					RightVtx = oldTrap.RightVtx,
+					LeftVtx = oldTrap.LeftVtx,
+					LeftTop = lNeighborBottom,
+					BottomEdge = oldTrap.BottomEdge,
 					TopEdge = edge,
 					ContainingFace = belowFace
 				};
 				belowNode = new TrapNode(below);
+				lNeighborBottom.RightTop = below;
 			}
 
-			if (trap.LeftBottom == null)
+			if (oldTrap.LeftBottom == null)
 			{
 				above = lNeighborTop;
 				aboveNode = above.Node;
+				above.RightVtx = oldTrap.RightVtx;
 			}
 			else
 			{
 				above = new Trapezoid
 				{
-					RightVtx = trap.RightVtx,
-					LeftVtx = trap.LeftVtx,
+					RightVtx = oldTrap.RightVtx,
+					LeftVtx = oldTrap.LeftVtx,
 					BottomEdge = edge,
-					TopEdge = trap.TopEdge,
+					TopEdge = oldTrap.TopEdge,
 					ContainingFace = aboveFace
 				};
 				aboveNode = new TrapNode(above);
+				lNeighborTop.RightBottom = above;
 			}
 
 			lNeighborTop = above;
 			lNeighborBottom = below;
-			return new YNode(edge, belowNode, aboveNode);
+			return new YNode(edge, aboveNode, belowNode);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +214,6 @@ namespace MeshNav.Placement
 					above = lNeighborTop;
 					above.RightVtx = midRightVtx;
 					aboveNode = above.Node;
-					// TODO: worry about right linkages on these merged trapezoids
 
 					// Create new bottom trap
 					below = new Trapezoid
@@ -217,7 +221,6 @@ namespace MeshNav.Placement
 						RightVtx = midRightVtx,
 						LeftVtx = midLeftVtx,
 						LeftTop = lNeighborBottom,
-						LeftBottom = null,
 						TopEdge = edge,
 						BottomEdge = oldTrap.BottomEdge,
 						ContainingFace = belowFace
@@ -236,7 +239,6 @@ namespace MeshNav.Placement
 					{
 						RightVtx = midRightVtx,
 						LeftVtx = midLeftVtx,
-						LeftTop = null,
 						LeftBottom = lNeighborTop,
 						BottomEdge = edge,
 						TopEdge = oldTrap.TopEdge,
@@ -255,7 +257,6 @@ namespace MeshNav.Placement
 					RightVtx = midRightVtx,
 					LeftVtx = midLeftVtx,
 					LeftTop = leftOfTopTrap,
-					LeftBottom = null,
 					TopEdge = oldTrap.TopEdge,
 					BottomEdge = edge,
 					ContainingFace = aboveFace
@@ -265,9 +266,8 @@ namespace MeshNav.Placement
 				{
 					RightVtx = midRightVtx,
 					LeftVtx = midLeftVtx,
-					LeftTop = null,
 					LeftBottom = leftOfBottomTrap,
-					BottomEdge = oldTrap.TopEdge,
+					BottomEdge = oldTrap.BottomEdge,
 					TopEdge = edge,
 					ContainingFace = belowFace
 				};
@@ -283,7 +283,6 @@ namespace MeshNav.Placement
 					RightVtx = midRightVtx,
 					LeftVtx = midLeftVtx,
 					LeftTop = left,
-					LeftBottom = null,
 					TopEdge = oldTrap.TopEdge,
 					BottomEdge = edge,
 					ContainingFace = aboveFace
@@ -293,7 +292,6 @@ namespace MeshNav.Placement
 				{
 					RightVtx = midRightVtx,
 					LeftVtx = midLeftVtx,
-					LeftTop = null,
 					LeftBottom = left,
 					BottomEdge = oldTrap.BottomEdge,
 					TopEdge = edge,

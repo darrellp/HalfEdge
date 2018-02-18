@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 using static MeshNav.Utilities;
 using static MeshNav.Geometry2D;
@@ -43,7 +39,7 @@ namespace MeshNav.Placement
 				}
 				else
 				{
-					repl = _map.UpdateMiddleTrapezoid(trap.Node, edge, ref lNeighborTop, ref lNeighborBottom);
+					repl = _map.UpdateMiddleTrapezoid(trap, edge, ref lNeighborTop, ref lNeighborBottom);
 				}
 
 				foreach (var parent in trap.Node.Parents)

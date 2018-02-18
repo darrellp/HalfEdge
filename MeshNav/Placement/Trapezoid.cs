@@ -116,9 +116,29 @@ namespace MeshNav.Placement
 			}
 		}
 
+		private string EdgeName(HalfEdge e)
+		{
+			string edgeName;
+			var ypos = e.InitVertex.Y;
+			switch (ypos)
+			{
+				case T.MaxValue:
+					edgeName = "Inf";
+					break;
+				case T.MinValue:
+					edgeName = "-Inf";
+					break;
+				default:
+					edgeName = e.ToString();
+					break;
+			}
+
+			return edgeName;
+		}
+
 		public override string ToString()
 		{
-			return $"{Left} - {Right} le {BottomEdge} ue {TopEdge}";
+			return $"{Left} - {Right} le {EdgeName(BottomEdge)} ue {EdgeName(TopEdge)}";
 		}
 	}
 }
