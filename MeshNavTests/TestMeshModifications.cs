@@ -107,10 +107,6 @@ namespace MeshNavTests
             mesh.FinalizeMesh();
             var vertsCcw = faceCcw.Vertices().ToList();
             var vertsCw = faceCw.Vertices().ToList();
-            // This is the outer face surrounding faceCcw
-            var boundaryFaceCw = mesh.Faces.First(f => f.IsBoundary &&  f.IsCcw);
-            // This is the outer face surrounding faceCw
-            var boundaryFaceCcw = mesh.Faces.First(f => f.IsBoundary && f.IsCcw);
 
             Assert.IsFalse(faceCcw.IsBoundary);
             Assert.IsFalse(faceCw.IsBoundary);

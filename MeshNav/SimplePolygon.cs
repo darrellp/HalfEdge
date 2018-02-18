@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using Priority_Queue;
-using static MeshNav.Geometry2D;
 #if FLOAT
 using T = System.Single;
 #else
@@ -30,7 +29,7 @@ namespace MeshNav
                 return true;
             }
 
-            if (polyList[0].Count() != 2)
+            if (polyList[0].Count != 2)
             {
                 throw new ArgumentException("Calling FTestSimplePolygon with non-2D points");
             }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static MeshNav.Utilities;
-#if FLOAT
+﻿#if FLOAT
 using T = System.Single;
 #else
 using T = System.Double;
@@ -14,8 +8,9 @@ namespace MeshNav.Placement
 {
 	internal class Trapezoid
 	{
-		// ReSharper disable once CompareOfFloatsByEqualityOperator
+		// ReSharper disable CompareOfFloatsByEqualityOperator
 		internal bool IsBoundary => TopEdge.InitVertex.Y == T.MaxValue || BottomEdge.InitVertex.Y == T.MinValue;
+		// ReSharper restore CompareOfFloatsByEqualityOperator
 		internal bool IsBBox { get; private set; }
 		internal HalfEdge TopEdge { get; set; }
 		internal HalfEdge BottomEdge { get; set; }
@@ -32,8 +27,6 @@ namespace MeshNav.Placement
 		internal Face ContainingFace { get; set; }
 
 		internal TrapNode Node { get; set; }
-
-		internal Trapezoid() { }
 
 		private static Trapezoid _bbox;
 

@@ -7,6 +7,7 @@ using static MeshNav.Utilities;
 using T = System.Single;
 #else
 using T = System.Double;
+// ReSharper disable RedundantArgumentDefaultValue
 #endif
 
 namespace MeshNavTests

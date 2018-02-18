@@ -2,6 +2,7 @@
 using MeshNav;
 using MeshNav.RedBlack;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 // ReSharper disable RedundantArgumentDefaultValue
 
 namespace MeshNavTests
@@ -45,29 +46,53 @@ namespace MeshNavTests
 		public void InitTreesForTests()
 		{
 			if (TestContext.TestName.Contains("Empty"))
-				this.InitEmptyTreeForTests();
+			{
+				InitEmptyTreeForTests();
+			}
 			else if (TestContext.TestName.Contains("RootOnly"))
-				this.InitRootOnlyForTests();
+			{
+				InitRootOnlyForTests();
+			}
 			else if (TestContext.TestName.Contains("RootLeft"))
-				this.InitRootLeftForTests();
+			{
+				InitRootLeftForTests();
+			}
 			else if (TestContext.TestName.Contains("RootRight"))
-				this.InitRootRightForTests();
+			{
+				InitRootRightForTests();
+			}
 			else if (TestContext.TestName.Contains("ThreeNodesFull"))
-				this.InitThreeNodesFullForTests();
+			{
+				InitThreeNodesFullForTests();
+			}
 			else if (TestContext.TestName.Contains("FourNodesLeftLeft"))
-				this.InitFourNodesLeftLeft();
+			{
+				InitFourNodesLeftLeft();
+			}
 			else if (TestContext.TestName.Contains("FourNodesLeftRight"))
-				this.InitFourNodesLeftRight();
+			{
+				InitFourNodesLeftRight();
+			}
 			else if (TestContext.TestName.Contains("FourNodesRightLeft"))
-				this.InitFourNodesRightLeft();
+			{
+				InitFourNodesRightLeft();
+			}
 			else if (TestContext.TestName.Contains("FourNodesRightRight"))
-				this.InitFourNodesRightRight();
+			{
+				InitFourNodesRightRight();
+			}
 			else if (TestContext.TestName.Contains("FiveNodesLeftFull"))
-				this.InitFiveNodesLeftFullForTests();
+			{
+				InitFiveNodesLeftFullForTests();
+			}
 			else if (TestContext.TestName.Contains("Bigger"))
-				this.InitBiggerForTests();
+			{
+				InitBiggerForTests();
+			}
 			else
-				this.InitCustomForTests();
+			{
+				InitCustomForTests();
+			}
 		}
 
 		public void InitEmptyTreeForTests()
@@ -77,7 +102,7 @@ namespace MeshNavTests
 
 		public void InitRootOnlyForTests()
 		{
-			RootOnly = new RedBlackTree<int>()
+			RootOnly = new RedBlackTree<int>
 			{
 				Count = 1,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -86,19 +111,19 @@ namespace MeshNavTests
 
 		public void InitRootLeftForTests()
 		{
-			RootLeft = new RedBlackTree<int>()
+			RootLeft = new RedBlackTree<int>
 			{
 				Count = 2,
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
 					Left = new RedBlackNode<int>(25, Color.Red)
-				},
+				}
 			};
 		}
 
 		public void InitRootRightForTests()
 		{
-			RootRight = new RedBlackTree<int>()
+			RootRight = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -110,7 +135,7 @@ namespace MeshNavTests
 
 		public void InitThreeNodesFullForTests()
 		{
-			ThreeNodesFull = new RedBlackTree<int>()
+			ThreeNodesFull = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -123,7 +148,7 @@ namespace MeshNavTests
 
 		public void InitFourNodesLeftLeft()
 		{
-			FourNodesLeftLeft = new RedBlackTree<int>()
+			FourNodesLeftLeft = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -139,7 +164,7 @@ namespace MeshNavTests
 
 		public void InitFourNodesLeftRight()
 		{
-			FourNodesLeftRight = new RedBlackTree<int>()
+			FourNodesLeftRight = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -155,7 +180,7 @@ namespace MeshNavTests
 
 		public void InitFourNodesRightLeft()
 		{
-			FourNodesRightLeft = new RedBlackTree<int>()
+			FourNodesRightLeft = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -171,7 +196,7 @@ namespace MeshNavTests
 
 		public void InitFourNodesRightRight()
 		{
-			FourNodesRightRight = new RedBlackTree<int>()
+			FourNodesRightRight = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -188,7 +213,7 @@ namespace MeshNavTests
 
 		public void InitFiveNodesLeftFullForTests()
 		{
-			FiveNodesLeftFull = new RedBlackTree<int>()
+			FiveNodesLeftFull = new RedBlackTree<int>
 			{
 				Root = new RedBlackNode<int>(50, Color.Black)
 				{
@@ -205,7 +230,7 @@ namespace MeshNavTests
 
 		public void InitBiggerForTests()
 		{
-			Bigger = new RedBlackTree<int>()
+			Bigger = new RedBlackTree<int>
 			{
 				Count = 9,
 				Root = new RedBlackNode<int>(100, Color.Black)
@@ -232,7 +257,7 @@ namespace MeshNavTests
 
 		public void InitDelete_BlackLeftLeafRedSibling1()
 		{
-			InstanceDelete_BlackLeftLeafRedSibling1 = new RedBlackTree<int>()
+			InstanceDelete_BlackLeftLeafRedSibling1 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -244,15 +269,15 @@ namespace MeshNavTests
 						Right = new RedBlackNode<int>(100, Color.Black)
 						{
 							Left = new RedBlackNode<int>(80, Color.Red)
-						},
-					},
+						}
+					}
 				}
 			};
 		}
 
 		public void InitDelete_BlackRightLeafRedSibling1()
 		{
-			InstanceDelete_BlackRightLeafRedSibling1 = new RedBlackTree<int>()
+			InstanceDelete_BlackRightLeafRedSibling1 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -261,18 +286,18 @@ namespace MeshNavTests
 					{
 						Left = new RedBlackNode<int>(12, Color.Black)
 						{
-							Right = new RedBlackNode<int>(20, Color.Red),
+							Right = new RedBlackNode<int>(20, Color.Red)
 						},
 						Right = new RedBlackNode<int>(32, Color.Black)
 					},
-					Right = new RedBlackNode<int>(75, Color.Black),
+					Right = new RedBlackNode<int>(75, Color.Black)
 				}
 			};
 		}
 
 		public void InitDelete_BlackLeftLeafRedSibling2()
 		{
-			InstanceDelete_BlackLeftLeafRedSibling2 = new RedBlackTree<int>()
+			InstanceDelete_BlackLeftLeafRedSibling2 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -285,14 +310,14 @@ namespace MeshNavTests
 							Right = new RedBlackNode<int>(70, Color.Red)
 						},
 						Right = new RedBlackNode<int>(100, Color.Black)
-					},
+					}
 				}
 			};
 		}
 
 		public void InitDelete_BlackRightLeafRedSibling2()
 		{
-			InstanceDelete_BlackRightLeafRedSibling2 = new RedBlackTree<int>()
+			InstanceDelete_BlackRightLeafRedSibling2 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -302,10 +327,10 @@ namespace MeshNavTests
 						Left = new RedBlackNode<int>(10, Color.Black),
 						Right = new RedBlackNode<int>(40, Color.Black)
 						{
-							Left = new RedBlackNode<int>(30, Color.Red),
+							Left = new RedBlackNode<int>(30, Color.Red)
 						}
 					},
-					Right = new RedBlackNode<int>(75, Color.Black),
+					Right = new RedBlackNode<int>(75, Color.Black)
 				}
 			};
 		}
@@ -335,7 +360,6 @@ namespace MeshNavTests
 			InstanceDelete_BlackLeftLeafRedSibling2 = null;
 			InstanceDelete_BlackRightLeafRedSibling1 = null;
 			InstanceDelete_BlackRightLeafRedSibling2 = null;
-
 		}
 		#endregion
 
@@ -346,10 +370,10 @@ namespace MeshNavTests
 		{
 			InstanceThreeNodesFull.Insert(100);
 
-			Assert.AreEqual<int>(50, InstanceThreeNodesFull.Root.Value);
-			Assert.AreEqual<int>(25, InstanceThreeNodesFull.Root.Left.Value);
-			Assert.AreEqual<int>(75, InstanceThreeNodesFull.Root.Right.Value);
-			Assert.AreEqual<int>(100, InstanceThreeNodesFull.Root.Right.Right.Value);
+			Assert.AreEqual(50, InstanceThreeNodesFull.Root.Value);
+			Assert.AreEqual(25, InstanceThreeNodesFull.Root.Left.Value);
+			Assert.AreEqual(75, InstanceThreeNodesFull.Root.Right.Value);
+			Assert.AreEqual(100, InstanceThreeNodesFull.Root.Right.Right.Value);
 
 			Assert.IsFalse(InstanceThreeNodesFull.Root.IsRed);
 			Assert.IsFalse(InstanceThreeNodesFull.Root.Left.IsRed);
@@ -369,10 +393,10 @@ namespace MeshNavTests
 		{
 			ThreeNodesFull.Insert(1);
 
-			Assert.AreEqual<int>(50, InstanceThreeNodesFull.Root.Value);
-			Assert.AreEqual<int>(25, InstanceThreeNodesFull.Root.Left.Value);
-			Assert.AreEqual<int>(75, InstanceThreeNodesFull.Root.Right.Value);
-			Assert.AreEqual<int>(1, InstanceThreeNodesFull.Root.Left.Left.Value);
+			Assert.AreEqual(50, InstanceThreeNodesFull.Root.Value);
+			Assert.AreEqual(25, InstanceThreeNodesFull.Root.Left.Value);
+			Assert.AreEqual(75, InstanceThreeNodesFull.Root.Right.Value);
+			Assert.AreEqual(1, InstanceThreeNodesFull.Root.Left.Left.Value);
 
 			Assert.IsFalse(InstanceThreeNodesFull.Root.IsRed);
 			Assert.IsFalse(InstanceThreeNodesFull.Root.Left.IsRed);
@@ -394,9 +418,9 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(FourNodesLeftLeft.Delete(75));
 
-			Assert.AreEqual<int>(25, InstanceFourNodesLeftLeft.Root.Value);
-			Assert.AreEqual<int>(12, InstanceFourNodesLeftLeft.Root.Left.Value);
-			Assert.AreEqual<int>(50, InstanceFourNodesLeftLeft.Root.Right.Value);
+			Assert.AreEqual(25, InstanceFourNodesLeftLeft.Root.Value);
+			Assert.AreEqual(12, InstanceFourNodesLeftLeft.Root.Left.Value);
+			Assert.AreEqual(50, InstanceFourNodesLeftLeft.Root.Right.Value);
 
 			Assert.IsFalse(InstanceFourNodesLeftLeft.Root.IsRed);
 			Assert.IsFalse(InstanceFourNodesLeftLeft.Root.Left.IsRed);
@@ -414,9 +438,9 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(FourNodesRightRight.Delete(25));
 
-			Assert.AreEqual<int>(75, InstanceFourNodesRightRight.Root.Value);
-			Assert.AreEqual<int>(50, InstanceFourNodesRightRight.Root.Left.Value);
-			Assert.AreEqual<int>(100, InstanceFourNodesRightRight.Root.Right.Value);
+			Assert.AreEqual(75, InstanceFourNodesRightRight.Root.Value);
+			Assert.AreEqual(50, InstanceFourNodesRightRight.Root.Left.Value);
+			Assert.AreEqual(100, InstanceFourNodesRightRight.Root.Right.Value);
 
 			Assert.IsFalse(InstanceFourNodesRightRight.Root.IsRed);
 			Assert.IsFalse(InstanceFourNodesRightRight.Root.Left.IsRed);
@@ -434,11 +458,11 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling1.Delete(25));
 
-			Assert.AreEqual<int>(75, InstanceDelete_BlackLeftLeafRedSibling1.Root.Value);
-			Assert.AreEqual<int>(50, InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Value);
-			Assert.AreEqual<int>(100, InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Value);
-			Assert.AreEqual<int>(63, InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Right.Value);
-			Assert.AreEqual<int>(80, InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Left.Value);
+			Assert.AreEqual(75, InstanceDelete_BlackLeftLeafRedSibling1.Root.Value);
+			Assert.AreEqual(50, InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Value);
+			Assert.AreEqual(100, InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Value);
+			Assert.AreEqual(63, InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Right.Value);
+			Assert.AreEqual(80, InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Left.Value);
 
 			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling1.Root.IsRed);
 			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.IsRed);
@@ -460,11 +484,11 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling1.Delete(75));
 
-			Assert.AreEqual<int>(25, InstanceDelete_BlackRightLeafRedSibling1.Root.Value);
-			Assert.AreEqual<int>(12, InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Value);
-			Assert.AreEqual<int>(50, InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Value);
-			Assert.AreEqual<int>(20, InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Right.Value);
-			Assert.AreEqual<int>(32, InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Left.Value);
+			Assert.AreEqual(25, InstanceDelete_BlackRightLeafRedSibling1.Root.Value);
+			Assert.AreEqual(12, InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Value);
+			Assert.AreEqual(50, InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Value);
+			Assert.AreEqual(20, InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Right.Value);
+			Assert.AreEqual(32, InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Left.Value);
 
 			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling1.Root.IsRed);
 			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling1.Root.Left.IsRed);
@@ -486,11 +510,11 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling2.Delete(25));
 
-			Assert.AreEqual<int>(75, InstanceDelete_BlackLeftLeafRedSibling2.Root.Value);
-			Assert.AreEqual<int>(60, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Value);
-			Assert.AreEqual<int>(100, InstanceDelete_BlackLeftLeafRedSibling2.Root.Right.Value);
-			Assert.AreEqual<int>(50, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Left.Value);
-			Assert.AreEqual<int>(70, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Right.Value);
+			Assert.AreEqual(75, InstanceDelete_BlackLeftLeafRedSibling2.Root.Value);
+			Assert.AreEqual(60, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Value);
+			Assert.AreEqual(100, InstanceDelete_BlackLeftLeafRedSibling2.Root.Right.Value);
+			Assert.AreEqual(50, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Left.Value);
+			Assert.AreEqual(70, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Right.Value);
 
 			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling2.Root.IsRed);
 			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.IsRed);
@@ -512,11 +536,11 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling2.Delete(75));
 
-			Assert.AreEqual<int>(25, InstanceDelete_BlackRightLeafRedSibling2.Root.Value);
-			Assert.AreEqual<int>(10, InstanceDelete_BlackRightLeafRedSibling2.Root.Left.Value);
-			Assert.AreEqual<int>(40, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Value);
-			Assert.AreEqual<int>(30, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Left.Value);
-			Assert.AreEqual<int>(50, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Right.Value);
+			Assert.AreEqual(25, InstanceDelete_BlackRightLeafRedSibling2.Root.Value);
+			Assert.AreEqual(10, InstanceDelete_BlackRightLeafRedSibling2.Root.Left.Value);
+			Assert.AreEqual(40, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Value);
+			Assert.AreEqual(30, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Left.Value);
+			Assert.AreEqual(50, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Right.Value);
 
 			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling2.Root.IsRed);
 			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling2.Root.Left.IsRed);
@@ -538,9 +562,9 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(FourNodesLeftRight.Delete(75));
 
-			Assert.AreEqual<int>(32, InstanceFourNodesLeftRight.Root.Value);
-			Assert.AreEqual<int>(25, InstanceFourNodesLeftRight.Root.Left.Value);
-			Assert.AreEqual<int>(50, InstanceFourNodesLeftRight.Root.Right.Value);
+			Assert.AreEqual(32, InstanceFourNodesLeftRight.Root.Value);
+			Assert.AreEqual(25, InstanceFourNodesLeftRight.Root.Left.Value);
+			Assert.AreEqual(50, InstanceFourNodesLeftRight.Root.Right.Value);
 
 			Assert.IsFalse(InstanceFourNodesLeftRight.Root.IsRed);
 			Assert.IsFalse(InstanceFourNodesLeftRight.Root.Left.IsRed);
@@ -557,9 +581,9 @@ namespace MeshNavTests
 		{
 			Assert.IsTrue(FourNodesRightLeft.Delete(25));
 
-			Assert.AreEqual<int>(63, InstanceFourNodesRightLeft.Root.Value);
-			Assert.AreEqual<int>(50, InstanceFourNodesRightLeft.Root.Left.Value);
-			Assert.AreEqual<int>(75, InstanceFourNodesRightLeft.Root.Right.Value);
+			Assert.AreEqual(63, InstanceFourNodesRightLeft.Root.Value);
+			Assert.AreEqual(50, InstanceFourNodesRightLeft.Root.Left.Value);
+			Assert.AreEqual(75, InstanceFourNodesRightLeft.Root.Right.Value);
 
 			Assert.IsFalse(InstanceFourNodesRightLeft.Root.IsRed);
 			Assert.IsFalse(InstanceFourNodesRightLeft.Root.Left.IsRed);
@@ -572,83 +596,83 @@ namespace MeshNavTests
 		#endregion
 
 		#region RedBlackTree.AssertTree
-        [TestMethod]
-        [TestCategory("RedBlackTree")]
-        [ExpectedException(typeof(MeshNavException))]
-        public void AssertValidTree_InvalidChildren()
-        {
-            var root = new RedBlackNode<int>(100);
-            root.Left = new RedBlackNode<int>(150);
+		[TestMethod]
+		[TestCategory("RedBlackTree")]
+		[ExpectedException(typeof(MeshNavException))]
+		public void AssertValidTree_InvalidChildren()
+		{
+			var root = new RedBlackNode<int>(100) {Left = new RedBlackNode<int>(150)};
 
-            RedBlackTree<int> bst = new RedBlackTree<int>();
-            bst.Root = root;
+			var bst = new RedBlackTree<int> {Root = root};
 
-            bst.AssertValidTree();
-        }
+			bst.AssertValidTree();
+		}
 
-        [TestMethod]
-        [TestCategory("RedBlackTree")]
-        [ExpectedException(typeof(MeshNavException))]
-        public void AssertValidTree_Invalid_DoubleRed_Left()
-        {
-            RedBlackNode<int> root = new RedBlackNode<int>(100, Color.Black);
-            root.Left = new RedBlackNode<int>(50, Color.Red);
-            root.Right = new RedBlackNode<int>(150, Color.Red);
-            root.Left.Left = new RedBlackNode<int>(40, Color.Red);
+		[TestMethod]
+		[TestCategory("RedBlackTree")]
+		[ExpectedException(typeof(MeshNavException))]
+		public void AssertValidTree_Invalid_DoubleRed_Left()
+		{
+			var root = new RedBlackNode<int>(100, Color.Black)
+			{
+				Left = new RedBlackNode<int>(50, Color.Red),
+				Right = new RedBlackNode<int>(150, Color.Red)
+			};
+			root.Left.Left = new RedBlackNode<int>(40, Color.Red);
 
-            RedBlackTree<int> bst = new RedBlackTree<int>();
-            bst.Root = root;
+			var bst = new RedBlackTree<int> {Root = root};
 
-            bst.AssertValidTree();
-        }
+			bst.AssertValidTree();
+		}
 
-        [TestMethod]
-        [TestCategory("RedBlackTree")]
-        [ExpectedException(typeof(MeshNavException))]
-        public void AssertValidTree_Invalid_DoubleRed_Right()
-        {
-            RedBlackNode<int> root = new RedBlackNode<int>(100, Color.Black);
-            root.Left = new RedBlackNode<int>(50, Color.Red);
-            root.Right = new RedBlackNode<int>(150, Color.Red);
-            root.Right.Right = new RedBlackNode<int>(160, Color.Red);
+		[TestMethod]
+		[TestCategory("RedBlackTree")]
+		[ExpectedException(typeof(MeshNavException))]
+		public void AssertValidTree_Invalid_DoubleRed_Right()
+		{
+			var root = new RedBlackNode<int>(100, Color.Black)
+			{
+				Left = new RedBlackNode<int>(50, Color.Red),
+				Right = new RedBlackNode<int>(150, Color.Red) {Right = new RedBlackNode<int>(160, Color.Red)}
+			};
 
-            RedBlackTree<int> bst = new RedBlackTree<int>();
-            bst.Root = root;
+			var bst = new RedBlackTree<int> {Root = root};
 
-            bst.AssertValidTree();
-        }
+			bst.AssertValidTree();
+		}
 
-        [TestMethod]
-        [TestCategory("RedBlackTree")]
-        [ExpectedException(typeof(MeshNavException))]
-        public void AssertValidTree_Invalid_BlackMismatch_Left()
-        {
-            RedBlackNode<int> root = new RedBlackNode<int>(100, Color.Black);
-            root.Left = new RedBlackNode<int>(50, Color.Red);
-            root.Right = new RedBlackNode<int>(150, Color.Red);
-            root.Left.Left = new RedBlackNode<int>(40, Color.Red);
+		[TestMethod]
+		[TestCategory("RedBlackTree")]
+		[ExpectedException(typeof(MeshNavException))]
+		public void AssertValidTree_Invalid_BlackMismatch_Left()
+		{
+			var root = new RedBlackNode<int>(100, Color.Black)
+			{
+				Left = new RedBlackNode<int>(50, Color.Red),
+				Right = new RedBlackNode<int>(150, Color.Red)
+			};
+			root.Left.Left = new RedBlackNode<int>(40, Color.Red);
 
-            RedBlackTree<int> bst = new RedBlackTree<int>();
-            bst.Root = root;
+			var bst = new RedBlackTree<int> {Root = root};
 
-            bst.AssertValidTree();
-        }
+			bst.AssertValidTree();
+		}
 
-        [TestMethod]
-        [TestCategory("RedBlackTree")]
-        [ExpectedException(typeof(MeshNavException))]
-        public void AssertValidTree_Invalid_BlackMismatch_Right()
-        {
-            RedBlackNode<int> root = new RedBlackNode<int>(100, Color.Black);
-            root.Left = new RedBlackNode<int>(50, Color.Red);
-            root.Right = new RedBlackNode<int>(150, Color.Red);
-            root.Right.Right = new RedBlackNode<int>(160, Color.Red);
+		[TestMethod]
+		[TestCategory("RedBlackTree")]
+		[ExpectedException(typeof(MeshNavException))]
+		public void AssertValidTree_Invalid_BlackMismatch_Right()
+		{
+			var root = new RedBlackNode<int>(100, Color.Black)
+			{
+				Left = new RedBlackNode<int>(50, Color.Red),
+				Right = new RedBlackNode<int>(150, Color.Red) {Right = new RedBlackNode<int>(160, Color.Red)}
+			};
 
-            RedBlackTree<int> bst = new RedBlackTree<int>();
-            bst.Root = root;
+			var bst = new RedBlackTree<int> {Root = root};
 
-            bst.AssertValidTree();
-        }
-	#endregion
-    }
+			bst.AssertValidTree();
+		}
+		#endregion
+	}
 }

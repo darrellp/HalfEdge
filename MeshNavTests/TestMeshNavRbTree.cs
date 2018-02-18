@@ -5,6 +5,7 @@ using static MeshNav.Utilities;
 using T = System.Single;
 #else
 using T = System.Double;
+// ReSharper disable AccessToModifiedClosure
 #endif
 
 namespace MeshNavTests
@@ -25,6 +26,7 @@ namespace MeshNavTests
 			var mnrb = new MeshNavRbTree();
 			var sweep = 0;
 			// From origin up 45 degrees to the right
+			// ReSharper disable RedundantArgumentDefaultValue
 			var rbt1 = new RbLineSegment(Make(0, 0), Make(100, 100), () => sweep);
 			(var higher, var lower) = mnrb.InsertBracketed(rbt1);
 			Assert.IsNull(higher);
@@ -57,6 +59,7 @@ namespace MeshNavTests
 			mnrb.InsertBracketed(rbt2);
 			rbt3 = new RbLineSegment(Make(0, 5), Make(100, 105), () => sweep);
 			mnrb.InsertBracketed(rbt3);
+			// ReSharper enable RedundantArgumentDefaultValue
 
 			// Now move the sweepline to 5 and the horizontal line at y=1 should have rbt1 above it and
 			// nothing below it

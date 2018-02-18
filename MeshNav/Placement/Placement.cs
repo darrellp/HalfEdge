@@ -23,7 +23,7 @@ namespace MeshNav.Placement
 				throw new ArgumentException($"Mesh contains non-simple polygons in {nameof(GetPlacementTree)}");
 			}
 
-			var placementTree = new PlacementTree(mesh);
+			var placementTree = new PlacementTree();
 
 			// TODO: We need to pass Rayed Faces so that placement may be extended to them.
 			foreach (var edge in mesh.Edges())

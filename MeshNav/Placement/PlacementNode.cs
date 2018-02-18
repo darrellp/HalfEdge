@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
-using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else
@@ -18,7 +13,7 @@ namespace MeshNav.Placement
 		internal PlacementNode Left { get; set; }
 		internal PlacementNode Right { get; set; }
 		internal List<PlacementNode> Parents { get; set; }
-		internal Trapezoid Trapezoid { get; private set; }
+		internal Trapezoid Trapezoid { get; }
 
 		internal bool IsTrapNode => Trapezoid == null;
 

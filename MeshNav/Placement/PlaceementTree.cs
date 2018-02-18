@@ -15,9 +15,9 @@ namespace MeshNav.Placement
 		private TrapezoidalMap _map;
 		private PlacementNode _root;
 
-		public PlacementTree(Mesh mesh)
+		public PlacementTree()
 		{
-			_map = new TrapezoidalMap(mesh);
+			_map = new TrapezoidalMap();
 		}
 
 		internal void AddEdge(HalfEdge edge)
@@ -88,7 +88,7 @@ namespace MeshNav.Placement
 				return new List<Trapezoid> {new TrapNode(_map.Bbox).Trapezoid};
 			}
 			var ret = new List<Trapezoid>();
-			var slope = Utilities.Slope(edge.InitVertex.Position, edge.NextVertex.Position);
+			var slope = Slope(edge.InitVertex.Position, edge.NextVertex.Position);
 			var tCur = LocateTrapezoid(edge, slope);
 			var edgeRight = edge.NextVertex.X;
 			ret.Add(tCur);

@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using MathNet.Numerics.Providers.FourierTransform;
 #if FLOAT
 using T = System.Single;
 #else
@@ -13,7 +11,7 @@ namespace MeshNav.Placement
 	{
 		internal Trapezoid Bbox { get; }
 
-		public TrapezoidalMap(Mesh mesh)
+		public TrapezoidalMap()
 		{
 			Bbox = Trapezoid.Bbox();
 		}
@@ -57,7 +55,7 @@ namespace MeshNav.Placement
 			(var belowFace, var aboveFace) = GetFaces(edge);
 
 			Trapezoid above, below;
-			TrapNode aboveNode = null, belowNode = null;
+			TrapNode aboveNode, belowNode;
 
 			Debug.Assert(oldTrap.LeftTop == null ^ oldTrap.LeftBottom == null);
 
@@ -109,19 +107,21 @@ namespace MeshNav.Placement
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Updates the Trapezoid which an endpoint of the edge is located in. </summary>
-		///
-		/// <remarks>	Note - we presume the caller is modifying trapezoids intersected by the side from
-		/// 			left to right.  The lNeighborTop and lNeighborBottom are the top and bottom
-		/// 			trapezoids created by the edge splitting in the trapezoid to our left.  This is
-		/// 			so we can merge one of our upper or lower traps with the one on the left. Generally
-		///				we can't merge right traps into left ones because the right trapezoids haven't been
-		///				created yet.
+		///  <summary>	Updates the Trapezoid which an endpoint of the edge is located in. </summary>
 		/// 
-		///				Darrell Plank, 2/12/2018. </remarks>
-		/// 
-		/// <param name="trapNode">	The trapNode which contains the left endpoint. </param>
-		/// <param name="edge">	   	The edge whose left endpoint is in the trapezoid. </param>
+		///  <remarks>	Note - we presume the caller is modifying trapezoids intersected by the side from
+		///  			left to right.  The lNeighborTop and lNeighborBottom are the top and bottom
+		///  			trapezoids created by the edge splitting in the trapezoid to our left.  This is
+		///  			so we can merge one of our upper or lower traps with the one on the left. Generally
+		/// 				we can't merge right traps into left ones because the right trapezoids haven't been
+		/// 				created yet.
+		///  
+		/// 				Darrell Plank, 2/12/2018. </remarks>
+		///  
+		///  <param name="oldTrap">	The trapNode which contains the left endpoint. </param>
+		///  <param name="edge">	   	The edge whose left endpoint is in the trapezoid. </param>
+		/// <param name="lNeighborTop"> The left neighbor's top trapezoid </param>
+		/// <param name="lNeighborBottom"> The left neighbor's bottom trapezoid </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		public PlacementNode  UpdateEndTrapezoid(Trapezoid oldTrap, HalfEdge edge, ref Trapezoid lNeighborTop, ref Trapezoid lNeighborBottom)
 		{
@@ -150,8 +150,8 @@ namespace MeshNav.Placement
 			var interiorLeft = trapLeft < edgeLeft;
 			var interiorRight = trapRight > edgeRight;
 
-			(var midRight, var midRightVtx) = meetsRight || exceedsRight ? (trapRight, oldTrap.RightVtx) : (edgeRight, edge.NextVertex);
-			(var midLeft, var midLeftVtx) = meetsLeft || exceedsLeft ? (trapLeft, oldTrap.LeftVtx) : (edgeLeft, edge.InitVertex);
+			var midRightVtx = meetsRight || exceedsRight ? oldTrap.RightVtx : edge.NextVertex;
+			var midLeftVtx = meetsLeft || exceedsLeft ? oldTrap.LeftVtx : edge.InitVertex;
 
 			// The newly created traps to be inserted into the map
 			Trapezoid above, below, left, right;
@@ -297,6 +297,7 @@ namespace MeshNav.Placement
 					TopEdge = edge,
 					ContainingFace = belowFace
 				};
+				// ReSharper disable once PossibleNullReferenceException
 				left.RightTop = above;
 				left.RightBottom = below;
 			}

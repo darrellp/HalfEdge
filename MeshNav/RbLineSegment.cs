@@ -101,7 +101,7 @@ namespace MeshNav
 				// We don't intersect non-existent segments.
 				return false;
 			}
-			(CrossingType ct, Vector<T> pt) = SegSegInt(_left, _right, ls._left, ls._right);
+			(CrossingType ct, Vector<T> _) = SegSegInt(_left, _right, ls._left, ls._right);
 			// TODO: Think about the various crossing types more carefully
 			// ReSharper disable PossibleUnintendedReferenceComparison
 			return ct == CrossingType.Normal || ct == CrossingType.Edge || ct == CrossingType.Vertex;
