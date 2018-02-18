@@ -330,117 +330,7 @@ namespace MeshNav.Placement
 			{
 				belowNode = new TrapNode(below);
 			}
-#if OLD
-			// We may have to merge our top or bottom on the left side.  No merging on the
-			// right because we move through trapezoids left to right, always merging the
-			// current trapezoid with the previous one.
-			if (exceedsLeft && trap.LeftBottom == null)
-			{
-				// Merge top traps
-				above = lNeighborTop;
-				above.RightVtx = midRightVtx;
-				aboveNode = above.Node;
-			}
-			else
-			{
-				var leftTop = meetsLeft ? trap.LeftTop : left;
-				var rightTop = meetsRight ? trap.RightTop : right;
 
-				Trapezoid leftBottom = null;
-				if (exceedsLeft && trap.LeftTop == null)
-				{
-					leftBottom = lNeighborTop;
-				}
-				// There is a similar situation on the right side but since we backpatch
-				// from right to left neighbors, that will get patched when we're processing
-				// the next trap to the right and so we have an assymetry here where we
-				// don't "fix" the righthand side in this trapezoid.
-
-				above = new Trapezoid
-				{
-					RightVtx = midRightVtx,
-					LeftVtx = midLeftVtx,
-					LeftTop = leftTop,
-					LeftBottom = leftBottom,
-					RightTop = rightTop,
-					RightBottom = null,
-					BottomEdge = edge,
-					TopEdge = trap.TopEdge,
-					ContainingFace = aboveFace
-				};
-				aboveNode = new TrapNode(above);
-				// If left != null then we linked to left already
-				if (left == null)
-				{
-					trap.LeftTop?.LinkTo(trap, above, true);
-					trap.LeftBottom?.LinkTo(trap, above, true);
-				}
-				// Ditto right
-				if (right == null)
-				{ 
-					trap.RightTop?.LinkTo(trap, above, false);
-				}
-			}
-
-			if (exceedsLeft && trap.LeftTop == null)
-			{
-				// Merge bottom traps
-				below = lNeighborBottom;
-				below.RightVtx = midRightVtx;
-				belowNode = below.Node;
-			}
-			else
-			{
-				var leftBottom = meetsLeft ? trap.LeftBottom : left;
-				var rightBottom = meetsRight ? trap.RightBottom : right;
-
-				Trapezoid leftTop = null;
-				
-				if (exceedsLeft && trap.LeftBottom == null)
-				{
-					// We merged the top new trap - this lower one has the new left neighbor on it's left
-					leftTop = lNeighborBottom;
-				}
-
-				below = new Trapezoid
-				{
-					RightVtx = midRightVtx,
-					LeftVtx = midLeftVtx,
-					LeftTop = leftTop,
-					LeftBottom = leftBottom,
-					RightTop = null,
-					RightBottom = rightBottom,
-					BottomEdge = trap.BottomEdge,
-					TopEdge = edge,
-					ContainingFace = belowFace
-				};
-				belowNode = new TrapNode(below);
-
-				if (left == null)
-				{
-
-					below.LeftBottom?.LinkTo(trap, below, true);
-					below.LeftTop?.LinkTo(trap, below, true);
-				}
-
-				if (right == null)
-				{
-					trap.RightBottom?.LinkTo(trap, below, false);
-				}
-			}
-
-			if (left != null)
-			{
-				left.RightBottom = below;
-				left.RightTop = above;
-			}
-
-			if (right != null)
-			{
-				right.LeftBottom = below;
-				right.LeftTop = above;
-			}
-#endif
 			lNeighborTop = above;
 			lNeighborBottom = below;
 
@@ -451,13 +341,15 @@ namespace MeshNav.Placement
 			// Do we split off a right trap?
 			if (interiorRight)
 			{
-				repl = new XNode(repl, new TrapNode(right), midRight);
+				repl = new XNode(repl, new TrapNode(right), right.LeftVtx);
+				//repl = new XNode(repl, new TrapNode(right), midRight);
 			}
 
 			// How about splitting off a left trap?
 			if (interiorLeft)
 			{
-				repl = new XNode(new TrapNode(left), repl, midLeft);
+				repl = new XNode(new TrapNode(left), repl, left.RightVtx);
+				//repl = new XNode(new TrapNode(left), repl, midLeft);
 			}
 
 			return repl;

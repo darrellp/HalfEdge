@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
-using MeshNav.TraitInterfaces;
+﻿using MathNet.Numerics.LinearAlgebra;
 #if FLOAT
 using T = System.Single;
 #else
@@ -13,21 +9,25 @@ namespace MeshNav.Placement
 {
 	class XNode : PlacementNode
 	{
-		private T _value;
+		private readonly T _value;
+		private readonly Vector<T> _point;
 
 		internal override bool ShouldTravelLeft(Vector<T> queryPt)
 		{
-			return queryPt.X() < _value;
+			var queryX = queryPt.X();
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			return queryX == _value ? queryPt.Y() < _point.Y() : queryX < _value;
 		}
 
 		internal override bool ShouldTravelLeft(Vector<T> queryPt, T edgeSlope)
 		{
-			return queryPt.X() < _value;
+			return ShouldTravelLeft(queryPt);
 		}
 
-		public XNode(PlacementNode left, PlacementNode right, T value) : base(left, right)
+		public XNode(PlacementNode left, PlacementNode right, Vertex vtx) : base(left, right)
 		{
-			_value = value;
+			_point = vtx.Position;
+			_value = _point.X();
 			left.Parents.Add(this);
 			right.Parents.Add(this);
 		}
