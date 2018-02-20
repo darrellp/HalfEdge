@@ -1,4 +1,5 @@
-﻿using static MeshNav.Utilities;
+﻿using System.Runtime.Serialization;
+using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else
@@ -7,10 +8,18 @@ using T = System.Double;
 
 namespace MeshNav.Placement
 {
+	[DataContract]
 	class YNode : PlacementNode
 	{
+		[DataMember]
 		private readonly PlacementPoint _leftEnd;
+		[DataMember]
 		private readonly PlacementPoint _rightEnd;
+
+		public YNode() { }
+
+		// We don't actually need the slope to be serialized/deserialized.  It's only used in the
+		// construction where we have to insert edges.
 		private readonly T _slope;
 
 		internal YNode(PlacementPoint leftEnd, PlacementPoint rightEnd, PlacementNode left, PlacementNode right) : base(left, right)
@@ -18,7 +27,7 @@ namespace MeshNav.Placement
 			_leftEnd = leftEnd;
 			_rightEnd = rightEnd;
 
-			// PlacementTreeInternal.AddEdge() ensures that we use the half edge which goes from left to right
+			// PlacementTree.AddEdge() ensures that we use the half edge which goes from left to right
 			// so we don't have to check that here.
 			_slope = Slope(leftEnd.X, leftEnd.Y, rightEnd.X, rightEnd.Y);
 			left.Parents.Add(this);
@@ -48,7 +57,7 @@ namespace MeshNav.Placement
 			}
 		}
 
-	internal YNode(PlacementNode left, PlacementNode right, Trapezoid trapezoid = null) : base(left, right, trapezoid)
+		internal YNode(PlacementNode left, PlacementNode right, Trapezoid trapezoid = null) : base(left, right, trapezoid)
 		{
 			left.Parents.Add(this);
 			right.Parents.Add(this);

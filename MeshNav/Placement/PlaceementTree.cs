@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
 using static MeshNav.Utilities;
 using static MeshNav.Geometry2D;
 #if FLOAT
@@ -10,12 +9,12 @@ using T = System.Double;
 
 namespace MeshNav.Placement
 {
-	public class PlacementTreeInternal
+	public class PlacementTree
 	{
 		private TrapezoidalMap _map;
-		private PlacementNode _root;
+		internal PlacementNode Root { get; set; }
 
-		public PlacementTreeInternal()
+		public PlacementTree()
 		{
 			_map = new TrapezoidalMap();
 		}
@@ -47,37 +46,48 @@ namespace MeshNav.Placement
 					parent.ReplaceSon(trap.Node, repl);
 				}
 
-				if (_root == null)
+				if (Root == null)
 				{
-					_root = repl;
+					Root = repl;
 				}
 
 			}
 		}
 
-		public Face Locate(T x, T y)
+		private TrapNode LocateNode(T x, T y)
+		{
+			var curNode = Root;
+			while (!curNode.IsLeaf())
+			{
+				curNode = curNode.ShouldTravelLeft(x, y) ? curNode.Left : curNode.Right;
+			}
+
+			return (TrapNode) curNode;
+		}
+
+		public object Locate(T x, T y)
+		{
+			return LocateNode(x, y).Tag;
+		}
+
+		public Face LocateFace(T x, T y)
 		{
 			return LocateTrapezoid(x, y).ContainingFace;
 		}
 
 		private Trapezoid LocateTrapezoid(T x, T y)
 		{
-			var curNode = _root;
-			while (curNode.Trapezoid == null)
-			{
-				curNode = curNode.ShouldTravelLeft(x, y) ? curNode.Left : curNode.Right;
-			}
-			return curNode.Trapezoid;
+			return LocateNode(x, y).Trapezoid;
 		}
 
 		private Trapezoid LocateTrapezoid(HalfEdge edge, T slope)
 		{
-			var curNode = _root;
+			var curNode = Root;
 			var queryPt = edge.InitVertex.Position;
 			var x = queryPt.X();
 			var y = queryPt.Y();
 
-			while (curNode.Trapezoid == null)
+			while (!curNode.IsLeaf())
 			{
 				curNode = curNode.ShouldTravelLeft(x, y, slope) ? curNode.Left : curNode.Right;
 			}
@@ -86,7 +96,7 @@ namespace MeshNav.Placement
 
 		private List<Trapezoid> LocateTrapezoids(HalfEdge edge)
 		{
-			if (_root == null)
+			if (Root == null)
 			{
 				return new List<Trapezoid> {new TrapNode(_map.Bbox).Trapezoid};
 			}

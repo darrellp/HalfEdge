@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace MeshNav.Placement
 {
@@ -22,7 +24,7 @@ namespace MeshNav.Placement
 			_seed = seed;
 		}
 
-		public static PlacementTreeInternal GetPlacementTree(Mesh mesh)
+		public static PlacementTree GetPlacementTree(Mesh mesh)
 		{
 			if (!mesh.IsInitialized)
 			{
@@ -38,7 +40,7 @@ namespace MeshNav.Placement
 				throw new ArgumentException($"Mesh contains non-simple polygons in {nameof(GetPlacementTree)}");
 			}
 
-			var placementTree = new PlacementTreeInternal();
+			var placementTree = new PlacementTree();
 
 			IEnumerable<HalfEdge> edges = _seed == -1 ? mesh.Edges() : GetShuffledEdges(mesh);
 
@@ -51,6 +53,41 @@ namespace MeshNav.Placement
 			placementTree.Finish();
 			return placementTree;
 		}
+		#endregion
+
+		#region Serialization
+		public static void Serialize(PlacementTree tree, Func<Face, string> serializeFaceToString, TextWriter stm)
+		{
+			var serializer = new JsonSerializer
+			{
+				Context = new StreamingContext(StreamingContextStates.Other, (serializeFaceToString, new Dictionary<Face, string>())),
+				NullValueHandling = NullValueHandling.Ignore,
+				TypeNameHandling = TypeNameHandling.Objects
+			};
+
+			using (JsonWriter writer = new JsonTextWriter(stm))
+			{
+				serializer.Serialize(writer, tree.Root);
+			}
+		}
+
+		public static PlacementTree Deserialize(Func<string, object> serializeStringToObject, TextReader stm)
+		{
+			var serializer = new JsonSerializer
+			{
+				Context = new StreamingContext(StreamingContextStates.Other, (serializeStringToObject, new Dictionary<string, object>())),
+				NullValueHandling = NullValueHandling.Ignore,
+				TypeNameHandling = TypeNameHandling.Objects
+			};
+			var ret = new PlacementTree();
+			using (JsonReader reader = new JsonTextReader(stm))
+			{
+				ret.Root = (PlacementNode)serializer.Deserialize(reader);
+			}
+
+			return ret;
+		}
+
 		#endregion
 
 		#region Utilities

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
+﻿using System.Runtime.Serialization;
 #if FLOAT
 using T = System.Single;
 #else
@@ -9,9 +7,13 @@ using T = System.Double;
 
 namespace MeshNav.Placement
 {
-	class XNode : PlacementNode
+	[DataContract]
+	internal class XNode : PlacementNode
 	{
+		[DataMember]
 		private readonly PlacementPoint _point;
+
+		public XNode() { }
 
 		internal override bool ShouldTravelLeft(T x, T y)
 		{

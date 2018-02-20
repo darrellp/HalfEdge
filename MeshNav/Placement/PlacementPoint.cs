@@ -1,4 +1,5 @@
-﻿using static MeshNav.Utilities;
+﻿using System.Runtime.Serialization;
+using static MeshNav.Utilities;
 using MathNet.Numerics.LinearAlgebra;
 #if FLOAT
 using T = System.Single;
@@ -8,10 +9,15 @@ using T = System.Double;
 
 namespace MeshNav.Placement
 {
+	[DataContract]
 	public class PlacementPoint
 	{
+		[DataMember]
 		public T X { get; set; }
+		[DataMember]
 		public T Y { get; set; }
+
+		public PlacementPoint() { }
 
 		public PlacementPoint(Vertex vtx)
 		{
