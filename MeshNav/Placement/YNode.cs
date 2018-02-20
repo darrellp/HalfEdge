@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
@@ -12,8 +13,10 @@ namespace MeshNav.Placement
 	class YNode : PlacementNode
 	{
 		[DataMember]
+		[JsonProperty(TypeNameHandling = TypeNameHandling.None)]
 		private readonly PlacementPoint _leftEnd;
 		[DataMember]
+		[JsonProperty(TypeNameHandling = TypeNameHandling.None)]
 		private readonly PlacementPoint _rightEnd;
 
 		public YNode() { }

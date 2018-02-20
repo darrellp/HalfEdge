@@ -82,7 +82,7 @@ namespace MeshNav.Placement
 			var ret = new PlacementTree();
 			using (JsonReader reader = new JsonTextReader(stm))
 			{
-				ret.Root = (PlacementNode)serializer.Deserialize(reader);
+				ret.Root = serializer.Deserialize<PlacementNode>(reader);
 			}
 
 			return ret;
