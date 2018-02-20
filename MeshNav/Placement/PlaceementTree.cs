@@ -10,12 +10,12 @@ using T = System.Double;
 
 namespace MeshNav.Placement
 {
-	public class PlacementTree
+	public class PlacementTreeInternal
 	{
 		private TrapezoidalMap _map;
 		private PlacementNode _root;
 
-		public PlacementTree()
+		public PlacementTreeInternal()
 		{
 			_map = new TrapezoidalMap();
 		}
@@ -57,15 +57,15 @@ namespace MeshNav.Placement
 
 		public Face Locate(T x, T y)
 		{
-			return LocateTrapezoid(Make(x, y)).ContainingFace;
+			return LocateTrapezoid(x, y).ContainingFace;
 		}
 
-		private Trapezoid LocateTrapezoid(Vector<T> queryPt)
+		private Trapezoid LocateTrapezoid(T x, T y)
 		{
 			var curNode = _root;
 			while (curNode.Trapezoid == null)
 			{
-				curNode = curNode.ShouldTravelLeft(queryPt) ? curNode.Left : curNode.Right;
+				curNode = curNode.ShouldTravelLeft(x, y) ? curNode.Left : curNode.Right;
 			}
 			return curNode.Trapezoid;
 		}
@@ -74,9 +74,12 @@ namespace MeshNav.Placement
 		{
 			var curNode = _root;
 			var queryPt = edge.InitVertex.Position;
+			var x = queryPt.X();
+			var y = queryPt.Y();
+
 			while (curNode.Trapezoid == null)
 			{
-				curNode = curNode.ShouldTravelLeft(queryPt, slope) ? curNode.Left : curNode.Right;
+				curNode = curNode.ShouldTravelLeft(x, y, slope) ? curNode.Left : curNode.Right;
 			}
 			return curNode.Trapezoid;
 		}

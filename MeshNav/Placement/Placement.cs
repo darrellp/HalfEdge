@@ -22,7 +22,7 @@ namespace MeshNav.Placement
 			_seed = seed;
 		}
 
-		public static PlacementTree GetPlacementTree(Mesh mesh)
+		public static PlacementTreeInternal GetPlacementTree(Mesh mesh)
 		{
 			if (!mesh.IsInitialized)
 			{
@@ -38,7 +38,7 @@ namespace MeshNav.Placement
 				throw new ArgumentException($"Mesh contains non-simple polygons in {nameof(GetPlacementTree)}");
 			}
 
-			var placementTree = new PlacementTree();
+			var placementTree = new PlacementTreeInternal();
 
 			IEnumerable<HalfEdge> edges = _seed == -1 ? mesh.Edges() : GetShuffledEdges(mesh);
 

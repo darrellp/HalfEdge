@@ -103,7 +103,7 @@ namespace MeshNav.Placement
 
 			lNeighborTop = above;
 			lNeighborBottom = below;
-			return new YNode(edge, aboveNode, belowNode);
+			return new YNode(new PlacementPoint(edge.InitVertex), new PlacementPoint(edge.NextVertex), aboveNode, belowNode);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,7 +337,7 @@ namespace MeshNav.Placement
 
 			// Okay - finally done with the map.  Now to deal with the tree.
 			// We always have the edge split to concern ourselves with
-			PlacementNode repl = new YNode(edge, aboveNode, belowNode);
+			PlacementNode repl = new YNode(new PlacementPoint(edge.InitVertex), new PlacementPoint(edge.NextVertex), aboveNode, belowNode);
 
 			// Do we split off a right trap?
 			if (interiorRight)

@@ -1,5 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using static MeshNav.Utilities;
+﻿using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else
@@ -10,46 +9,46 @@ namespace MeshNav.Placement
 {
 	class YNode : PlacementNode
 	{
-		private readonly Vector<T> _left;
-		private readonly Vector<T> _right;
+		private readonly PlacementPoint _leftEnd;
+		private readonly PlacementPoint _rightEnd;
 		private readonly T _slope;
 
-		internal YNode(HalfEdge edge, PlacementNode left, PlacementNode right) : base(left, right)
+		internal YNode(PlacementPoint leftEnd, PlacementPoint rightEnd, PlacementNode left, PlacementNode right) : base(left, right)
 		{
-			_left = edge.InitVertex.Position;
-			_right = edge.NextVertex.Position;
+			_leftEnd = leftEnd;
+			_rightEnd = rightEnd;
 
-			// PlacementTree.AddEdge() ensures that we use the half edge which goes from left to right
+			// PlacementTreeInternal.AddEdge() ensures that we use the half edge which goes from left to right
 			// so we don't have to check that here.
-			_slope = Slope(_left, _right);
+			_slope = Slope(leftEnd.X, leftEnd.Y, rightEnd.X, rightEnd.Y);
 			left.Parents.Add(this);
 			right.Parents.Add(this);
 		}
 
 		// In the tree, left is "above", right is "below"
-		internal override bool ShouldTravelLeft(Vector<T> queryPt)
+		internal override bool ShouldTravelLeft(T x, T y)
 		{
 			// We want to go left if we're above - i.e., to the left of the line travelling
 			// from left to right.
-			return Geometry2D.FLeft(_left, _right, queryPt);
+			return Geometry2D.FLeft(_leftEnd.ToVector(), _rightEnd.ToVector(), Make(x, y));
 		}
 
 		// If we're adding a segment to the tree then we make the decision partially based on slopes
-		internal override bool ShouldTravelLeft(Vector<T> queryPt, T edgeSlope)
+		internal override bool ShouldTravelLeft(T x, T y, T edgeSlope)
 		{
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
-			if (queryPt.Y() == _left.Y())
+			if (y == _leftEnd.Y)
 			{
 				// We share our left endpoints so we compare slopes rather than above/below
 				return edgeSlope > _slope;
 			}
 			else
 			{
-				return ShouldTravelLeft(queryPt);
+				return ShouldTravelLeft(x, y);
 			}
 		}
 
-		internal YNode(PlacementNode left, PlacementNode right, Trapezoid trapezoid = null) : base(left, right, trapezoid)
+	internal YNode(PlacementNode left, PlacementNode right, Trapezoid trapezoid = null) : base(left, right, trapezoid)
 		{
 			left.Parents.Add(this);
 			right.Parents.Add(this);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 #if FLOAT
 using T = System.Single;
@@ -25,13 +26,8 @@ namespace MeshNav.Placement
 			Parents = new List<PlacementNode>();
 		}
 
-		internal PlacementNode NextNode(Vector<T> queryPt)
-		{
-			return ShouldTravelLeft(queryPt) ? Left : Right;
-		}
-
-		internal abstract bool ShouldTravelLeft(Vector<T> queryPt);
-		internal abstract bool ShouldTravelLeft(Vector<T> queryPt, T edgeSlope);
+		internal abstract bool ShouldTravelLeft(T x, T y);
+		internal abstract bool ShouldTravelLeft(T x, T y, T edgeSlope);
 
 		internal void ReplaceSon(PlacementNode oldSon, PlacementNode newSon)
 		{
