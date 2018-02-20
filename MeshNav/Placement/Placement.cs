@@ -85,6 +85,7 @@ namespace MeshNav.Placement
 				ret.Root = serializer.Deserialize<PlacementNode>(reader);
 			}
 
+			ret.FromDeserialized = true;
 			return ret;
 		}
 

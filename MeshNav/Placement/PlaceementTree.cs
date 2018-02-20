@@ -13,6 +13,7 @@ namespace MeshNav.Placement
 	{
 		private TrapezoidalMap _map;
 		internal PlacementNode Root { get; set; }
+		internal bool FromDeserialized { get; set; }
 
 		public PlacementTree()
 		{
@@ -67,11 +68,24 @@ namespace MeshNav.Placement
 
 		public object Locate(T x, T y)
 		{
+			// TODO: Should we somehow allow for Tags in non-deserialized trees?
+			// The only place we currently specify how to turn a Face into a tag is in the callback
+			// functions passed down to Serialize/Deserialize so they would have to somehow be included
+			// in the creation phase also which seems weird.  Perhaps we could make a tag trait for
+			// faces and use it as the tag in the TrapezoidNode?
+			if (!FromDeserialized)
+			{
+				throw new MeshNavException("Locate() is not available for unserialized trees");
+			}
 			return LocateNode(x, y).Tag;
 		}
 
 		public Face LocateFace(T x, T y)
 		{
+			if (FromDeserialized)
+			{
+				throw new MeshNavException("LocateFace() is not available for deserialized placement trees");
+			}
 			return LocateTrapezoid(x, y).ContainingFace;
 		}
 
@@ -125,7 +139,7 @@ namespace MeshNav.Placement
 			return tCur.RightTop;
 		}
 
-		public void Finish()
+		internal void Finish()
 		{
 			// dereference map so it can be garbage collected
 			_map = null;
