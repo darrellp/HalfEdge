@@ -14,10 +14,10 @@ namespace MeshNav.Placement
 	{
 		[DataMember]
 		[JsonProperty(TypeNameHandling = TypeNameHandling.None)]
-		private readonly PlacementPoint _leftEnd;
+		private readonly Vector _leftEnd;
 		[DataMember]
 		[JsonProperty(TypeNameHandling = TypeNameHandling.None)]
-		private readonly PlacementPoint _rightEnd;
+		private readonly Vector _rightEnd;
 
 		public YNode() { }
 
@@ -25,7 +25,7 @@ namespace MeshNav.Placement
 		// construction where we have to insert edges.
 		private readonly T _slope;
 
-		internal YNode(PlacementPoint leftEnd, PlacementPoint rightEnd, PlacementNode left, PlacementNode right) : base(left, right)
+		internal YNode(Vector leftEnd, Vector rightEnd, PlacementNode left, PlacementNode right) : base(left, right)
 		{
 			_leftEnd = leftEnd;
 			_rightEnd = rightEnd;
@@ -42,7 +42,7 @@ namespace MeshNav.Placement
 		{
 			// We want to go left if we're above - i.e., to the left of the line travelling
 			// from left to right.
-			return Geometry2D.FLeft(_leftEnd.ToVector(), _rightEnd.ToVector(), new Vector(x, y));
+			return Geometry2D.FLeft(_leftEnd, _rightEnd, new Vector(x, y));
 		}
 
 		// If we're adding a segment to the tree then we make the decision partially based on slopes

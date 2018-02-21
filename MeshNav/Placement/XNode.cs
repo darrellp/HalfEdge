@@ -13,7 +13,7 @@ namespace MeshNav.Placement
 	{
 		[DataMember]
 		[JsonProperty(TypeNameHandling = TypeNameHandling.None)]
-		private readonly PlacementPoint _point;
+		private readonly Vector _point;
 
 		public XNode() { }
 
@@ -30,7 +30,7 @@ namespace MeshNav.Placement
 
 		public XNode(PlacementNode left, PlacementNode right, Vertex vtx) : base(left, right)
 		{
-			_point = new PlacementPoint(vtx);
+			_point = vtx.Position;
 			left.Parents.Add(this);
 			right.Parents.Add(this);
 		}

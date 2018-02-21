@@ -68,7 +68,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Placement\PlacementPoint.cs" />
     <Compile Include="Placement\PlaceementTree.cs" />
     <Compile Include="Placement\PlacementNode.cs" />
     <Compile Include="Placement\Trapezoid.cs" />
