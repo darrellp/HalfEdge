@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
 using Priority_Queue;
 #if FLOAT
 using T = System.Single;
@@ -14,7 +13,7 @@ namespace MeshNav
     class SimplePolygon
     {
 
-        public static bool FTestSimplePolygon(IEnumerable<Vector<T>> poly)
+        public static bool FTestSimplePolygon(IEnumerable<Vector> poly)
         {
             var polyList = poly?.ToList();
 	        var sweep = T.MinValue;
@@ -29,7 +28,7 @@ namespace MeshNav
                 return true;
             }
 
-            if (polyList[0].Count != 2)
+            if (polyList[0].Rank != 2)
             {
                 throw new ArgumentException("Calling FTestSimplePolygon with non-2D points");
             }
@@ -68,7 +67,7 @@ namespace MeshNav
                 }
                 else
                 {
-	                sweep = nextEvent.Vertex.X();
+	                sweep = nextEvent.Vertex.X;
                     var lsCur = edgeList[nextEvent.SegIndex];
 
 					// Insert the corresponding line segment
@@ -81,12 +80,12 @@ namespace MeshNav
             }
             return true;
 
-            int CmpVectors(Vector<T> v1, Vector<T> v2)
+            int CmpVectors(Vector v1, Vector v2)
             {
-                var cmp = v1.X().CompareTo(v2.X());
+                var cmp = v1.X.CompareTo(v2.X);
                 if (cmp == 0)
                 {
-                    cmp = v1.Y().CompareTo(v2.Y());
+                    cmp = v1.Y.CompareTo(v2.Y);
                 }
                 return cmp;
             }
@@ -94,11 +93,11 @@ namespace MeshNav
 
 	    private struct SimplePolygonEvent
         {
-            internal readonly Vector<T> Vertex;
+            internal readonly Vector Vertex;
             internal readonly int SegIndex;
             internal readonly bool IsRightEndpoint;
 
-            public SimplePolygonEvent(Vector<double> vertex, int segIndex, bool isRightEndpoint)
+            public SimplePolygonEvent(Vector vertex, int segIndex, bool isRightEndpoint)
             {
                 Vertex = vertex;
                 SegIndex = segIndex;
@@ -107,7 +106,7 @@ namespace MeshNav
 
 	        public override string ToString()
 	        {
-		        return $"({Vertex.X()}, {Vertex.Y()}) in seg index {SegIndex} : {(IsRightEndpoint ? "Right" : "Left")}";
+		        return $"({Vertex.X}, {Vertex.Y}) in seg index {SegIndex} : {(IsRightEndpoint ? "Right" : "Left")}";
 	        }
         }
     }

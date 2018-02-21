@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
 using Assimp;
 #if FLOAT
 using T = System.Single;
@@ -12,10 +11,6 @@ namespace MeshNav
 {
     public class Factory
     {
-        #region Static Variables
-        protected internal static readonly VectorBuilder<T> Builder = Vector<T>.Build;
-        #endregion
-
         #region Public properties
         public int Dimension { get;}
         #endregion
@@ -28,13 +23,6 @@ namespace MeshNav
         #endregion
 
         #region Virtual functions
-        internal Vector<T> FromVector3D(Vector3D vec)
-        {
-            // ReSharper disable RedundantCast
-            return Builder.DenseOfArray(new[] { (T)vec.X, (T)vec.Y, (T)vec.Z });
-            // ReSharper restore RedundantCast
-        }
-
         public virtual Mesh CreateMesh()
         {
             return new Mesh(Dimension, this);
@@ -42,19 +30,19 @@ namespace MeshNav
 
         public Vertex CreateVertex(Mesh mesh, params T[] coords)
         {
-            var vector = Builder.Dense(coords);
+            var vector = new Vector(coords);
             return CreateVertex(mesh, vector);
         }
 
 	    public Vertex CreateVertex(Mesh mesh, IList<T> coords)
 	    {
-		    var vector = Builder.Dense(coords.ToArray());
+		    var vector = new Vector(coords.ToArray());
 		    return CreateVertex(mesh, vector);
 	    }
 
-        internal virtual Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal virtual Vertex CreateVertex(Mesh mesh, Vector vec)
         {
-            if (vec.Count != Dimension)
+            if (vec.Rank != Dimension)
             {
                 throw new MeshNavException("Dimension mismatch");
             }
@@ -71,14 +59,9 @@ namespace MeshNav
 		    return new HalfEdge(vertex, opposite, face, nextEdge);
 	    }
 
-		public static Vector<T> Vector(params T[] coords)
-        {
-            return Builder.Dense(coords);
-        }
-
-	    public Vector<T> ZeroVector()
+	    public Vector ZeroVector()
 	    {
-			return Builder.Dense(Dimension);
+			return new Vector(Dimension);
 	    }
 		#endregion
 

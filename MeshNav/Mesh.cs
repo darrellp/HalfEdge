@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
 using static System.Diagnostics.Debug;
 #if FLOAT
@@ -191,7 +190,7 @@ namespace MeshNav
             return AddVertex(Factory.CreateVertex(this, coords));
         }
 
-        public Vertex AddVertex(Vector<T> vec)
+        public Vertex AddVertex(Vector vec)
         {
             if (IsInitialized)
             {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
 #if FLOAT
 using T = System.Single;
@@ -104,7 +103,7 @@ namespace MeshNav
         /// An enumerator of points in this face.
         /// </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public IEnumerable<Vector<T>> Points()
+        public IEnumerable<Vector> Points()
         {
             return Vertices().Select(v => v.Position);
         }

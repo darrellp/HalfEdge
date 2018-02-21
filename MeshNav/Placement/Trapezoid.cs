@@ -21,8 +21,8 @@ namespace MeshNav.Placement
 		internal Trapezoid LeftTop { get; set; }
 		internal Trapezoid LeftBottom { get; set; }
 
-		internal T Left => LeftVtx.Position.X();
-		internal T Right => RightVtx.Position.X();
+		internal T Left => LeftVtx.Position.X;
+		internal T Right => RightVtx.Position.X;
 
 		internal Face ContainingFace { get; set; }
 

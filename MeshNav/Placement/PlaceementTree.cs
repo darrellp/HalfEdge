@@ -98,8 +98,8 @@ namespace MeshNav.Placement
 		{
 			var curNode = Root;
 			var queryPt = edge.InitVertex.Position;
-			var x = queryPt.X();
-			var y = queryPt.Y();
+			var x = queryPt.X;
+			var y = queryPt.Y;
 
 			while (!curNode.IsLeaf())
 			{

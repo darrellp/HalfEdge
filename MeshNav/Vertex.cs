@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
 using static MeshNav.Utilities;
 #if FLOAT
@@ -26,9 +25,9 @@ namespace MeshNav
     public class Vertex : MeshComponent
     {
         #region Public Properties
-        internal virtual Vector<T> Position { get; set; }
+        internal virtual Vector Position { get; set; }
         public HalfEdge Edge { get; internal set; }
-        public int Dimension => Position.Count;
+        public int Dimension => Position.Rank;
         public Mesh Mesh { get; internal set; }
 
         public T X => Position[0];
@@ -37,7 +36,7 @@ namespace MeshNav
 	    #endregion
 
         #region Traits
-        public Vector<T> Normal
+        public Vector? Normal
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
@@ -54,7 +53,7 @@ namespace MeshNav
         }
 
 	    // ReSharper disable once InconsistentNaming
-        public Vector<T> UV
+        public Vector? UV
         {
             // ReSharper disable SuspiciousTypeConversion.Global
             // ReSharper disable PossibleNullReferenceException
@@ -76,7 +75,7 @@ namespace MeshNav
 	    #endregion
 
         #region Constructor
-        internal Vertex(Mesh mesh, Vector<T> position)
+        internal Vertex(Mesh mesh, Vector position)
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             Position = position;
@@ -153,11 +152,11 @@ namespace MeshNav
                 sum = sum + FaceNormal(he);
                 faceCount++;
             }
-            Normal = sum / faceCount;
-            Normal.Normalize(2.0);
+            Normal = (Vector?)sum / faceCount;
+            Normal.Value.Normalize();
         }
 
-        private Vector<T> FaceNormal(HalfEdge he)
+        private Vector FaceNormal(HalfEdge he)
         {
             var pos = Position;
             var pos1 = he.NextVertex.Position;

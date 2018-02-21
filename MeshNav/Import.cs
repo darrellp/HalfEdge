@@ -27,11 +27,12 @@ namespace MeshNav
 					for (var iVtx = 0; iVtx < aiMesh.Vertices.Count; iVtx++)
 	                {
 		                var aiVtx = aiMesh.Vertices[iVtx];
-	                    var vtxCur = factory.FromVector3D(aiVtx);
+	                    var vtxCur = new Vector(aiVtx.X, aiVtx.Y, aiVtx.Z);
                         var vtx = mesh.AddVertex(vtxCur);
 						if (addNormals)
 						{
-							vtx.Normal = factory.FromVector3D(aiMesh.Normals[iVtx]);
+							var v3d = aiMesh.Normals[iVtx];
+							vtx.Normal = new Vector(v3d.X, v3d.Y, v3d.Z);
 						}
 					}
                     foreach (var face in aiMesh.Faces)

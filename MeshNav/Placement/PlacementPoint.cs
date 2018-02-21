@@ -1,6 +1,5 @@
 ﻿using System.Runtime.Serialization;
 using static MeshNav.Utilities;
-using MathNet.Numerics.LinearAlgebra;
 #if FLOAT
 using T = System.Single;
 #else
@@ -25,15 +24,15 @@ namespace MeshNav.Placement
 			Y = vtx.Y;
 		}
 
-		public PlacementPoint(Vector<T> vec)
+		public PlacementPoint(Vector vec)
 		{
-			X = vec.X();
-			Y = vec.Y();
+			X = vec.X;
+			Y = vec.Y;
 		}
 
-		public Vector<T> ToVector()
+		public Vector ToVector()
 		{
-			return Make(X, Y);
+			return new Vector(X, Y);
 		}
 	}
 }

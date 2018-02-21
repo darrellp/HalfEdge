@@ -42,7 +42,7 @@ namespace MeshNav.Placement
 		{
 			// We want to go left if we're above - i.e., to the left of the line travelling
 			// from left to right.
-			return Geometry2D.FLeft(_leftEnd.ToVector(), _rightEnd.ToVector(), Make(x, y));
+			return Geometry2D.FLeft(_leftEnd.ToVector(), _rightEnd.ToVector(), new Vector(x, y));
 		}
 
 		// If we're adding a segment to the tree then we make the decision partially based on slopes
