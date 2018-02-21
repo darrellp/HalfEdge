@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
 #if FLOAT
@@ -72,7 +72,7 @@ namespace MeshNav
 					StringBuilder sb = new StringBuilder("(");
 					for (int i = 0; i < Rank; i++)
 					{
-						sb.Append(this[i].ToString() + (i == Rank - 1 ? "" : ", "));
+						sb.Append(this[i].ToString(CultureInfo.InvariantCulture) + (i == Rank - 1 ? "" : ", "));
 					}
 
 					sb.Append(")");
@@ -82,8 +82,7 @@ namespace MeshNav
 
 		public Vector Clone()
 		{
-			var clone = new Vector(X, Y, Z);
-			clone.Rank = Rank;
+			var clone = new Vector(X, Y, Z) {Rank = Rank};
 			if (Rank > 3)
 			{
 				Array.Copy(MoreCoordinates, clone.MoreCoordinates, Rank - 3);
@@ -91,9 +90,9 @@ namespace MeshNav
 			return clone;
 		}
 
-		public Vector(T x, T y) : this(new T[] {x, y}) { }
+		public Vector(T x, T y) : this(new[] {x, y}) { }
 
-		public Vector(T x, T y, T z) : this(new T[] {x, y, z}) { }
+		public Vector(T x, T y, T z) : this(new[] {x, y, z}) { }
 
 		public static Vector CoordinateWise(Vector x1, Vector x2, Func<T, T, T> fn)
 		{

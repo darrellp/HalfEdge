@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
 using static System.Math;
 using static MeshNav.Geometry2D;
-using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else

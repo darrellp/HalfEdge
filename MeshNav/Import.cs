@@ -31,6 +31,7 @@ namespace MeshNav
                         var vtx = mesh.AddVertex(vtxCur);
 						if (addNormals)
 						{
+							// ReSharper disable once InconsistentNaming
 							var v3d = aiMesh.Normals[iVtx];
 							vtx.Normal = new Vector(v3d.X, v3d.Y, v3d.Z);
 						}

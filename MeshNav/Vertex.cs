@@ -152,7 +152,7 @@ namespace MeshNav
                 sum = sum + FaceNormal(he);
                 faceCount++;
             }
-            Normal = (Vector?)sum / faceCount;
+            Normal = sum / faceCount;
             Normal.Value.Normalize();
         }
 

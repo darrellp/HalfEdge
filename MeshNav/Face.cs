@@ -2,11 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MeshNav.TraitInterfaces;
-#if FLOAT
-using T = System.Single;
-#else
-using T = System.Double;
-#endif
 
 namespace MeshNav
 {

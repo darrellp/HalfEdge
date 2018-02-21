@@ -37,10 +37,10 @@ namespace MeshNavTests
 		public RedBlackTree<int> InstanceFourNodesRightRight => FourNodesRightRight;
 		public RedBlackTree<int> InstanceFiveNodesLeftFull => FiveNodesLeftFull;
 		public RedBlackTree<int> InstanceBigger => Bigger;
-		public RedBlackTree<int> InstanceDelete_BlackRightLeafRedSibling1 { get; set; }
-		public RedBlackTree<int> InstanceDelete_BlackLeftLeafRedSibling1 { get; set; }
-		public RedBlackTree<int> InstanceDelete_BlackRightLeafRedSibling2 { get; set; }
-		public RedBlackTree<int> InstanceDelete_BlackLeftLeafRedSibling2 { get; set; }
+		public RedBlackTree<int> InstanceDeleteBlackRightLeafRedSibling1 { get; set; }
+		public RedBlackTree<int> InstanceDeleteBlackLeftLeafRedSibling1 { get; set; }
+		public RedBlackTree<int> InstanceDeleteBlackRightLeafRedSibling2 { get; set; }
+		public RedBlackTree<int> InstanceDeleteBlackLeftLeafRedSibling2 { get; set; }
 
 		[TestInitialize]
 		public void InitTreesForTests()
@@ -257,7 +257,7 @@ namespace MeshNavTests
 
 		public void InitDelete_BlackLeftLeafRedSibling1()
 		{
-			InstanceDelete_BlackLeftLeafRedSibling1 = new RedBlackTree<int>
+			InstanceDeleteBlackLeftLeafRedSibling1 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -277,7 +277,7 @@ namespace MeshNavTests
 
 		public void InitDelete_BlackRightLeafRedSibling1()
 		{
-			InstanceDelete_BlackRightLeafRedSibling1 = new RedBlackTree<int>
+			InstanceDeleteBlackRightLeafRedSibling1 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -297,7 +297,7 @@ namespace MeshNavTests
 
 		public void InitDelete_BlackLeftLeafRedSibling2()
 		{
-			InstanceDelete_BlackLeftLeafRedSibling2 = new RedBlackTree<int>
+			InstanceDeleteBlackLeftLeafRedSibling2 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -317,7 +317,7 @@ namespace MeshNavTests
 
 		public void InitDelete_BlackRightLeafRedSibling2()
 		{
-			InstanceDelete_BlackRightLeafRedSibling2 = new RedBlackTree<int>
+			InstanceDeleteBlackRightLeafRedSibling2 = new RedBlackTree<int>
 			{
 				Count = 0,
 				Root = new RedBlackNode<int>(50, Color.Black)
@@ -356,10 +356,10 @@ namespace MeshNavTests
 
 		public void CleanupCustom()
 		{
-			InstanceDelete_BlackLeftLeafRedSibling1 = null;
-			InstanceDelete_BlackLeftLeafRedSibling2 = null;
-			InstanceDelete_BlackRightLeafRedSibling1 = null;
-			InstanceDelete_BlackRightLeafRedSibling2 = null;
+			InstanceDeleteBlackLeftLeafRedSibling1 = null;
+			InstanceDeleteBlackLeftLeafRedSibling2 = null;
+			InstanceDeleteBlackRightLeafRedSibling1 = null;
+			InstanceDeleteBlackRightLeafRedSibling2 = null;
 		}
 		#endregion
 
@@ -456,104 +456,104 @@ namespace MeshNavTests
 		[TestCategory("RedBlackTree")]
 		public void Delete_BlackLeftLeafRedSibling1()
 		{
-			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling1.Delete(25));
+			Assert.IsTrue(InstanceDeleteBlackLeftLeafRedSibling1.Delete(25));
 
-			Assert.AreEqual(75, InstanceDelete_BlackLeftLeafRedSibling1.Root.Value);
-			Assert.AreEqual(50, InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Value);
-			Assert.AreEqual(100, InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Value);
-			Assert.AreEqual(63, InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Right.Value);
-			Assert.AreEqual(80, InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Left.Value);
+			Assert.AreEqual(75, InstanceDeleteBlackLeftLeafRedSibling1.Root.Value);
+			Assert.AreEqual(50, InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.Value);
+			Assert.AreEqual(100, InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.Value);
+			Assert.AreEqual(63, InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.Right.Value);
+			Assert.AreEqual(80, InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.Left.Value);
 
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling1.Root.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.IsRed);
-			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Right.IsRed);
-			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling1.Root.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.IsRed);
+			Assert.IsTrue(InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.Right.IsRed);
+			Assert.IsTrue(InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.Left.IsRed);
 
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Right.Left);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling1.Root.Left.Right.Right);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Right);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling1.Root.Right.Left.Right);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.Right.Left);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling1.Root.Left.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling1.Root.Right.Left.Right);
 		}
 
 		[TestMethod]
 		[TestCategory("RedBlackTree")]
 		public void Delete_BlackRightLeafRedSibling1()
 		{
-			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling1.Delete(75));
+			Assert.IsTrue(InstanceDeleteBlackRightLeafRedSibling1.Delete(75));
 
-			Assert.AreEqual(25, InstanceDelete_BlackRightLeafRedSibling1.Root.Value);
-			Assert.AreEqual(12, InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Value);
-			Assert.AreEqual(50, InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Value);
-			Assert.AreEqual(20, InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Right.Value);
-			Assert.AreEqual(32, InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Left.Value);
+			Assert.AreEqual(25, InstanceDeleteBlackRightLeafRedSibling1.Root.Value);
+			Assert.AreEqual(12, InstanceDeleteBlackRightLeafRedSibling1.Root.Left.Value);
+			Assert.AreEqual(50, InstanceDeleteBlackRightLeafRedSibling1.Root.Right.Value);
+			Assert.AreEqual(20, InstanceDeleteBlackRightLeafRedSibling1.Root.Left.Right.Value);
+			Assert.AreEqual(32, InstanceDeleteBlackRightLeafRedSibling1.Root.Right.Left.Value);
 
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling1.Root.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling1.Root.Left.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling1.Root.Right.IsRed);
-			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Right.IsRed);
-			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling1.Root.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling1.Root.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling1.Root.Right.IsRed);
+			Assert.IsTrue(InstanceDeleteBlackRightLeafRedSibling1.Root.Left.Right.IsRed);
+			Assert.IsTrue(InstanceDeleteBlackRightLeafRedSibling1.Root.Right.Left.IsRed);
 
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Right.Left);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling1.Root.Left.Right.Right);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Right);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling1.Root.Right.Left.Right);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling1.Root.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling1.Root.Left.Right.Left);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling1.Root.Left.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling1.Root.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling1.Root.Right.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling1.Root.Right.Left.Right);
 		}
 
 		[TestMethod]
 		[TestCategory("RedBlackTree")]
 		public void Delete_BlackLeftLeafRedSibling2()
 		{
-			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling2.Delete(25));
+			Assert.IsTrue(InstanceDeleteBlackLeftLeafRedSibling2.Delete(25));
 
-			Assert.AreEqual(75, InstanceDelete_BlackLeftLeafRedSibling2.Root.Value);
-			Assert.AreEqual(60, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Value);
-			Assert.AreEqual(100, InstanceDelete_BlackLeftLeafRedSibling2.Root.Right.Value);
-			Assert.AreEqual(50, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Left.Value);
-			Assert.AreEqual(70, InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Right.Value);
+			Assert.AreEqual(75, InstanceDeleteBlackLeftLeafRedSibling2.Root.Value);
+			Assert.AreEqual(60, InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Value);
+			Assert.AreEqual(100, InstanceDeleteBlackLeftLeafRedSibling2.Root.Right.Value);
+			Assert.AreEqual(50, InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Left.Value);
+			Assert.AreEqual(70, InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Right.Value);
 
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling2.Root.IsRed);
-			Assert.IsTrue(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling2.Root.Right.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Left.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Right.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling2.Root.IsRed);
+			Assert.IsTrue(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling2.Root.Right.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Right.IsRed);
 
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Left.Right);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Right.Left);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling2.Root.Left.Right.Right);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling2.Root.Right.Left);
-			Assert.IsNull(InstanceDelete_BlackLeftLeafRedSibling2.Root.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Left.Right);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Right.Left);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling2.Root.Left.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling2.Root.Right.Left);
+			Assert.IsNull(InstanceDeleteBlackLeftLeafRedSibling2.Root.Right.Right);
 		}
 
 		[TestMethod]
 		[TestCategory("RedBlackTree")]
 		public void Delete_BlackRightLeafRedSibling2()
 		{
-			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling2.Delete(75));
+			Assert.IsTrue(InstanceDeleteBlackRightLeafRedSibling2.Delete(75));
 
-			Assert.AreEqual(25, InstanceDelete_BlackRightLeafRedSibling2.Root.Value);
-			Assert.AreEqual(10, InstanceDelete_BlackRightLeafRedSibling2.Root.Left.Value);
-			Assert.AreEqual(40, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Value);
-			Assert.AreEqual(30, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Left.Value);
-			Assert.AreEqual(50, InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Right.Value);
+			Assert.AreEqual(25, InstanceDeleteBlackRightLeafRedSibling2.Root.Value);
+			Assert.AreEqual(10, InstanceDeleteBlackRightLeafRedSibling2.Root.Left.Value);
+			Assert.AreEqual(40, InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Value);
+			Assert.AreEqual(30, InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Left.Value);
+			Assert.AreEqual(50, InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Right.Value);
 
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling2.Root.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling2.Root.Left.IsRed);
-			Assert.IsTrue(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Left.IsRed);
-			Assert.IsFalse(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Right.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling2.Root.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling2.Root.Left.IsRed);
+			Assert.IsTrue(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Left.IsRed);
+			Assert.IsFalse(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Right.IsRed);
 
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Left.Right);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Right.Left);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling2.Root.Right.Right.Right);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling2.Root.Left.Left);
-			Assert.IsNull(InstanceDelete_BlackRightLeafRedSibling2.Root.Left.Right);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Left.Right);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Right.Left);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling2.Root.Right.Right.Right);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling2.Root.Left.Left);
+			Assert.IsNull(InstanceDeleteBlackRightLeafRedSibling2.Root.Left.Right);
 		}
 
 		[TestMethod]

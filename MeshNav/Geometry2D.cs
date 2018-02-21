@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else

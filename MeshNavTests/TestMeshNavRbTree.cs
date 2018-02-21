@@ -1,12 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
-using static MeshNav.Utilities;
-#if FLOAT
-using T = System.Single;
-#else
-using T = System.Double;
 // ReSharper disable AccessToModifiedClosure
-#endif
 
 namespace MeshNavTests
 {
