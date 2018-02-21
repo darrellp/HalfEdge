@@ -1,6 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
 
 namespace MeshNavTests
 {
@@ -37,7 +42,7 @@ namespace MeshNavTests
 			{
 				new Vector(0, 0),
 				new Vector(1, 1),
-				new Vector(0.01, 1),
+				new Vector((T)0.01, 1),
 				new Vector(1, 2),
 				new Vector(0, 2)
 			};

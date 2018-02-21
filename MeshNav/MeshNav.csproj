@@ -38,6 +38,7 @@
     <DefineConstants>TRACE;DEBUG;FLOAT</DefineConstants>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'FLRelease|AnyCPU'">
     <OutputPath>bin\FLRelease\</OutputPath>
@@ -45,6 +46,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AssimpNet, Version=3.3.2.0, Culture=neutral, PublicKeyToken=3edc10cb77b1bca2, processorArchitecture=MSIL">

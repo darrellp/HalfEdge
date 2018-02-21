@@ -215,7 +215,7 @@ namespace MeshNav
 
 		public T Length()
 		{
-			return Math.Sqrt(X * X + Y * Y);
+			return (T)Math.Sqrt(X * X + Y * Y);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ namespace MeshNav
 		{
 			var ln = Length();
 			// ReSharper disable RedundantCast
-			return new Vector(X / (T)ln, Y / (T)ln);
+			return new Vector((T)(X / ln), (T)(Y / ln));
 			// ReSharper restore RedundantCast
 		}
 	}

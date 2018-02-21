@@ -4,6 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
 using MeshNav.Placement;
 using Templates;
+using static MeshNav.Geometry2D;
+#if FLOAT
+using T = System.Single;
+#else
+using T = System.Double;
+#endif
+
 
 namespace MeshNavTests
 {
@@ -46,16 +53,16 @@ namespace MeshNavTests
 			mesh.FinalizeMesh();
 
 			var tree = Placement.GetPlacementTree(mesh);
-			Assert.IsNotNull(tree.LocateFace(0.5, 0.1));
-			Assert.IsNotNull(tree.LocateFace(1.5, 0.1));
-			Assert.IsNotNull(tree.LocateFace(2.5, 0.9));
-			Assert.IsNull(tree.LocateFace(-1, 0));
-			Assert.IsNull(tree.LocateFace(0.5, -1));
-			Assert.IsNull(tree.LocateFace(0.5, 3));
-			Assert.IsNull(tree.LocateFace(1.5, -1));
-			Assert.IsNull(tree.LocateFace(1.5, 3));
-			Assert.IsNull(tree.LocateFace(2.5, 0.1));
-			Assert.IsNull(tree.LocateFace(2.5, 3));
+			Assert.IsNotNull(tree.LocateFace((T)0.5, (T)0.1));
+			Assert.IsNotNull(tree.LocateFace((T)1.5, (T)0.1));
+			Assert.IsNotNull(tree.LocateFace((T)2.5, (T)0.9));
+			Assert.IsNull(tree.LocateFace((T)(-1), (T)0));
+			Assert.IsNull(tree.LocateFace((T)0.5, (T) (-1)));
+			Assert.IsNull(tree.LocateFace((T)0.5, (T)3));
+			Assert.IsNull(tree.LocateFace((T)1.5, (T) (-1)));
+			Assert.IsNull(tree.LocateFace((T)1.5, (T)3));
+			Assert.IsNull(tree.LocateFace((T)2.5, (T)0.1));
+			Assert.IsNull(tree.LocateFace((T)2.5, (T)3));
 		}
 
 		[TestMethod]
@@ -72,16 +79,16 @@ namespace MeshNavTests
 			mesh.FinalizeMesh();
 
 			var tree = Placement.GetPlacementTree(mesh);
-			Assert.IsNotNull(tree.LocateFace(0.5, 0.1));
-			Assert.IsNotNull(tree.LocateFace(1.5, 0.1));
-			Assert.IsNotNull(tree.LocateFace(2.5, 0.1));
-			Assert.IsNull(tree.LocateFace(-1, 0));
-			Assert.IsNull(tree.LocateFace(0.5, -1));
-			Assert.IsNull(tree.LocateFace(0.5, 3));
-			Assert.IsNull(tree.LocateFace(1.5, -1));
-			Assert.IsNull(tree.LocateFace(1.5, 3));
-			Assert.IsNull(tree.LocateFace(2.5, 0.9));
-			Assert.IsNull(tree.LocateFace(2.5, 3));
+			Assert.IsNotNull(tree.LocateFace((T)0.5, (T)0.1));
+			Assert.IsNotNull(tree.LocateFace((T)1.5, (T)0.1));
+			Assert.IsNotNull(tree.LocateFace((T)2.5, (T)0.1));
+			Assert.IsNull(tree.LocateFace((T)(-1), (T)0));
+			Assert.IsNull(tree.LocateFace((T)0.5, (T)(-1)));
+			Assert.IsNull(tree.LocateFace((T)0.5, (T)3));
+			Assert.IsNull(tree.LocateFace((T)1.5, (T)(-1)));
+			Assert.IsNull(tree.LocateFace((T)1.5, (T)3));
+			Assert.IsNull(tree.LocateFace((T)2.5, (T)0.9));
+			Assert.IsNull(tree.LocateFace((T)2.5, (T)3));
 		}
 
 		[TestMethod]
@@ -103,11 +110,11 @@ namespace MeshNavTests
 			mesh.FinalizeMesh();
 
 			var tree = Placement.GetPlacementTree(mesh);
-			Assert.IsNotNull(tree.LocateFace(0.5, 0.5));
-			Assert.IsNull(tree.LocateFace(-1, 0.5));
-			Assert.IsNull(tree.LocateFace(0.5, -1));
-			Assert.IsNull(tree.LocateFace(0.5, 3));
-			Assert.IsNull(tree.LocateFace(1.5, 0.5));
+			Assert.IsNotNull(tree.LocateFace((T)0.5, (T)0.5));
+			Assert.IsNull(tree.LocateFace((T)(-1), (T)0.5));
+			Assert.IsNull(tree.LocateFace((T)0.5, (T)(-1)));
+			Assert.IsNull(tree.LocateFace((T)0.5, (T)3));
+			Assert.IsNull(tree.LocateFace((T)1.5, (T)0.5));
 
 			mesh = new BndFactory(2).CreateMesh() as BndMesh;
 			ptLL = mesh.AddVertex(0, 0);
@@ -120,8 +127,8 @@ namespace MeshNavTests
 			mesh.FinalizeMesh();
 
 			tree = Placement.GetPlacementTree(mesh);
-			Assert.AreEqual(tree.LocateFace(0.5, 0.75), ul);
-			Assert.AreEqual(tree.LocateFace(0.5, 0.25), lr);
+			Assert.AreEqual(tree.LocateFace((T)0.5, (T)0.75), ul);
+			Assert.AreEqual(tree.LocateFace((T)0.5, (T)0.25), lr);
 			// ReSharper restore PossibleNullReferenceException
 		}
 
@@ -146,16 +153,16 @@ namespace MeshNavTests
 
 			StringReader sr = new StringReader(sb.ToString());
 			tree = Placement.Deserialize(s => s, sr);
-			Assert.AreEqual(tree.Locate(0.5, 0.1), "The one and only!");
-			Assert.AreEqual(tree.Locate(1.5, 0.1), "The one and only!");
-			Assert.AreEqual(tree.Locate(2.5, 0.1), "The one and only!");
-			Assert.AreEqual(tree.Locate(-1, 0), "outside");
-			Assert.AreEqual(tree.Locate(0.5, -1), "outside");
-			Assert.AreEqual(tree.Locate(0.5, 3), "outside");
-			Assert.AreEqual(tree.Locate(1.5, -1), "outside");
-			Assert.AreEqual(tree.Locate(1.5, 3), "outside");
-			Assert.AreEqual(tree.Locate(2.5, 0.9), "outside");
-			Assert.AreEqual(tree.Locate(2.5, 3), "outside");
+			Assert.AreEqual(tree.Locate((T)0.5, (T)0.1), "The one and only!");
+			Assert.AreEqual(tree.Locate((T)1.5, (T)0.1), "The one and only!");
+			Assert.AreEqual(tree.Locate((T)2.5, (T)0.1), "The one and only!");
+			Assert.AreEqual(tree.Locate((T)(-1), (T)0), "outside");
+			Assert.AreEqual(tree.Locate((T)0.5, (T)(-1)), "outside");
+			Assert.AreEqual(tree.Locate((T)0.5, (T)3), "outside");
+			Assert.AreEqual(tree.Locate((T)1.5, (T)(-1)), "outside");
+			Assert.AreEqual(tree.Locate((T)1.5, (T)3), "outside");
+			Assert.AreEqual(tree.Locate((T)2.5, (T)0.9), "outside");
+			Assert.AreEqual(tree.Locate((T)2.5, (T)3), "outside");
 		}
 	}
 }

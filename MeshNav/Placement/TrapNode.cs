@@ -34,7 +34,7 @@ namespace MeshNav.Placement
 			throw new NotImplementedException();
 		}
 
-		internal override bool ShouldTravelLeft(T x, T y, double edgeSlope)
+		internal override bool ShouldTravelLeft(T x, T y, T edgeSlope)
 		{
 			throw new NotImplementedException();
 		}
