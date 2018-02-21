@@ -59,7 +59,6 @@ namespace MeshNav
             while (eventQueue.Count != 0)
             {
                 var nextEvent = eventQueue.Pop();
-	            Console.WriteLine(nextEvent);
                 if (nextEvent.IsRightEndpoint)
                 {
                     // We have to remove the corresponding line segment from consideration

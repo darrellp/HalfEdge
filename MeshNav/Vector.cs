@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 #if FLOAT
 using T = System.Single;
@@ -9,13 +10,19 @@ using T = System.Double;
 
 namespace MeshNav
 {
+	[DataContract]
 	public struct Vector
 	{
+		[DataMember]
 		public T X { get; set; }
+		[DataMember]
 		public T Y { get; set; }
+		[DataMember]
 		public T Z { get; set; }
+		[DataMember]
 		public T[] MoreCoordinates;
-		public int Rank { get; }
+		[DataMember]
+		public int Rank { get; private set; }
 
 		public Vector(params T[] coordinates)
 		{
@@ -75,8 +82,13 @@ namespace MeshNav
 
 		public Vector Clone()
 		{
-			var me = this;
-			return new Vector(Enumerable.Range(0, Rank).Select(i => me[i]).ToArray());
+			var clone = new Vector(X, Y, Z);
+			clone.Rank = Rank;
+			if (Rank > 3)
+			{
+				Array.Copy(MoreCoordinates, clone.MoreCoordinates, Rank - 3);
+			}
+			return clone;
 		}
 
 		public Vector(T x, T y) : this(new T[] {x, y}) { }
