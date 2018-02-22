@@ -245,11 +245,11 @@ namespace MeshNav
 
 		public override bool Equals(object obj)
 		{
-			if (!(obj is Vector))
+			if (!(obj is Vector ptCompare))
 			{
 				return false;
 			}
-			var ptCompare = (Vector)obj;
+
 			// ReSharper disable CompareOfFloatsByEqualityOperator
 			switch (Rank)
 			{

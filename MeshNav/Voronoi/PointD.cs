@@ -16,9 +16,6 @@ namespace DAP.CompGeom
 		/// <summary> The y coordinate </summary>
 		public double Y;
 
-		/// <summary> Cookie to hold arbitrary information for the user </summary>
-		public object Cookie;
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Constructor. </summary>
 		///
@@ -28,21 +25,8 @@ namespace DAP.CompGeom
 		/// <param name="y">	The y coordinate. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public PointD(double x, double y) : this(x, y, null) {}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Constructor. </summary>
-		///
-		/// <remarks>	Darrellp, 2/20/2011. </remarks>
-		///
-		/// <param name="x">		The x coordinate. </param>
-		/// <param name="y">		The y coordinate. </param>
-		/// <param name="cookie">	pt1 cookie to hold user specified info in. </param>
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		public PointD(double x, double y, object cookie)
+		public PointD(double x, double y)
 		{
-			Cookie = cookie;
 			X = x;
 			Y = y;
 		}
