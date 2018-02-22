@@ -121,7 +121,6 @@
     <Compile Include="Voronoi\InternalNode.cs" />
     <Compile Include="Voronoi\LeafNode.cs" />
     <Compile Include="Voronoi\Node.cs" />
-    <Compile Include="Voronoi\PointD.cs" />
     <Compile Include="Voronoi\WeEdge.cs" />
     <Compile Include="Voronoi\WePolygon.cs" />
     <Compile Include="Voronoi\WeVertex.cs" />

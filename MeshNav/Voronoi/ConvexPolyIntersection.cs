@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MeshNav;
+using static MeshNav.Geometry2D;
 
 namespace DAP.CompGeom
 {
@@ -40,7 +42,7 @@ namespace DAP.CompGeom
 		/// <returns>	An enumeration of the points in the intersection. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static IEnumerable<PointD> FindIntersection(IEnumerable<PointD> poly1Enum, IEnumerable<PointD> poly2Enum)
+		public static IEnumerable<Vector> FindIntersection(IEnumerable<Vector> poly1Enum, IEnumerable<Vector> poly2Enum)
 		{
 			// Put the two polygons into arrays
 			var polyA = poly1Enum.ToArray();
@@ -71,7 +73,7 @@ namespace DAP.CompGeom
 			// Index of the heads that chase each other around the polygon
 			var aCur = 0;
 			var bCur = 0;
-			var origin = new PointD(0, 0);
+			var origin = new Vector(0, 0);
 
 			// Tells whether A or B is currently on the "inside".
 			var inflag = InflagVals.Unknown;
@@ -88,8 +90,8 @@ namespace DAP.CompGeom
 			var cPolyBVertices = polyB.Length;
 
 			// Last point we output so we don't repeat points
-			var ptPrevOutput = new PointD();
-			var ptFirstOutput = new PointD();
+			var ptPrevOutput = new Vector();
+			var ptFirstOutput = new Vector();
 
 			// Step through the edges
 			do
@@ -105,15 +107,15 @@ namespace DAP.CompGeom
 				var vecB = polyB[bCur] - polyB[bPrev];
 
 				// cross > 0 means a counterclockwise turn from vector A to vector B
-				var cross = Math.Sign(Geometry.SignedArea(origin, vecA, vecB));
+				var cross = Math.Sign(SignedArea(origin, vecA, vecB));
 
 				// Whether the left half plane of each vector contains the head of the other vector
-				var bHalfPlaneContainsA = Math.Sign(Geometry.SignedArea(polyB[bPrev], polyB[bCur], polyA[aCur]));
-				var aHalfPlaneContainsB = Math.Sign(Geometry.SignedArea(polyA[aPrev], polyA[aCur], polyB[bCur]));
+				var bHalfPlaneContainsA = Math.Sign(SignedArea(polyB[bPrev], polyB[bCur], polyA[aCur]));
+				var aHalfPlaneContainsB = Math.Sign(SignedArea(polyA[aPrev], polyA[aCur], polyB[bCur]));
 
 				// if A & B intersect
-			    var code = Geometry.SegSegInt(polyA[aPrev], polyA[aCur], polyB[bPrev], polyB[bCur], out var ptCrossing);
-				if (code == Geometry.CrossingType.Normal || code == Geometry.CrossingType.Vertex)
+			    (var code, var ptCrossing) = SegSegInt(polyA[aPrev], polyA[aCur], polyB[bPrev], polyB[bCur]);
+				if (code == CrossingType.Normal || code == CrossingType.Vertex)
 				{
 					// If this is the first intersection we've seen
 					if (inflag == InflagVals.Unknown && !fFoundFirstPoint)
@@ -143,7 +145,7 @@ namespace DAP.CompGeom
 				// This means that one edge of the polys meets the edge of the other with the polygons lying on
 				// opposite sides so that this overlap is the entirety of the overlap for the polygons.  We've
 				// already returned the points so nothing to do here but quit out.
-				if (code == Geometry.CrossingType.Edge && Geometry.Dot(vecA, vecB) < 0)
+				if (code == Geometry2D.CrossingType.Edge && Geometry2D.Dot(vecA, vecB) < 0)
 				{
 					yield break;
 				}
@@ -239,7 +241,7 @@ namespace DAP.CompGeom
 			if (inflag == InflagVals.Unknown)
 			{
 				// If a point of A is in B
-				if (Geometry.PointInConvexPoly(polyA[0], polyB))
+				if (PointInConvexPoly(polyA[0], polyB))
 				{
 					// Yield all of A
 					foreach (var pt in polyA)
@@ -248,7 +250,7 @@ namespace DAP.CompGeom
 					}
 				}
 				// else if a point of B is in A
-				else if (Geometry.PointInConvexPoly(polyB[0], polyA))
+				else if (PointInConvexPoly(polyB[0], polyA))
 				{
 					// Yield all of B
 					foreach (var pt in polyB)

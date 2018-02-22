@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MeshNav;
 using WE = DAP.CompGeom.WingedEdge<DAP.CompGeom.FortunePoly, DAP.CompGeom.FortuneEdge, DAP.CompGeom.FortuneVertex>;
 
 namespace DAP.CompGeom
@@ -37,7 +38,7 @@ namespace DAP.CompGeom
 		#endregion
 
 		#region Constructors
-		internal FortuneVertex(PointD pt) : base(pt)
+		internal FortuneVertex(Vector pt) : base(pt)
 		{
 			FortuneEdges = new List<FortuneEdge>();
 		}
@@ -135,7 +136,7 @@ namespace DAP.CompGeom
 		/// <returns>	The point at the opposite end of the edge. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		private PointD PtAtOtherEnd(WeEdge edge)
+		private Vector PtAtOtherEnd(WeEdge edge)
 		{
 			// Get the vertex at the other end
 			var ptRet = VtxOtherEnd(edge).Pt;
@@ -144,7 +145,7 @@ namespace DAP.CompGeom
 			if (edge.VtxEnd.FAtInfinity)
 			{
 				// Produce a "real" point
-				ptRet = new PointD(Pt.X + ptRet.X, Pt.Y + ptRet.Y);
+				ptRet = new Vector(Pt.X + ptRet.X, Pt.Y + ptRet.Y);
 			}
 
 			// Return the result
@@ -178,7 +179,7 @@ namespace DAP.CompGeom
 			// Compare edges for clockwise order
 			var fe1 = (FortuneEdge)e1;
 			var fe2 = (FortuneEdge)e2;
-			return Geometry.ICompareCw(Pt, fe1.PolyOrderingTestPoint, fe2.PolyOrderingTestPoint);
+			return Geometry2D.ICompareCw(Pt, fe1.PolyOrderingTestPoint, fe2.PolyOrderingTestPoint);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +205,7 @@ namespace DAP.CompGeom
 				var pt2 = PtAtOtherEnd(FortuneEdges[2]);
 
 				// If ordered incorrectly
-				if (Geometry.ICcw(pt0, pt1, pt2) > 0)
+				if (Geometry2D.ICcw(pt0, pt1, pt2) > 0)
 				{
 					// Swap the first two
 					var edge0 = FortuneEdges[0];
@@ -237,7 +238,7 @@ namespace DAP.CompGeom
 		/// <returns>	The vertex at infinity. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal static FortuneVertex InfiniteVertex(PointD ptDirection, bool fNormalize = true)
+		internal static FortuneVertex InfiniteVertex(Vector ptDirection, bool fNormalize = true)
 		{
 			var vtx = new FortuneVertex(ptDirection);
 			vtx.SetInfinite(fNormalize);

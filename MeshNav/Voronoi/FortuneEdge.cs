@@ -1,4 +1,6 @@
-﻿using WE = DAP.CompGeom.WingedEdge<DAP.CompGeom.FortunePoly, DAP.CompGeom.FortuneEdge, DAP.CompGeom.FortuneVertex>;
+﻿using MeshNav;
+using WE = DAP.CompGeom.WingedEdge<DAP.CompGeom.FortunePoly, DAP.CompGeom.FortuneEdge, DAP.CompGeom.FortuneVertex>;
+using static MeshNav.Geometry2D;
 
 namespace DAP.CompGeom
 {
@@ -44,21 +46,21 @@ namespace DAP.CompGeom
 		/// <value>	The polygon ordering test point. </value>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal PointD PolyOrderingTestPoint
+		internal Vector PolyOrderingTestPoint
 		{
 			get
 			{
 				// Finite line segments just take the midpoint
 				if (!VtxEnd.FAtInfinity)
 				{
-					return Geometry.MidPoint(VtxStart.Pt, VtxEnd.Pt);
+					return MidPoint(VtxStart.Pt, VtxEnd.Pt);
 				}
 
 				// If it's a ray
 				if (!VtxStart.FAtInfinity)
 				{
 					// Just take a point a little out from the start point
-					return new PointD(
+					return new Vector(
 						VtxStart.Pt.X + VtxEnd.Pt.X,
 						VtxStart.Pt.Y + VtxEnd.Pt.Y);
 				}
@@ -67,7 +69,7 @@ namespace DAP.CompGeom
 				//
 				// We use the midpoint of the two starting points of the rays on
 				// each side of the edge at infinity
-				return Geometry.MidPoint(
+				return MidPoint(
 					EdgeCCWSuccessor.VtxStart.Pt,
 					EdgeCWPredecessor.VtxStart.Pt);
 			}
@@ -102,7 +104,7 @@ namespace DAP.CompGeom
 
 		internal bool FZeroLength()
 		{
-			return !VtxEnd.FAtInfinity && Geometry.FCloseEnough(VtxStart.Pt, VtxEnd.Pt);
+			return !VtxEnd.FAtInfinity && FCloseEnough(VtxStart.Pt, VtxEnd.Pt);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,7 +681,7 @@ namespace DAP.CompGeom
 
 			// Return the "clockwisedness" of the generator and points on the two edges.
 			// ReSharper disable once PossibleNullReferenceException
-			return Geometry.ICompareCw(PolyCommon(edge).VoronoiPoint, PolyOrderingTestPoint, edge.PolyOrderingTestPoint);
+			return ICompareCw(PolyCommon(edge).VoronoiPoint, PolyOrderingTestPoint, edge.PolyOrderingTestPoint);
 		}
 		#endregion
 	}

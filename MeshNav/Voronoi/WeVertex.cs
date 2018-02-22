@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MeshNav;
+
 // ReSharper disable MemberCanBeProtected.Global
 
 namespace DAP.CompGeom
@@ -71,7 +73,7 @@ namespace DAP.CompGeom
 		/// <value>	The point. </value>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public PointD Pt { get; internal set; }
+		public Vector Pt { get; internal set; }
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	A place for users to store information. </summary>
@@ -101,7 +103,7 @@ namespace DAP.CompGeom
 		/// <param name="pt">	The point the vertex is located at. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public WeVertex(PointD pt)
+		public WeVertex(Vector pt)
 		{
 			Pt = pt;
 		}
@@ -141,9 +143,9 @@ namespace DAP.CompGeom
 		/// <returns>	A point on the ray different than the starting point. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public PointD ConvertToReal(PointD ptStart, Double rayLength)
+		public Vector ConvertToReal(Vector ptStart, Double rayLength)
 		{
-			return new PointD(
+			return new Vector(
 				Pt.X * rayLength + ptStart.X,
 				Pt.Y * rayLength + ptStart.Y);
 		}

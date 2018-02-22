@@ -1,4 +1,6 @@
 ﻿
+using MeshNav;
+
 namespace DAP.CompGeom
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +68,7 @@ namespace DAP.CompGeom
 
 		internal double CurrentEdgeXPos(double yScanLine)
 		{
-			return Geometry.ParabolicCut(PolyRight.VoronoiPoint, PolyLeft.VoronoiPoint, yScanLine);
+			return Geometry2D.ParabolicCut(PolyRight.VoronoiPoint, PolyLeft.VoronoiPoint, yScanLine);
 		}
 		#endregion
 

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Drawing;
+using MeshNav;
+
 // ReSharper disable MemberCanBeProtected.Global
 // 
 namespace DAP.CompGeom
@@ -246,7 +247,7 @@ namespace DAP.CompGeom
 		/// <returns>	true if it succeeds, false if it fails. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public bool FLeftOf(PointD pt)
+		public bool FLeftOf(Vector pt)
 		{
 			// We should never have a start vertex at infinity
 			//
@@ -261,7 +262,7 @@ namespace DAP.CompGeom
 			var pt2 = VtxEnd.FAtInfinity ? VtxEnd.ConvertToReal(pt1, 10) : VtxEnd.Pt;
 
 			// Do the geometry on pt1 and pt2
-			return Geometry.FLeft(pt1, pt2, pt);
+			return Geometry2D.FLeft(pt1, pt2, pt);
 		}
 		#endregion
 

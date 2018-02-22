@@ -1,5 +1,5 @@
 using System;
-using System.Diagnostics;
+using MeshNav;
 
 namespace DAP.CompGeom
 {
@@ -129,7 +129,7 @@ namespace DAP.CompGeom
 		/// <param name="evq">				Event queue. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal void RemoveNodeAndInsertVertex(CircleEvent cevt, LeafNode lfnEliminated, PointD voronoiVertex, EventQueue evq)
+		internal void RemoveNodeAndInsertVertex(CircleEvent cevt, LeafNode lfnEliminated, Vector voronoiVertex, EventQueue evq)
 		{
 			// Initialize
 			var yScanLine = cevt.Pt.Y;
@@ -390,10 +390,10 @@ namespace DAP.CompGeom
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// ReSharper disable once InconsistentNaming
-		internal static int ICcwVoronoi(PointD pt1, PointD pt2, PointD pt3)
+		internal static int ICcwVoronoi(Vector pt1, Vector pt2, Vector pt3)
 		{
 			// Do the geometry to see if they're clockwise
-			var iSign = Geometry.ICcw(pt1, pt2, pt3);
+			var iSign = Geometry2D.ICcw(pt1, pt2, pt3);
 
 			// If they're not collilnear
 			if (iSign != 0)
@@ -633,7 +633,7 @@ namespace DAP.CompGeom
 
 			// Watch for the odd corner case of the top n generators having the same y coordinate.  See comments
 			// on NdInsertAtSameY().
-			if (Geometry.FCloseEnough(evt.Pt.Y, lfn.Poly.VoronoiPoint.Y))
+			if (Geometry2D.FCloseEnough(evt.Pt.Y, lfn.Poly.VoronoiPoint.Y))
 			{
 				NdInsertAtSameY(lfn, lfnNewParabola, innParent, innSubRoot, fLeftChild);
 			}
@@ -736,19 +736,6 @@ namespace DAP.CompGeom
 
 			// Create any circle events which this site causes
 			CreateCircleEventsFromSiteEvent(lfnLeft, lfnRight, evt.Pt.Y, evq);
-		}
-		#endregion
-
-		#region Debugging
-		LeafNode LfnLeftmost()
-		{
-			var nd = NdRoot;
-
-			while (!nd.IsLeaf)
-			{
-				nd = nd.LeftChild;
-			}
-			return nd as LeafNode;
 		}
 		#endregion
 	}

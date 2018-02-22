@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using MeshNav;
 
 namespace DAP.CompGeom
 {
@@ -83,7 +83,7 @@ namespace DAP.CompGeom
 			}
 
 			// Calculate where we intersect the parabola to our right
-			return Geometry.ParabolicCut(RightAdjacentLeaf.Poly.VoronoiPoint, Poly.VoronoiPoint, yScanLine);
+			return Geometry2D.ParabolicCut(RightAdjacentLeaf.Poly.VoronoiPoint, Poly.VoronoiPoint, yScanLine);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ namespace DAP.CompGeom
 				return double.MinValue;
 			}
 			// Calculate where we intersect the parabola to our left
-			return Geometry.ParabolicCut(Poly.VoronoiPoint, LeftAdjacentLeaf.Poly.VoronoiPoint, yScanLine);
+			return Geometry2D.ParabolicCut(Poly.VoronoiPoint, LeftAdjacentLeaf.Poly.VoronoiPoint, yScanLine);
 		}
 		#endregion
 

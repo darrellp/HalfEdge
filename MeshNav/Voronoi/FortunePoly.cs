@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MeshNav;
+using static MeshNav.Geometry2D;
 
 namespace DAP.CompGeom
 {
@@ -85,7 +87,7 @@ namespace DAP.CompGeom
 		/// <value>	The point in the original set of data points. </value>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public PointD VoronoiPoint { get; set; }
+		public Vector VoronoiPoint { get; set; }
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	A generic index to identify this polygon for debugging purposes.. </summary>
@@ -127,7 +129,7 @@ namespace DAP.CompGeom
 		/// <returns>	An enumerable of real points representing the voronoi cell clipped to the box. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public IEnumerable<PointD> BoxVertices(PointD ptUL, PointD ptLR)
+		public IEnumerable<Vector> BoxVertices(Vector ptUL, Vector ptLR)
 		{
 			// If no edges, then it's just the entire box
 			if (!Edges.Any())
@@ -160,7 +162,7 @@ namespace DAP.CompGeom
 			}
 		}
 
-		private bool FCheckParallelLines(List<PointD> ptsBox, out IEnumerable<PointD> ptsToBeClipped)
+		private bool FCheckParallelLines(List<Vector> ptsBox, out IEnumerable<Vector> ptsToBeClipped)
 		{
 			// Do the required initialization of our out parameter
 			ptsToBeClipped = null;
@@ -183,8 +185,8 @@ namespace DAP.CompGeom
 				var ptsFinite = Vertices.Where(v => !v.FAtInfinity).Select(v => v.Pt).ToArray();
 
 				// Find out the max dist from any finite point to any finite point on the box and double it for good measure
-				var maxDist0 = Math.Sqrt(ptsBox.Select(pt => Geometry.DistanceSq(pt, ptsFinite[0])).Max());
-				var maxDist1 = Math.Sqrt(ptsBox.Select(pt => Geometry.DistanceSq(pt, ptsFinite[1])).Max());
+				var maxDist0 = Math.Sqrt(ptsBox.Select(pt => DistanceSq(pt, ptsFinite[0])).Max());
+				var maxDist1 = Math.Sqrt(ptsBox.Select(pt => DistanceSq(pt, ptsFinite[1])).Max());
 				var maxDist = 2.0 * Math.Max(maxDist0, maxDist1);
 
 				// Use that as a ray length to get real vertices which will later be clipped to the box
@@ -194,7 +196,7 @@ namespace DAP.CompGeom
 			return false;
 		}
 
-		private bool FCheckDoublyInfinite(List<PointD> ptsBox, out IEnumerable<PointD> ptsToBeClipped)
+		private bool FCheckDoublyInfinite(List<Vector> ptsBox, out IEnumerable<Vector> ptsToBeClipped)
 		{
 			ptsToBeClipped = null;
 
@@ -207,8 +209,8 @@ namespace DAP.CompGeom
 			// Get the finite vertex
 			WeVertex vtx = null;
 			var vtxs = Vertices.ToArray();
-			var ptTailDir = new PointD(0, 0);
-			var ptHeadDir = new PointD(0, 0);
+			var ptTailDir = new Vector(0, 0);
+			var ptHeadDir = new Vector(0, 0);
 			for (var ivtx = 0; ivtx < 3; ivtx++)
 			{
 				if (vtxs[ivtx].FAtInfinity)
@@ -228,7 +230,7 @@ namespace DAP.CompGeom
 				// TODO: We should probably do this manually rather than relying on ConvexPolyIntersection
 
 				// Figure out a satisfactory distance for our ray length
-				var maxDist = 2.0 * Math.Sqrt(ptsBox.Select(pt => Geometry.DistanceSq(pt, vtx.Pt)).Max());
+				var maxDist = 2.0 * Math.Sqrt(ptsBox.Select(pt => DistanceSq(pt, vtx.Pt)).Max());
 				var ptTail = vtx.Pt + ptTailDir*maxDist;
 				var ptHead = vtx.Pt + ptHeadDir*maxDist;
 
@@ -240,7 +242,7 @@ namespace DAP.CompGeom
 
 				var leftDistances = ptsBox.
 					// Get the distance to our line
-					Select(p => Geometry.PtToLineDistance(p, ptHead, ptTail)).
+					Select(p => PtToLineDistance(p, ptHead, ptTail)).
 					// Keep only the ones to the left of the line
 					Where(d => d > 0);
 
@@ -249,7 +251,7 @@ namespace DAP.CompGeom
 			    if (!leftDistancesArray.Any())
 				{
 					// return an empty array
-					ptsToBeClipped = new List<PointD>();
+					ptsToBeClipped = new List<Vector>();
 					return true;
 				}
 				
@@ -259,7 +261,7 @@ namespace DAP.CompGeom
 				// Return the rectangle formed from our line segment extended out by maxLineDist
 				var vcOffset = (ptTail - ptHead).Normalize().Flip90Ccw()*maxLineDist;
 				//var vcOffset = (ptHead - ptTail).Normalize().Flip90Ccw() * maxLineDist;
-				ptsToBeClipped = new List<PointD>
+				ptsToBeClipped = new List<Vector>
 				                 	{
 				                 		ptHead,
 				                 		ptTail,
@@ -271,7 +273,7 @@ namespace DAP.CompGeom
 			return false;
 		}
 
-		private bool FCheckEasy(out IEnumerable<PointD> ptsToBeClipped)
+		private bool FCheckEasy(out IEnumerable<Vector> ptsToBeClipped)
 		{
 			ptsToBeClipped = null;
 			if (!Edges.Any(e => e.VtxStart.FAtInfinity || e.VtxEnd.FAtInfinity))
@@ -283,7 +285,7 @@ namespace DAP.CompGeom
 		}
 
 
-		private double CalcRayLength(List<PointD> ptsBox)
+		private double CalcRayLength(List<Vector> ptsBox)
 		{
 			// Initialize
 			var oes = OrientedEdges.ToArray();
@@ -322,31 +324,31 @@ namespace DAP.CompGeom
 			return length;
 		}
 
-		private static bool Satisfactory(double length, OrientedEdge oeIn, OrientedEdge oeOut, IEnumerable<PointD> ptsBox)
+		private static bool Satisfactory(double length, OrientedEdge oeIn, OrientedEdge oeOut, IEnumerable<Vector> ptsBox)
 		{
 			// The length is satisfactory if all the points in the box are on the same side of it
 			var ptRealOut = oeOut.EndVtx.ConvertToReal(oeOut.StartPt, length);
 			var ptRealIn = oeIn.StartVtx.ConvertToReal(oeIn.EndPt, length);
-			return ptsBox.All(pt => Geometry.FLeft(ptRealOut, ptRealIn, pt));
+			return ptsBox.All(pt => FLeft(ptRealOut, ptRealIn, pt));
 		}
 
-		private static double CalcInitialGuess(OrientedEdge oeIn, OrientedEdge oeOut, List<PointD> ptsBox)
+		private static double CalcInitialGuess(OrientedEdge oeIn, OrientedEdge oeOut, List<Vector> ptsBox)
 		{
 			// Find out the max dist from any finite point to any point on the box and double it for good measure
-			var maxDist0 = Math.Sqrt(ptsBox.Select(pt => Geometry.DistanceSq(pt, oeIn.StartPt)).Max());
-			var maxDist1 = Math.Sqrt(ptsBox.Select(pt => Geometry.DistanceSq(pt, oeOut.StartPt)).Max());
+			var maxDist0 = Math.Sqrt(ptsBox.Select(pt => DistanceSq(pt, oeIn.StartPt)).Max());
+			var maxDist1 = Math.Sqrt(ptsBox.Select(pt => DistanceSq(pt, oeOut.StartPt)).Max());
 			return 2.0 * Math.Max(maxDist0, maxDist1);
 
 		}
 
-		private static List<PointD> BoxPoints(PointD ptUL, PointD ptLR)
+		private static List<Vector> BoxPoints(Vector ptUL, Vector ptLR)
 		{
-			return new List<PointD>
+			return new List<Vector>
 			       	{
-			       		new PointD(ptUL.X, ptLR.Y),
-			       		new PointD(ptLR.X, ptLR.Y),
-			       		new PointD(ptLR.X, ptUL.Y),
-			       		new PointD(ptUL.X, ptUL.Y)
+			       		new Vector(ptUL.X, ptLR.Y),
+			       		new Vector(ptLR.X, ptLR.Y),
+			       		new Vector(ptLR.X, ptUL.Y),
+			       		new Vector(ptUL.X, ptUL.Y)
 			       	};
 		}
 
@@ -376,7 +378,7 @@ namespace DAP.CompGeom
 		/// <returns>	An enumerable of real points representing the polygon. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public IEnumerable<PointD> RealVertices(PointD ptUL, PointD ptLR)
+		public IEnumerable<Vector> RealVertices(Vector ptUL, Vector ptLR)
 		{
 			if (!Edges.Any(e => e.VtxStart.FAtInfinity || e.VtxEnd.FAtInfinity))
 			{
@@ -419,7 +421,7 @@ namespace DAP.CompGeom
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// TODO: share code between this and BoxVertices
-		public IEnumerable<PointD> RealVertices(double rayLength, PointD ptUL, PointD ptLR)
+		public IEnumerable<Vector> RealVertices(double rayLength, Vector ptUL, Vector ptLR)
 		{
 			// If no edges, then it's just the entire box
 			if (!Edges.Any())
@@ -478,7 +480,7 @@ namespace DAP.CompGeom
 		/// <returns>	An enumerable of real points representing the polygon. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public IEnumerable<PointD> RealVertices(double rayLength)
+		public IEnumerable<Vector> RealVertices(double rayLength)
 		{
 			// For every edge in the polygon
 			foreach (var oe in OrientedEdges)
@@ -526,7 +528,7 @@ namespace DAP.CompGeom
 		/// <param name="index">	The index to identiry this polygon. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal FortunePoly(PointD pt, int index)
+		internal FortunePoly(Vector pt, int index)
 		{
 			FZeroLengthEdge = false;
 			FAtInfinity = false;
@@ -568,7 +570,7 @@ namespace DAP.CompGeom
 					// directed rays as in this case, there is no such "order" independent of the polygon that
 					// does the ordering.  I'm leaving it in but I don't think it's necessary.
 					// TODO: Check on this!
-					if (Geometry.ICcw(
+					if (ICcw(
 						FortuneEdges[0].PolyOrderingTestPoint,
 						FortuneEdges[1].PolyOrderingTestPoint,
 						VoronoiPoint) < 0)
@@ -584,7 +586,7 @@ namespace DAP.CompGeom
 					// I think this represents an infinite polygon with only two edges.
 
 					// If not ordered around the single base point properly
-					if (Geometry.ICcw(FortuneEdges[0].VtxStart.Pt,
+					if (ICcw(FortuneEdges[0].VtxStart.Pt,
 					                  FortuneEdges[0].PolyOrderingTestPoint,
 					                  FortuneEdges[1].PolyOrderingTestPoint) > 0)
 					{
@@ -599,7 +601,7 @@ namespace DAP.CompGeom
 			{
 				// I think the nontransitivity of the "order" here will cause the CLR Sort()
 				// to screw up our ordering in this case so we handle it specially...
-				if (Geometry.ICcw(FortuneEdges[0].VtxStart.Pt,
+				if (ICcw(FortuneEdges[0].VtxStart.Pt,
 					FortuneEdges[0].PolyOrderingTestPoint,
 					FortuneEdges[1].PolyOrderingTestPoint) > 0)
 				{
@@ -607,7 +609,7 @@ namespace DAP.CompGeom
 					FortuneEdges[0] = FortuneEdges[1];
 					FortuneEdges[1] = edgeT;
 				}
-				if (Geometry.ICcw(FortuneEdges[2].VtxStart.Pt,
+				if (ICcw(FortuneEdges[2].VtxStart.Pt,
 					FortuneEdges[2].PolyOrderingTestPoint,
 					FortuneEdges[3].PolyOrderingTestPoint) > 0)
 				{

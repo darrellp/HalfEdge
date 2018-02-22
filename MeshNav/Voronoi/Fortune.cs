@@ -1,9 +1,10 @@
 #define NEW
 using System;
-using System.Diagnostics;
 using System.Linq;
+using static MeshNav.Geometry2D;
 
 using System.Collections.Generic;
+using MeshNav;
 using WE = DAP.CompGeom.WingedEdge<DAP.CompGeom.FortunePoly, DAP.CompGeom.FortuneEdge, DAP.CompGeom.FortuneVertex>;
 
 namespace DAP.CompGeom
@@ -56,9 +57,9 @@ namespace DAP.CompGeom
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
 		///
 		/// <param name="points">	Points whose Voronoi diagram will be calculated. If the library is
-		/// 						built for double precision, these should be PointD, else PointF. </param>
+		/// 						built for double precision, these should be Vector, else PointF. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		private Fortune(IEnumerable<PointD> points)
+		private Fortune(IEnumerable<Vector> points)
 		{
 			Bchl = new Beachline();
 			QevEvents = new EventQueue();
@@ -85,7 +86,7 @@ namespace DAP.CompGeom
 	    /// 
 	    /// <returns>	The polygon produced. </returns>
 	    ////////////////////////////////////////////////////////////////////////////////////////////////////
-	    FortunePoly InsertPoly(PointD pt, int index)
+	    FortunePoly InsertPoly(Vector pt, int index)
 		{
 			// The count is being passed in only as a unique identifier for this point.
 		    var poly = new FortunePoly(pt, Polygons.Count) {Cookie = index};
@@ -133,7 +134,7 @@ namespace DAP.CompGeom
 		/// <returns>	The calculated voronoi diagram. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static WE ComputeVoronoi(IEnumerable<PointD> pts)
+		public static WE ComputeVoronoi(IEnumerable<Vector> pts)
 		{
 			var f = new Fortune(pts);
 			f.Voronoi();
@@ -169,10 +170,10 @@ namespace DAP.CompGeom
 		/// <returns>	The relaxed Winged Edge structure. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static WE LloydRelax(WE we, double rayLength, IEnumerable<PointD> polyClip, double strength = 1)
+		public static WE LloydRelax(WE we, double rayLength, IEnumerable<Vector> polyClip, double strength = 1)
 		{
 			// Locals
-			var ptsRelaxed = new List<PointD>();
+			var ptsRelaxed = new List<Vector>();
 
 			// For each polygon in the Winged edge
 			foreach (var poly in we.LstPolygons)
@@ -199,7 +200,7 @@ namespace DAP.CompGeom
 
 				// Locals for the centroid calculations
 				var cpts = 0;
-				var ptCentroid = new PointD();
+				var ptCentroid = new Vector();
 
 				// For each point in the clipped polygon
 				foreach (var pt in ptsCentroid)
@@ -211,14 +212,14 @@ namespace DAP.CompGeom
 				// ReSharper restore PossibleMultipleEnumeration
 
 				// Determine the centroid
-				var ctrd = new PointD(ptCentroid.X / cpts, ptCentroid.Y / cpts);
+				var ctrd = new Vector(ptCentroid.X / cpts, ptCentroid.Y / cpts);
 
 				// If strength is the default -1, just take our centroid
 				// ReSharper disable once CompareOfFloatsByEqualityOperator
 				if (strength == 1)
 				{
 					// Calculate the new centroid and add it to our list of points
-					ptsRelaxed.Add(new PointD(ptCentroid.X / cpts, ptCentroid.Y / cpts));
+					ptsRelaxed.Add(new Vector(ptCentroid.X / cpts, ptCentroid.Y / cpts));
 				}
 				else
 				{
@@ -362,7 +363,7 @@ namespace DAP.CompGeom
 				// Diagnostics
 				// If we run clockwise from the origin through edge 0 through edge 1
 				// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-				if (Geometry.ICcw(new PointD(0, 0), polyInfinityStart.FortuneEdges[0].VtxEnd.Pt, polyInfinityStart.FortuneEdges[1].VtxEnd.Pt) > 0)
+				if (ICcw(new Vector(0, 0), polyInfinityStart.FortuneEdges[0].VtxEnd.Pt, polyInfinityStart.FortuneEdges[1].VtxEnd.Pt) > 0)
 				// ReSharper restore ConvertIfStatementToConditionalTernaryExpression
 				{
 					// Edge 1 is our leading edge
@@ -498,7 +499,7 @@ namespace DAP.CompGeom
 			int iLeadingEdgeNext;
 
 			// Create the infamous polygon at infinity...
-			var polyAtInfinity = new FortunePoly(new PointD(0, 0), -1);
+			var polyAtInfinity = new FortunePoly(new Vector(0, 0), -1);
 			FortuneEdge edgePreviousAtInfinity = null;
 
 			// Declare this the official polygon at infinity
@@ -579,7 +580,6 @@ namespace DAP.CompGeom
 
 			// Next polygon in order is to the left of our leading edge
 			polyNextCcw = edgeLeadingCw.PolyLeft as FortunePoly;
-
 			
 			// Create the edge at infinity
 			//
@@ -689,7 +689,7 @@ namespace DAP.CompGeom
 		private void ProcessEvents()
 		{
 			// Create an impossible fictional "previous event"
-			FortuneEvent evtPrev = new CircleEvent(new PointD(Single.MaxValue, Single.MaxValue), 0);
+			FortuneEvent evtPrev = new CircleEvent(new Vector(Single.MaxValue, Single.MaxValue), 0);
 
 			// While there are events in the queue
 			while (QevEvents.Count > 0)
@@ -702,7 +702,7 @@ namespace DAP.CompGeom
 				var evt = QevEvents.Pop();
 
 				// If we've got a pair of identically placed events
-				if (Geometry.FCloseEnough(evt.Pt, evtPrev.Pt))
+				if (Geometry2D.FCloseEnough(evt.Pt, evtPrev.Pt))
 				{
 					// Locals
 					var tpPrev = evtPrev.GetType();
@@ -737,7 +737,7 @@ namespace DAP.CompGeom
 						// polygons which meet at that common point. These will be removed later in postprocessing.
 						// 
 						// ReSharper disable PossibleNullReferenceException
-						if (Geometry.FCloseEnough(cevt.VoronoiVertex, cevtPrev.VoronoiVertex))
+						if (Geometry2D.FCloseEnough(cevt.VoronoiVertex, cevtPrev.VoronoiVertex))
 						{
 							// We're going to create a zero length edge.
 							cevt.FZeroLength = true;
@@ -848,7 +848,7 @@ namespace DAP.CompGeom
 			// Replace the null vertex with an infinite vertex
 			var pt1 = edge.Poly1.VoronoiPoint;
 			var pt2 = edge.Poly2.VoronoiPoint;
-			var ptMid = new PointD((pt1.X + pt2.X) / 2, (pt1.Y + pt2.Y) / 2);
+			var ptMid = new Vector((pt1.X + pt2.X) / 2, (pt1.Y + pt2.Y) / 2);
 
 			// Point the ray in the proper direction
 			//
@@ -859,12 +859,12 @@ namespace DAP.CompGeom
 			// it points along.  To do this, we find the third polygon at the "base" of this ray
 			// and point the ray "away" from it.
 			var polyThird = ((FortuneVertex)edge.VtxStart).PolyThird(edge);
-			var fThirdOnLeft = Geometry.FLeft(pt1, pt2, polyThird.VoronoiPoint);
+			var fThirdOnLeft = Geometry2D.FLeft(pt1, pt2, polyThird.VoronoiPoint);
 			var dx = pt2.X - pt1.X;
 			var dy = pt2.Y - pt1.Y;
-			var ptProposedDirection = new PointD(dy, -dx);
-			var ptInProposedDirection = new PointD(ptMid.X + dy, ptMid.Y - dx);
-			var fProposedOnLeft = Geometry.FLeft(pt1, pt2, ptInProposedDirection);
+			var ptProposedDirection = new Vector(dy, -dx);
+			var ptInProposedDirection = new Vector(ptMid.X + dy, ptMid.Y - dx);
+			var fProposedOnLeft = Geometry2D.FLeft(pt1, pt2, ptInProposedDirection);
 
 			// Do we need to reverse orientation?
 			if (fProposedOnLeft == fThirdOnLeft)
@@ -894,11 +894,11 @@ namespace DAP.CompGeom
 			var pt2 = edge.Poly2.VoronoiPoint;
 			var dx = pt2.X - pt1.X;
 			var dy = pt2.Y - pt1.Y;
-			var ptMid = new PointD((pt1.X + pt2.X) / 2, (pt1.Y + pt2.Y) / 2);
+			var ptMid = new Vector((pt1.X + pt2.X) / 2, (pt1.Y + pt2.Y) / 2);
 
 			// Infinite vertices have directions in them rather than locations
-			var vtx1 = FortuneVertex.InfiniteVertex(new PointD(-dy, dx));
-			var vtx2 = FortuneVertex.InfiniteVertex(new PointD(dy, -dx));
+			var vtx1 = FortuneVertex.InfiniteVertex(new Vector(-dy, dx));
+			var vtx2 = FortuneVertex.InfiniteVertex(new Vector(dy, -dx));
 
 			// Create the new edge an link it in 
 			edge.VtxStart = new FortuneVertex(ptMid);

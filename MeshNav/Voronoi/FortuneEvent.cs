@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MeshNav;
 using Priority_Queue;
 
 namespace DAP.CompGeom
@@ -36,12 +37,12 @@ namespace DAP.CompGeom
 		/// <value>	The point where this event occurs. </value>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal PointD Pt { get; set; }
+		internal Vector Pt { get; set; }
 
 		#endregion
 
 		#region Constructor
-		internal FortuneEvent(PointD pt)
+		internal FortuneEvent(Vector pt)
 		{
 			Pt = pt;
 		}
@@ -63,11 +64,11 @@ namespace DAP.CompGeom
 		/// <returns></returns>
 		int IComparable.CompareTo(object obj)
 		{
-			// Get our PointD
+			// Get our Vector
 			var ptCompare = ((FortuneEvent)obj).Pt;
 
 			// If two events have essentially the same Y coordinate, we defer to the X coordinate
-			if (Geometry.FCloseEnough(Pt.Y, ptCompare.Y))
+			if (Geometry2D.FCloseEnough(Pt.Y, ptCompare.Y))
 			{
 				if (Pt.X > ptCompare.X)
 				{
@@ -122,11 +123,11 @@ namespace DAP.CompGeom
 		    CircleEvent cevtRet = null;
 
 			// Determine a circumcenter for the sites of poly1/2/3.
-			if (Geometry.FFindCircumcenter(poly1.VoronoiPoint, poly2.VoronoiPoint, poly3.VoronoiPoint, out var ptCenter))
+			if (Geometry2D.FFindCircumcenter(poly1.VoronoiPoint, poly2.VoronoiPoint, poly3.VoronoiPoint, out var ptCenter))
 			{
 				// Determine y coordinate for the side of the circle
 				// The event will fire when the scan line hits that y position
-				var radius = Geometry.Distance(poly1.VoronoiPoint, ptCenter);
+				var radius = Geometry2D.Distance(poly1.VoronoiPoint, ptCenter);
 				ptCenter.Y -= radius;
 
 				// If the circumcenter is above the scan line we've already passed it by, so don't put it in the queue
@@ -209,12 +210,12 @@ namespace DAP.CompGeom
 
 		internal LeafNode LfnEliminated { get; set; }
 
-		internal PointD VoronoiVertex => new PointD(Pt.X, Pt.Y + _radius);
+		internal Vector VoronoiVertex => new Vector(Pt.X, Pt.Y + _radius);
 
 	    #endregion
 
 		#region Constructor
-		internal CircleEvent(PointD pt, double radius) : base(pt)
+		internal CircleEvent(Vector pt, double radius) : base(pt)
 		{
 			_radius = radius;
 			_radiusSq = radius*radius;
@@ -260,9 +261,9 @@ namespace DAP.CompGeom
 		/// <returns>	True if its contained in the circle, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal bool Contains(PointD pt)
+		internal bool Contains(Vector pt)
 		{
-			return Geometry.DistanceSq(pt, Pt) <= _radiusSq;
+			return Geometry2D.DistanceSq(pt, Pt) <= _radiusSq;
 		}
 		#endregion
 	}
