@@ -109,6 +109,23 @@
     <Compile Include="Vector.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="Voronoi\Beachline.cs" />
+    <Compile Include="Voronoi\ConvexPolyIntersection.cs" />
+    <Compile Include="Voronoi\EventQueue.cs" />
+    <Compile Include="Voronoi\Fortune.cs" />
+    <Compile Include="Voronoi\FortuneEdge.cs" />
+    <Compile Include="Voronoi\FortuneEvent.cs" />
+    <Compile Include="Voronoi\FortunePoly.cs" />
+    <Compile Include="Voronoi\FortuneVertex.cs" />
+    <Compile Include="Voronoi\Geometry.cs" />
+    <Compile Include="Voronoi\InternalNode.cs" />
+    <Compile Include="Voronoi\LeafNode.cs" />
+    <Compile Include="Voronoi\Node.cs" />
+    <Compile Include="Voronoi\PointD.cs" />
+    <Compile Include="Voronoi\WeEdge.cs" />
+    <Compile Include="Voronoi\WePolygon.cs" />
+    <Compile Include="Voronoi\WeVertex.cs" />
+    <Compile Include="Voronoi\WingedEdge.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -119,6 +136,7 @@
   <ItemGroup>
     <Content Include="Local Refs\Priority Queue.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.2\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.2\build\AssimpNet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

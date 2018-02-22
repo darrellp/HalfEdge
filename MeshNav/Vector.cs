@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 #if FLOAT
@@ -230,6 +231,52 @@ namespace MeshNav
 			// ReSharper disable RedundantCast
 			return new Vector((T)(X / ln), (T)(Y / ln));
 			// ReSharper restore RedundantCast
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>	Compares this vector with another one. </summary>
+		///
+		/// <remarks>	Darrellp, 2/23/2011. </remarks>
+		///
+		/// <param name="obj">	The object to compare to this object. </param>
+		///
+		/// <returns>	true if the objects are considered equal, false if they are not. </returns>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		public override bool Equals(object obj)
+		{
+			if (!(obj is Vector))
+			{
+				return false;
+			}
+			var ptCompare = (Vector)obj;
+			// ReSharper disable CompareOfFloatsByEqualityOperator
+			switch (Rank)
+			{
+				case 2:
+					return X == ptCompare.X && Y == ptCompare.Y;
+				case 3:
+					return X == ptCompare.X && Y == ptCompare.Y && Z == ptCompare.Z;
+				default:
+					return X == ptCompare.X && Y == ptCompare.Y && Z == ptCompare.Z &&
+					       MoreCoordinates.Zip(ptCompare.MoreCoordinates, (v1, v2) => v1 == v2).All(f => f);
+			}
+			// ReSharper restore CompareOfFloatsByEqualityOperator
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>	Retrieves a hashcode that is dependent on the elements. </summary>
+		///
+		/// <remarks>	Darrellp, 2/23/2011. </remarks>
+		///
+		/// <returns>	The hashcode. </returns>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		public override int GetHashCode()
+		{
+			// ReSharper disable NonReadonlyMemberInGetHashCode
+			return X.GetHashCode() ^ Y.GetHashCode();
+			// ReSharper restore NonReadonlyMemberInGetHashCode
 		}
 	}
 }
