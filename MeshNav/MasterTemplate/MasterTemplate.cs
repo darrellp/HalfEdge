@@ -187,10 +187,6 @@ namespace Templates
 #endif
     {
         internal __TEMPLATE__Vertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
-#if RAYED
-        public bool IsRayed { get; set; }
-#endif
-
 #if NORMALS
         public Vector? NormalAccessor { get; set; }
 #endif

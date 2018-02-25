@@ -181,9 +181,6 @@ namespace Templates
 #endif
     {
         internal VoronoiVertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
-#if RAYED
-        public bool IsRayed { get; set; }
-#endif
 
 #if NORMALS
         public Vector? NormalAccessor { get; set; }

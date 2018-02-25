@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DAP.CompGeom;
-using MeshNav.TraitInterfaces;
 using MeshNav.RayedMeshSpace;
+using MeshNav.TraitInterfaces;
 
 namespace MeshNav.Voronoi
 {
@@ -14,9 +14,11 @@ namespace MeshNav.Voronoi
 			fortune.Voronoi();
 			return PopulateMesh(fortune, factory);
 		}
+
 		internal static Mesh PopulateMesh(Fortune fortune, Factory factory)
 		{
 			var mesh = factory.CreateMesh() as RayedMesh;
+			// ReSharper disable once PossibleNullReferenceException
 			if (mesh.Dimension != 2)
 			{
 				throw new MeshNavException("Voronoi requires 2D mesh");
@@ -108,12 +110,14 @@ namespace MeshNav.Voronoi
 					}
 				}
 			}
+
 			newList.AddRange(poly.FortuneEdges.Skip(iEdge + 1));
 			return newList;
 		}
 
 		private static Vertex AddVertex(WeVertex vtx, RayedMesh mesh)
 		{
+			// ReSharper disable once ConvertIfStatementToNullCoalescingExpression
 			if (vtx.HalfEdgeVertex == null)
 			{
 				vtx.HalfEdgeVertex = vtx.FAtInfinity ? mesh.AddRayedVertex(vtx.Pt) : mesh.AddVertex(vtx.Pt);

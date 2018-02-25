@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
@@ -14,7 +13,6 @@ namespace MeshNavTests
 		[TestMethod]
 		public void TestSimpleCase()
 		{
-			var factory = new VoronoiFactory(2);
 			var mesh = BuildHalfEdge.CreateVoronoi(new List<Vector>()
 			{
 				new Vector(1, 0),

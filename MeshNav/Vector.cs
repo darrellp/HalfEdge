@@ -221,7 +221,7 @@ namespace MeshNav
 
 		public T Length()
 		{
-			return (T)Math.Sqrt(X * X + Y * Y);
+			return Math.Sqrt(X * X + Y * Y);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////

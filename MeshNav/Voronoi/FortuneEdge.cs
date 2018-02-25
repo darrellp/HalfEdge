@@ -6,28 +6,37 @@ namespace DAP.CompGeom
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// <summary>	Fortune edge. </summary>
-	///
 	/// <remarks>
-	/// An edge for a winged edge structure but specifically designed for the voronoi algorithm.
-	/// Darrellp, 2/18/2011.
+	///     An edge for a winged edge structure but specifically designed for the voronoi algorithm.
+	///     Darrellp, 2/18/2011.
 	/// </remarks>
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	public class FortuneEdge : WeEdge
 	{
+		#region ToString
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>	Convert this object into a string representation. </summary>
+		/// <remarks>	Darrellp, 2/21/2011. </remarks>
+		/// <returns>	A string representation of this object. </returns>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		public override string ToString()
+		{
+			return $"{base.ToString()} : Gens {_arPoly[0].Index} - {_arPoly[1].Index}:";
+		}
+		#endregion
+
 		#region Private Variables
-		bool _fStartVertexSet;										// True if the first vertex has already been set on this edge
-		bool _fAddedToWingedEdge;									// True if we've already been added to a winged edge data structure
-		readonly FortunePoly[] _arPoly = new FortunePoly[2];		// The polygons on each side of us
+		private bool _fStartVertexSet; // True if the first vertex has already been set on this edge
+		private bool _fAddedToWingedEdge; // True if we've already been added to a winged edge data structure
+		private readonly FortunePoly[] _arPoly = new FortunePoly[2]; // The polygons on each side of us
 		#endregion
 
 		#region Properties
 		internal FortunePoly Poly1 => _arPoly[0];
-	    internal FortunePoly Poly2 => _arPoly[1];
+		internal FortunePoly Poly2 => _arPoly[1];
 
-	    ////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Gets or sets a value indicating whether this is part of a split doubly infinite edge. </summary>
-		///
 		/// <value>	true if split, false if not. </value>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,14 +44,12 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Return a point suitable for testing angle around the generator. </summary>
-		/// 
-		/// <remarks>	
-		/// When we order the edges in CW or CCW order, we need to get representative points on each edge
-		/// so that we can compare the angle they make with the vertex being tested.  This means they
-		/// have to be on the edge but not at either vertex so that we can order the edges of polygons in
-		/// postprocessing.  This is used in the CompareToVirtual() to effect that ordering. 
+		/// <remarks>
+		///     When we order the edges in CW or CCW order, we need to get representative points on each edge
+		///     so that we can compare the angle they make with the vertex being tested.  This means they
+		///     have to be on the edge but not at either vertex so that we can order the edges of polygons in
+		///     postprocessing.  This is used in the CompareToVirtual() to effect that ordering.
 		/// </remarks>
-		///
 		/// <value>	The polygon ordering test point. </value>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -76,32 +83,12 @@ namespace DAP.CompGeom
 		}
 		#endregion
 
-		#region ToString
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Convert this object into a string representation. </summary>
-		///
-		/// <remarks>	Darrellp, 2/21/2011. </remarks>
-		///
-		/// <returns>	A string representation of this object. </returns>
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		public override string ToString()
-		{
-			return $"{base.ToString()} : Gens {_arPoly[0].Index} - {_arPoly[1].Index}:";
-		}
-		#endregion
-
 		#region Queries
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Is this edge zero length?  Infinite rays are never zero length. </summary>
-		///
 		/// <remarks>	Darrellp, 2/21/2011. </remarks>
-		///
 		/// <returns>	true if the edge is zero length. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal bool FZeroLength()
 		{
 			return !VtxEnd.FAtInfinity && FCloseEnough(VtxStart.Pt, VtxEnd.Pt);
@@ -109,18 +96,14 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Find the index of this edge in an adjacent vertex. </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="fStartVertex">	If true, search start vertex, else search end vertex. </param>
-		///
 		/// <returns>	Index in the vertice's edge list of this edge. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal int EdgeIndex(bool fStartVertex)
 		{
 			// Get the vertex we're supposed to search
-			var vtx = (FortuneVertex)(fStartVertex ? VtxStart : VtxEnd);
+			var vtx = (FortuneVertex) (fStartVertex ? VtxStart : VtxEnd);
 
 			// Go through all the edges for that vertex
 			for (var iEdge = 0; iEdge < vtx.FortuneEdges.Count; iEdge++)
@@ -132,42 +115,39 @@ namespace DAP.CompGeom
 					return iEdge;
 				}
 			}
+
 			// We should never make it to here
 			return -1;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Returns the polygon on the other side of this edge. </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="polyThis">	The polygon on "this" side. </param>
-		///
 		/// <returns>	The polygon on the "other" side. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal FortunePoly OtherPoly(FortunePoly polyThis)
 		{
 			return Poly1 == polyThis ? Poly2 : Poly1;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Determine whether two edges connect at a common vertex and if so, how they connect. 
+		/// <summary>
+		///     Determine whether two edges connect at a common vertex and if so, how they connect.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="edge1">					First edge. </param>
 		/// <param name="edge2">					Second edge. </param>
-		/// <param name="fEdge1ConnectsAtStartVtx">	[out] True if edge1 connects to edge2 at its start
-		/// 										vertex, else false. </param>
-		/// <param name="fEdge2ConnectsAtStartVtx">	[out] True if edge2 connects to edge1 at its start
-		/// 										vertex, else false. </param>
-		///
+		/// <param name="fEdge1ConnectsAtStartVtx">
+		///     [out] True if edge1 connects to edge2 at its start
+		///     vertex, else false.
+		/// </param>
+		/// <param name="fEdge2ConnectsAtStartVtx">
+		///     [out] True if edge2 connects to edge1 at its start
+		///     vertex, else false.
+		/// </param>
 		/// <returns>	true if the edges connect. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal static bool FConnectsTo(
 			FortuneEdge edge1,
 			FortuneEdge edge2,
@@ -188,7 +168,7 @@ namespace DAP.CompGeom
 				fEdge2ConnectsAtStartVtx = true;
 				fRet = true;
 			}
-			else if(ReferenceEquals(edge1.VtxStart, edge2.VtxEnd))
+			else if (ReferenceEquals(edge1.VtxStart, edge2.VtxEnd))
 			{
 				fEdge1ConnectsAtStartVtx = true;
 				fRet = true;
@@ -210,20 +190,16 @@ namespace DAP.CompGeom
 		#endregion
 
 		#region Modification
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Relabel all the end vertices of this edge to point to it's start vertex. </summary>
-		/// 
 		/// <remarks>
-		/// This is done only for zero length edges when they're deleted.  The edges emanating from the
-		/// end vertex of the zero length edge are moved to the start vertex (which is in the same location
-		/// as the end vertex).  Since these will not be ordered with the edges already there we set them to
-		/// unordered.
-		/// 	
-		/// Darrellp, 2/19/2011.
+		///     This is done only for zero length edges when they're deleted.  The edges emanating from the
+		///     end vertex of the zero length edge are moved to the start vertex (which is in the same location
+		///     as the end vertex).  Since these will not be ordered with the edges already there we set them to
+		///     unordered.
+		///     Darrellp, 2/19/2011.
 		/// </remarks>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private void RelabelEndVerticesToStart()
 		{
 			// For each edge emanating at the end vertex
@@ -231,7 +207,7 @@ namespace DAP.CompGeom
 			// We HAVE to use FortuneEdges here since the WeVertex.Edges enumeration depends on
 			// CW and CCW predecessors which we're in the process of messing around with - a
 			// recipe for disaster!
-			foreach (var edgeCur in ((FortuneVertex)VtxEnd).FortuneEdges)
+			foreach (var edgeCur in ((FortuneVertex) VtxEnd).FortuneEdges)
 			{
 				// If it's not the zero length edge
 				if (!ReferenceEquals(edgeCur, this))
@@ -249,30 +225,30 @@ namespace DAP.CompGeom
 					}
 				}
 			}
-			
+
 			// Reset the ordering flag on the start vertex
-			((FortuneVertex)VtxStart).ResetOrderedFlag();
+			((FortuneVertex) VtxStart).ResetOrderedFlag();
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Splice all the end vertices of this edge into the edge list of it's start vertex. </summary>
-		///
 		/// <remarks>	We do this when removing zero length edges. Darrellp, 2/19/2011. </remarks>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private void SpliceEndEdgesIntoStart()
 		{
 			// Initialize locals
 			var iEnd = EdgeIndex(false);
 			var iStart = EdgeIndex(true);
-			var lstSpliceInto = ((FortuneVertex)VtxStart).FortuneEdges;
-			var lstSpliceFrom = ((FortuneVertex)VtxEnd).FortuneEdges;
+			var lstSpliceInto = ((FortuneVertex) VtxStart).FortuneEdges;
+			var lstSpliceFrom = ((FortuneVertex) VtxEnd).FortuneEdges;
 
 			// Now add all our end vertices to the start vertex's edge list.
 			// 
 			// We add them in reverse order starting from the edge before
 			// this one so that they end up in proper order in the target list
-			for (var i = (iEnd + lstSpliceFrom.Count - 1) % lstSpliceFrom.Count; i != iEnd; i = (i + lstSpliceFrom.Count - 1) % lstSpliceFrom.Count)
+			for (var i = (iEnd + lstSpliceFrom.Count - 1) % lstSpliceFrom.Count;
+				i != iEnd;
+				i = (i + lstSpliceFrom.Count - 1) % lstSpliceFrom.Count)
 			{
 				// Put them into the start list
 				lstSpliceInto.Insert(iStart, lstSpliceFrom[i]);
@@ -331,15 +307,13 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Move all the edges on the end vertex to the start. </summary>
-		///
-		/// <remarks>	
-		/// This is done to removing a zero length edge.  Since the edge is zero length
-		/// we can assume that all the end edges fit in the "wedge" occupied by this edge in the start
-		/// vertices list of edges.  That is, we can assume that we can just splice the end edges into
-		/// the start vertex's list of edges without having to resort based on angle. 
+		/// <remarks>
+		///     This is done to removing a zero length edge.  Since the edge is zero length
+		///     we can assume that all the end edges fit in the "wedge" occupied by this edge in the start
+		///     vertices list of edges.  That is, we can assume that we can just splice the end edges into
+		///     the start vertex's list of edges without having to resort based on angle.
 		/// </remarks>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void ReassignVertexEdges()
 		{
 			// Put the end edges into our start vertex's list of edges
@@ -351,12 +325,9 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Add a vertex in the proper place according to _fStartVertexSet. </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="vtx">	Vertex to add. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void AddVertex(FortuneVertex vtx)
 		{
 			// If we've already set the start vertex
@@ -374,23 +345,19 @@ namespace DAP.CompGeom
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Get the next edge in both the cw and ccw directions from this edge at the given vertex. 
+		/// <summary>
+		///     Get the next edge in both the cw and ccw directions from this edge at the given vertex.
 		/// </summary>
-		///
-		/// <remarks>	
-		/// This routine is called before they've been set up as winged edges so we have to search them
-		/// out ourselves.  The edges have been ordered in CW order, however.
-		/// 
-		/// Darrellp, 2/19/2011. 
+		/// <remarks>
+		///     This routine is called before they've been set up as winged edges so we have to search them
+		///     out ourselves.  The edges have been ordered in CW order, however.
+		///     Darrellp, 2/19/2011.
 		/// </remarks>
-		///
 		/// <param name="vtx">		vertex to use. </param>
 		/// <param name="edgeCW">	[out] returned cw edge. </param>
 		/// <param name="edgeCCW">	[out] returned ccw edge. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		void GetSuccessorEdgesFromVertex(
+		private void GetSuccessorEdgesFromVertex(
 			FortuneVertex vtx,
 			out FortuneEdge edgeCW,
 			out FortuneEdge edgeCCW)
@@ -412,13 +379,13 @@ namespace DAP.CompGeom
 				{
 					// Find our place in the list of edges for start vertex
 					iEdge = EdgeIndex(true);
-					cEdges = ((FortuneVertex)VtxStart).CtEdges;
+					cEdges = ((FortuneVertex) VtxStart).CtEdges;
 				}
 				else
 				{
 					// Find our place in the list of edges for end vertex
 					iEdge = EdgeIndex(false);
-					cEdges = ((FortuneVertex)VtxEnd).CtEdges;
+					cEdges = ((FortuneVertex) VtxEnd).CtEdges;
 				}
 
 				// Get our immediate neighbors on the edge list
@@ -428,24 +395,20 @@ namespace DAP.CompGeom
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Get the next edge in both the cw and ccw directions from this edge at the given 3 valent
-		/// vertex. 
+		/// <summary>
+		///     Get the next edge in both the cw and ccw directions from this edge at the given 3 valent
+		///     vertex.
 		/// </summary>
-		///
 		/// <remarks>
-		/// This is the simplest and most common case.  It's called before the winged edge stuff is set up
-		/// so we have to search manually.  The edges have been sorted in clockwise order however.
-		/// 
-		/// Darrellp, 2/19/2011.
+		///     This is the simplest and most common case.  It's called before the winged edge stuff is set up
+		///     so we have to search manually.  The edges have been sorted in clockwise order however.
+		///     Darrellp, 2/19/2011.
 		/// </remarks>
-		///
 		/// <param name="vtx">		vertex to use. </param>
 		/// <param name="edgeCW">	[out] returned cw edge. </param>
 		/// <param name="edgeCCW">	[out] returned ccw edge. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		void GetSuccessorEdgesFrom3ValentVertex(
+		private void GetSuccessorEdgesFrom3ValentVertex(
 			FortuneVertex vtx,
 			out FortuneEdge edgeCW,
 			out FortuneEdge edgeCCW)
@@ -469,16 +432,13 @@ namespace DAP.CompGeom
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Place the poly on the proper side of this edge.  We use the generator of the poly to locate
-		/// it properly WRT this edge. 
+		/// <summary>
+		///     Place the poly on the proper side of this edge.  We use the generator of the poly to locate
+		///     it properly WRT this edge.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/18/2011. </remarks>
-		///
 		/// <param name="poly">	Polygon to locate. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void SetOrderedPoly(FortunePoly poly)
 		{
 			if (FLeftOf(poly.VoronoiPoint))
@@ -492,18 +452,16 @@ namespace DAP.CompGeom
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Set up the "wings" for this edge - i.e., it's successor edges in both cw and ccw directions
-		/// at both start and end vertices. 
+		/// <summary>
+		///     Set up the "wings" for this edge - i.e., it's successor edges in both cw and ccw directions
+		///     at both start and end vertices.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/18/2011. </remarks>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void SetSuccessorEdges()
 		{
 			// Locals
-		    var fvtx = ((FortuneVertex) VtxStart);
+			var fvtx = (FortuneVertex) VtxStart;
 
 			// If this is the degenerate case of a fully infinite line
 			//
@@ -526,6 +484,7 @@ namespace DAP.CompGeom
 					// Set our pred ans succ to Edges[0]
 					EdgeCCWPredecessor = EdgeCWPredecessor = fvtx.FortuneEdges[0];
 				}
+
 				return;
 			}
 
@@ -533,11 +492,11 @@ namespace DAP.CompGeom
 			//
 			// We can't keep edges sorted during the sweepline processing so we do it here in
 			// postprocessing
-			((FortuneVertex)VtxStart).OrderEdges();
+			((FortuneVertex) VtxStart).OrderEdges();
 
 			// Get our predecessor edges
 			GetSuccessorEdgesFromVertex(
-				((FortuneVertex)VtxStart),
+				(FortuneVertex) VtxStart,
 				out var edgeCW,
 				out var edgeCCW);
 			EdgeCWPredecessor = edgeCW;
@@ -550,11 +509,11 @@ namespace DAP.CompGeom
 			if (!VtxEnd.FAtInfinity)
 			{
 				// Order our end vertices
-				((FortuneVertex)VtxEnd).OrderEdges();
+				((FortuneVertex) VtxEnd).OrderEdges();
 
 				// Get our successor edges
 				GetSuccessorEdgesFromVertex(
-					((FortuneVertex)VtxEnd),
+					(FortuneVertex) VtxEnd,
 					out edgeCW,
 					out edgeCCW);
 				EdgeCWSuccessor = edgeCW;
@@ -564,19 +523,15 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Add a poly to the edge and the edge to the winged edge data structure. </summary>
-		///
-		/// <remarks>	
-		/// This is where we set up the CW and CCW successor and predecessor edges, the polygons on each
-		/// side of the edge, it's start and end vertices.  Also, the edge is added to to start and end
-		/// vertices' edge list and it's actually added to the winged edge structure itself
-		/// 
-		/// Darrellp, 2/18/2011. 
+		/// <remarks>
+		///     This is where we set up the CW and CCW successor and predecessor edges, the polygons on each
+		///     side of the edge, it's start and end vertices.  Also, the edge is added to to start and end
+		///     vertices' edge list and it's actually added to the winged edge structure itself
+		///     Darrellp, 2/18/2011.
 		/// </remarks>
-		///
 		/// <param name="poly">	Polygon to add. </param>
 		/// <param name="we">	Winged edge structure to add edge to. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void HookToWingedEdge(FortunePoly poly, WE we)
 		{
 			// Put the poly properly to the left or right of this edge
@@ -604,20 +559,16 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Set up the polygons which surround this edge. </summary>
-		///
-		/// <remarks>	
-		/// During the sweepline processing we don't necessarily know where the final vertex for an edge
-		/// will be before we know the polygons on each side of the edge so we can't actually determine
-		/// which side of the edge the polygons will lie on.  Consequently, we have to just keep them
-		/// handy until we finally get our second point.
-		/// 
-		/// Darrellp, 2/19/2011. 
+		/// <remarks>
+		///     During the sweepline processing we don't necessarily know where the final vertex for an edge
+		///     will be before we know the polygons on each side of the edge so we can't actually determine
+		///     which side of the edge the polygons will lie on.  Consequently, we have to just keep them
+		///     handy until we finally get our second point.
+		///     Darrellp, 2/19/2011.
 		/// </remarks>
-		///
 		/// <param name="poly1">	First poly. </param>
 		/// <param name="poly2">	Second poly. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void SetPolys(FortunePoly poly1, FortunePoly poly2)
 		{
 			_arPoly[0] = poly1;
@@ -626,20 +577,15 @@ namespace DAP.CompGeom
 		#endregion
 
 		#region IComparable Members
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Find the common polygon between two edges.  An assertion will be raised if there is no common
-		/// polygon. 
+		/// <summary>
+		///     Find the common polygon between two edges.  An assertion will be raised if there is no common
+		///     polygon.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="edge">	Edge to find a common poly with. </param>
-		///
 		/// <returns>	The common polygon. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private FortunePoly PolyCommon(FortuneEdge edge)
 		{
 			// If my Poly1 is the same as one of the edge's polys
@@ -655,17 +601,13 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Compare two edges based on their cw order around a common generator. </summary>
-		///
-		/// <remarks>	
-		/// It is an error to compare edges which do not have a common generator so this is only a
-		/// "partial" comparer which is probably strictly verboten according to C# rules, but we have to
-		/// do it in order to use the framework Sort routine to sort edges around a generator. 	
-		/// 
-		/// Darrellp, 2/19/2011. 
+		/// <remarks>
+		///     It is an error to compare edges which do not have a common generator so this is only a
+		///     "partial" comparer which is probably strictly verboten according to C# rules, but we have to
+		///     do it in order to use the framework Sort routine to sort edges around a generator.
+		///     Darrellp, 2/19/2011.
 		/// </remarks>
-		///
 		/// <param name="edgeIn">	Edge to compare. </param>
-		///
 		/// <returns>	Comparison output. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		internal override int CompareToVirtual(WeEdge edgeIn)

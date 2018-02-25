@@ -4,11 +4,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
 using MeshNav.Placement;
 using Templates;
-using static MeshNav.Geometry2D;
 #if FLOAT
 using T = System.Single;
 #else
 using T = System.Double;
+// ReSharper disable RedundantCast
 #endif
 
 

@@ -8,40 +8,30 @@ namespace DAP.CompGeom
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// <summary>	Static class to hold the convex poly intersection routine. </summary>
-	///
 	/// <remarks>	Darrellp, 2/23/2011. </remarks>
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	public static class ConvexPolyIntersection
 	{
-		private enum InflagVals
-		{
-			AInterior,
-			BInterior,
-			Unknown
-		}
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Finds the intersection of two convex polygons. </summary>
-		///
-		/// <remarks>	<para>No check is made for convexity.  The enumerables must yield the points in counterclockwise
-		/// order.</para>
-		/// 
-		/// <para>This code works by looking for intersections between the two polygons.  If there is no intersection
-		/// then no points will be returned even if one is wholly contains within the other.  Putting a check in for
-		/// this case is often unnecessary and so we leave it out here and plan on incorporating it in a separate
-		/// method at a later date.</para>
-		/// 
-		/// <para>This is based on the code in "Computational Geometry in C" by Joseph O'Rourke.</para>
-		/// 
-		/// Darrellp, 2/23/2011. </remarks>
-		///
+		/// <remarks>
+		///     <para>
+		///         No check is made for convexity.  The enumerables must yield the points in counterclockwise
+		///         order.
+		///     </para>
+		///     <para>
+		///         This code works by looking for intersections between the two polygons.  If there is no intersection
+		///         then no points will be returned even if one is wholly contains within the other.  Putting a check in for
+		///         this case is often unnecessary and so we leave it out here and plan on incorporating it in a separate
+		///         method at a later date.
+		///     </para>
+		///     <para>This is based on the code in "Computational Geometry in C" by Joseph O'Rourke.</para>
+		///     Darrellp, 2/23/2011.
+		/// </remarks>
 		/// <param name="poly1Enum">	The polygon 1 enum. </param>
 		/// <param name="poly2Enum">	The polygon 2 enum. </param>
-		///
 		/// <returns>	An enumeration of the points in the intersection. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static IEnumerable<Vector> FindIntersection(IEnumerable<Vector> poly1Enum, IEnumerable<Vector> poly2Enum)
 		{
 			// Put the two polygons into arrays
@@ -55,6 +45,7 @@ namespace DAP.CompGeom
 				{
 					yield return poly;
 				}
+
 				yield break;
 			}
 
@@ -65,6 +56,7 @@ namespace DAP.CompGeom
 				{
 					yield return poly;
 				}
+
 				yield break;
 			}
 
@@ -99,8 +91,8 @@ namespace DAP.CompGeom
 				// Compute key variables
 
 				// Tail of our current sides
-				var aPrev = (aCur + cPolyAVertices - 1)%cPolyAVertices;
-				var bPrev = (bCur + cPolyBVertices - 1)%cPolyBVertices;
+				var aPrev = (aCur + cPolyAVertices - 1) % cPolyAVertices;
+				var bPrev = (bCur + cPolyBVertices - 1) % cPolyBVertices;
 
 				// Direction of each side
 				var vecA = polyA[aCur] - polyA[aPrev];
@@ -114,7 +106,7 @@ namespace DAP.CompGeom
 				var aHalfPlaneContainsB = Math.Sign(SignedArea(polyA[aPrev], polyA[aCur], polyB[bCur]));
 
 				// if A & B intersect
-			    (var code, var ptCrossing) = SegSegInt(polyA[aPrev], polyA[aCur], polyB[bPrev], polyB[bCur]);
+				(var code, var ptCrossing) = SegSegInt(polyA[aPrev], polyA[aCur], polyB[bPrev], polyB[bCur]);
 				if (code == CrossingType.Normal || code == CrossingType.Vertex)
 				{
 					// If this is the first intersection we've seen
@@ -149,6 +141,7 @@ namespace DAP.CompGeom
 				{
 					yield break;
 				}
+
 				// else if A and B are parallel and separated
 				//
 				// The union of the two polygons is empty
@@ -157,6 +150,7 @@ namespace DAP.CompGeom
 					// Handle it
 					yield break;
 				}
+
 				// else if A and B are collinear
 				if (cross == 0 && bHalfPlaneContainsA == 0 && aHalfPlaneContainsB == 0)
 				{
@@ -183,7 +177,7 @@ namespace DAP.CompGeom
 							yield return polyA[aCur];
 							ptPrevOutput = polyA[aCur];
 						}
-						
+
 						// Advance A
 						aCur = Advance(aCur, ref cAdvancesA, cPolyAVertices);
 					}
@@ -235,7 +229,7 @@ namespace DAP.CompGeom
 			// both indices have cycled or one has cycled twice
 			while (
 				(cAdvancesA < cPolyAVertices || cAdvancesB < cPolyBVertices) &&
-				cAdvancesA < 2*cPolyAVertices && cAdvancesB < 2*cPolyBVertices);
+				cAdvancesA < 2 * cPolyAVertices && cAdvancesB < 2 * cPolyBVertices);
 
 			// If Inflags is unknown then we never intersected and may have one poly wholly contained in the other.
 			if (inflag == InflagVals.Unknown)
@@ -258,14 +252,13 @@ namespace DAP.CompGeom
 						yield return pt;
 					}
 				}
-
 			}
 		}
 
 		private static int Advance(int iHead, ref int cAdvances, int cPolyVertices)
 		{
 			cAdvances++;
-			return (iHead + 1)%cPolyVertices;
+			return (iHead + 1) % cPolyVertices;
 		}
 
 		private static InflagVals InOut(InflagVals inflag, int aHalfPlaneContainsB, int bHalfPlaneContainsA)
@@ -274,11 +267,20 @@ namespace DAP.CompGeom
 			{
 				return InflagVals.AInterior;
 			}
+
 			if (bHalfPlaneContainsA > 0)
 			{
 				return InflagVals.BInterior;
 			}
+
 			return inflag;
+		}
+
+		private enum InflagVals
+		{
+			AInterior,
+			BInterior,
+			Unknown
 		}
 	}
 }

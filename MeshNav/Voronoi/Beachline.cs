@@ -4,59 +4,46 @@ using MeshNav;
 namespace DAP.CompGeom
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// <summary>	
-	/// The beachline is the union of all the parabolas formed from all sites.  This is actually
-	/// maintained as a height balanced tree as suggested in the book by de Berg, et al. 
+	/// <summary>
+	///     The beachline is the union of all the parabolas formed from all sites.  This is actually
+	///     maintained as a height balanced tree as suggested in the book by de Berg, et al.
 	/// </summary>
-	///
 	/// <remarks>	Darrellp, 2/18/2011. </remarks>
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	internal class Beachline
 	{
-		#region Constructor
+		#region Properties
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>	Gets or the root node of the beachline tree. </summary>
+		/// <value>	The root node of the beachline tree. </value>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		internal Node NdRoot { get; private set; }
+		#endregion
+
+		#region Constructor
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Default constructor. </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		internal Beachline()
 		{
 			NdRoot = null;
 		}
-
-		#endregion
-
-		#region Properties
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Gets or the root node of the beachline tree. </summary>
-		///
-		/// <value>	The root node of the beachline tree. </value>
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal Node NdRoot { get; private set; }
-
 		#endregion
 
 		#region Search
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Do a binary search down the tree looking for the leaf node which covers the passed in X
-		/// coordinate. 
+		/// <summary>
+		///     Do a binary search down the tree looking for the leaf node which covers the passed in X
+		///     coordinate.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/18/2011. </remarks>
-		///
 		/// <param name="xSite">		X coordinate. </param>
 		/// <param name="yScanLine">	Where the scan line is at now. </param>
-		///
 		/// <returns>	Leaf node for parabola covering xSite. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		private LeafNode LfnSearchNode( double xSite, double yScanLine)
+		private LeafNode LfnSearchNode(double xSite, double yScanLine)
 		{
 			// Initialize
 			LeafNode ndRet;
@@ -87,7 +74,7 @@ namespace DAP.CompGeom
 				// determined in CurrentEdgeXPos below.
 
 				// Determine the break point on the beach line 
-				var edgeXPos = ((InternalNode)ndCur).CurrentEdgeXPos(yScanLine);
+				var edgeXPos = ((InternalNode) ndCur).CurrentEdgeXPos(yScanLine);
 
 				// Search the side of the break point that xSite is on
 				ndCur = edgeXPos < xSite ? ndCur.RightChild : ndCur.LeftChild;
@@ -101,35 +88,31 @@ namespace DAP.CompGeom
 		#endregion
 
 		#region Deletion
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Remove a parabola node from the beachline since it's being squeezed out and insert a vertex
-		/// into the voronoi diagram. 
+		/// <summary>
+		///     Remove a parabola node from the beachline since it's being squeezed out and insert a vertex
+		///     into the voronoi diagram.
 		/// </summary>
-		///
-		/// <remarks>	
-		/// This happens when a circle event occurs.  It's a rather delicate operation. From the point of
-		/// view of the voronoi diagram, we have two edges from above coming together into the newly
-		/// created vertex and a new edge created which descends below it.  This is really where the meat
-		/// of actually creating the voronoi diagram occurs.  One of the important details which seems to
-		/// be left totally out of the book is the importance of keeping accurate left and right sibling
-		/// pointers on the leaf nodes.  Since each leaf node represents a parabola in the beachline,
-		/// these pointers represent the set of parabolas from the left to the right of the beachline.
-		/// In a case like this where a parabola is being squeezed out, it's left and right siblings will
-		/// not butt up against each other forming a new edge and we need to be able to locate both these
-		/// nodes in order to make everything come out right.
-		/// 
-		/// This is very persnickety code.
+		/// <remarks>
+		///     This happens when a circle event occurs.  It's a rather delicate operation. From the point of
+		///     view of the voronoi diagram, we have two edges from above coming together into the newly
+		///     created vertex and a new edge created which descends below it.  This is really where the meat
+		///     of actually creating the voronoi diagram occurs.  One of the important details which seems to
+		///     be left totally out of the book is the importance of keeping accurate left and right sibling
+		///     pointers on the leaf nodes.  Since each leaf node represents a parabola in the beachline,
+		///     these pointers represent the set of parabolas from the left to the right of the beachline.
+		///     In a case like this where a parabola is being squeezed out, it's left and right siblings will
+		///     not butt up against each other forming a new edge and we need to be able to locate both these
+		///     nodes in order to make everything come out right.
+		///     This is very persnickety code.
 		/// </remarks>
-		///
 		/// <param name="cevt">				Circle event which caused this. </param>
 		/// <param name="lfnEliminated">	Leaf node for the parabola being eliminated. </param>
 		/// <param name="voronoiVertex">	The new vertex to be inserted into the voronoi diagram. </param>
 		/// <param name="evq">				Event queue. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal void RemoveNodeAndInsertVertex(CircleEvent cevt, LeafNode lfnEliminated, Vector voronoiVertex, EventQueue evq)
+		internal void RemoveNodeAndInsertVertex(CircleEvent cevt, LeafNode lfnEliminated, Vector voronoiVertex,
+			EventQueue evq)
 		{
 			// Initialize
 			var yScanLine = cevt.Pt.Y;
@@ -246,6 +229,7 @@ namespace DAP.CompGeom
 					innFarSiblingEdge.PolyRight.FZeroLengthEdge = true;
 				}
 			}
+
 			// Set the polygons which border the new edge
 			edge.SetPolys(innFarSiblingEdge.PolyRight, innFarSiblingEdge.PolyLeft);
 
@@ -260,12 +244,9 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Remove a leaf node. </summary>
-		///
 		/// <remarks>	Darrellp, 2/18/2011. </remarks>
-		///
 		/// <param name="lfn">	node to remove. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private void RemoveLeaf(LeafNode lfn)
 		{
 			// If we're the root, then tree go bye bye...
@@ -323,16 +304,13 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	One of our incoming edges is zero length so note it properly in the polygons. </summary>
-		///
-		/// <remarks>	
-		/// This happens when cocircular generators cause more than one circle event at the same
-		/// location. 
+		/// <remarks>
+		///     This happens when cocircular generators cause more than one circle event at the same
+		///     location.
 		/// </remarks>
-		///
 		/// <param name="edgeNearSibling">	Immediate sibling. </param>
 		/// <param name="edgeFarSibling">	Far sibling. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private static void SetZeroLengthFlagOnPolys(FortuneEdge edgeNearSibling, FortuneEdge edgeFarSibling)
 		{
 			// If it's the edge between us and our near sibling that's zero length
@@ -352,16 +330,13 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Delete any circle events associated with the leaf node. </summary>
-		///
-		/// <remarks>	
-		/// Circle events are composed of three adjacent leaf nodes so the ones	associated with us
-		/// include the one directly on us and the ones on our left and right siblings. 
+		/// <remarks>
+		///     Circle events are composed of three adjacent leaf nodes so the ones	associated with us
+		///     include the one directly on us and the ones on our left and right siblings.
 		/// </remarks>
-		///
 		/// <param name="lfnEliminated">	Leaf node being eliminated. </param>
 		/// <param name="evq">				Event queue. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private static void RemoveAssociatedCircleEvents(LeafNode lfnEliminated, EventQueue evq)
 		{
 			// Delete circle events which involve us and our siblings
@@ -372,20 +347,17 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Catch special circle events and disallow them. </summary>
-		///
-		/// <remarks>	
-		/// In the book it says to add a circle event if it isn't already in the queue.  That seems a bit
-		/// wasteful to me - search the whole queue every time you add a circle event?  There has to be a
-		/// better way.  This routine is the alternative.  Just a few checks on the circle parameters
-		/// ensures that they'll only enter the queue once.  Much better than a searh of the queue. It's essentially
-		/// an extension of the counter clockwise generic routine which deals with collinear points as though
-		/// they were points on an infinitely large circle.
+		/// <remarks>
+		///     In the book it says to add a circle event if it isn't already in the queue.  That seems a bit
+		///     wasteful to me - search the whole queue every time you add a circle event?  There has to be a
+		///     better way.  This routine is the alternative.  Just a few checks on the circle parameters
+		///     ensures that they'll only enter the queue once.  Much better than a searh of the queue. It's essentially
+		///     an extension of the counter clockwise generic routine which deals with collinear points as though
+		///     they were points on an infinitely large circle.
 		/// </remarks>
-		///
 		/// <param name="pt1">	First point for proposed circle event. </param>
 		/// <param name="pt2">	Second point for proposed circle event. </param>
 		/// <param name="pt3">	Third point for proposed circle event. </param>
-		///
 		/// <returns>	Acceptable if less than or equal to zero, else rejected. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -407,10 +379,15 @@ namespace DAP.CompGeom
 			var dx2 = pt3.X - pt1.X;
 			var dy1 = pt2.Y - pt1.Y;
 			var dy2 = pt3.Y - pt1.Y;
-			if ((dx1 * dx2 < 0) || (dy1 * dy2 < 0))
+			if (dx1 * dx2 < 0 || dy1 * dy2 < 0)
+			{
 				return -1;
-			if ((dx1 * dx1 + dy1 * dy1) < (dx2 * dx2 + dy2 * dy2))
+			}
+
+			if (dx1 * dx1 + dy1 * dy1 < dx2 * dx2 + dy2 * dy2)
+			{
 				return +1;
+			}
 			// -RQS
 
 			return 0;
@@ -418,16 +395,14 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Create a circle event from a triple of leaf nodes. </summary>
-		///
 		/// <remarks>	Darrellp, 2/18/2011. </remarks>
-		///
 		/// <param name="lfnLeft">		Leaf node representing the leftmost parabola. </param>
 		/// <param name="lfnCenter">	Leaf node representing the center parabola. </param>
 		/// <param name="lfnRight">		Leaf node representing the rightmost parabola. </param>
 		/// <param name="yScanLine">	Where the scan line is located. </param>
 		/// <param name="evq">			Event queue. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		static void CreateCircleEventFromTriple(
+		private static void CreateCircleEventFromTriple(
 			LeafNode lfnLeft,
 			LeafNode lfnCenter,
 			LeafNode lfnRight,
@@ -476,30 +451,26 @@ namespace DAP.CompGeom
 		#endregion
 
 		#region Insertion
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Handle the top N nodes located on a single horizontal line. </summary>
-		///
-		/// <remarks>	
-		/// This only handles the corner case where the top N nodes are on the same horizontal
-		/// line.  In that case the parabolas from previous points are vertically straight up and only
-		/// project to a single point on the x axis so that the beachline is a series of points rather
-		/// than a series of parabolas.  When that is the case we can't "intersect" new points with
-		/// parabolas that span the x axis.  After the scanline passes that initial set of topmost points,
-		/// there will always be a parabola which projects to the entire x axis so no need for this
-		/// special handling. Normally, we produce two new parabolas at a site event like this - the new
-		/// parabola for the site itself and the new parabola produced when we split the parabola above
-		/// us.  In this case there is no parabola above us so we only produce one new parabola - the one
-		/// inserted by the site. 
+		/// <remarks>
+		///     This only handles the corner case where the top N nodes are on the same horizontal
+		///     line.  In that case the parabolas from previous points are vertically straight up and only
+		///     project to a single point on the x axis so that the beachline is a series of points rather
+		///     than a series of parabolas.  When that is the case we can't "intersect" new points with
+		///     parabolas that span the x axis.  After the scanline passes that initial set of topmost points,
+		///     there will always be a parabola which projects to the entire x axis so no need for this
+		///     special handling. Normally, we produce two new parabolas at a site event like this - the new
+		///     parabola for the site itself and the new parabola produced when we split the parabola above
+		///     us.  In this case there is no parabola above us so we only produce one new parabola - the one
+		///     inserted by the site.
 		/// </remarks>
-		///
 		/// <param name="lfn">				LeafNode of the (degenerate) parabola nearest us. </param>
 		/// <param name="lfnNewParabola">	LeafNode we're inserting. </param>
 		/// <param name="innParent">		Parent of lfnOld. </param>
 		/// <param name="innSubRoot">		Root of the tree. </param>
 		/// <param name="fLeftChild">		Left child of innParent. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private static void NdInsertAtSameY(
 			LeafNode lfn,
 			LeafNode lfnNewParabola,
@@ -524,6 +495,7 @@ namespace DAP.CompGeom
 				lfnLeft = lfn;
 				lfnRight = lfnNewParabola;
 			}
+
 			innSubRoot.PolyLeft = lfnLeft.Poly;
 			innSubRoot.PolyRight = lfnRight.Poly;
 
@@ -549,25 +521,25 @@ namespace DAP.CompGeom
 					innParent.PolyRight = lfnLeft.Poly;
 				}
 			}
+
 			edge.SetPolys(innSubRoot.PolyRight, innSubRoot.PolyLeft);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Insert a new parabola into the beachline when the beachline spans the X axis. </summary>
-		///
-		/// <remarks>	
-		/// This is the normal case.  We insert our new parabola and split the parabola above our site in
-		/// two. This means one new leaf node is created for leftmost of the two nodes in the split (the
-		/// old lfn is recycled to become the right node of the split).  Also a new internal node to
-		/// parent all this. 
+		/// <remarks>
+		///     This is the normal case.  We insert our new parabola and split the parabola above our site in
+		///     two. This means one new leaf node is created for leftmost of the two nodes in the split (the
+		///     old lfn is recycled to become the right node of the split).  Also a new internal node to
+		///     parent all this.
 		/// </remarks>
-		///
 		/// <param name="lfnOld">			Parabola above the new site. </param>
 		/// <param name="lfnNewParabola">	parabola for the new site. </param>
-		/// <param name="innSubRoot">		Parent node of both lfnOld and lfnNewParabola represneting
-		/// 								the breakpoint between them. </param>
+		/// <param name="innSubRoot">
+		///     Parent node of both lfnOld and lfnNewParabola represneting
+		///     the breakpoint between them.
+		/// </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		private static void InsertAtDifferentY(LeafNode lfnOld, LeafNode lfnNewParabola, InternalNode innSubRoot)
 		{
 			// The old lfn will become the new right half of the split but we need a new leaf node
@@ -593,21 +565,19 @@ namespace DAP.CompGeom
 			{
 				lfnOld.LeftAdjacentLeaf.RightAdjacentLeaf = lfnLeftHalf;
 			}
+
 			lfnOld.LeftAdjacentLeaf = lfnNewParabola;
 			edge.SetPolys(innSubRoot.PolyRight, innSubRoot.PolyLeft);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Insert a new LeafNode into the tree. </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="lfn">	Place to put the new leaf node. </param>
 		/// <param name="evt">	The event to insert. </param>
-		///
 		/// <returns>	. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		static InternalNode NdCreateInsertionSubtree(LeafNode lfn, SiteEvent evt)
+		private static InternalNode NdCreateInsertionSubtree(LeafNode lfn, SiteEvent evt)
 		{
 			// Initialize locals
 			var innParent = lfn.NdParent;
@@ -646,13 +616,13 @@ namespace DAP.CompGeom
 		}
 
 		/// <summary>
-		/// Create the new circle events that arise from a site event
+		///     Create the new circle events that arise from a site event
 		/// </summary>
 		/// <param name="lfnLeft">Node to the left</param>
 		/// <param name="lfnRight">Node to the right</param>
 		/// <param name="yScanLine">Scan line position</param>
 		/// <param name="evq">Event queue</param>
-		static void CreateCircleEventsFromSiteEvent(
+		private static void CreateCircleEventsFromSiteEvent(
 			LeafNode lfnLeft,
 			LeafNode lfnRight,
 			double yScanLine,
@@ -673,13 +643,10 @@ namespace DAP.CompGeom
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Insert a new polygon arising from a site event. </summary>
-		///
 		/// <remarks>	Darrellp, 2/19/2011. </remarks>
-		///
 		/// <param name="evt">	Site event causing the new polygon. </param>
 		/// <param name="evq">	Event queue. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal void PolyInsertNode(SiteEvent evt, EventQueue evq)
 		{
 			// If there's no tree yet
@@ -731,6 +698,7 @@ namespace DAP.CompGeom
 					evq.CircleEvents.Remove(lln);
 					cevt.LinkedListNode = null;
 				}
+
 				lln = llnNext;
 			}
 

@@ -42,6 +42,7 @@ namespace MeshNavTests
 			{
 				new Vector(0, 0),
 				new Vector(1, 1),
+				// ReSharper disable once RedundantCast
 				new Vector((T)0.01, 1),
 				new Vector(1, 2),
 				new Vector(0, 2)
