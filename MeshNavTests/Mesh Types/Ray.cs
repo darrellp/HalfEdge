@@ -48,8 +48,7 @@ using T = System.Double;
 
 // ReSharper disable RedundantUsingDirective
 using MeshNav;
-using MathNet.Numerics.LinearAlgebra;
-using MeshNav.RayedMesh;
+using MeshNav.RayedMeshSpace;
 using MeshNav.BoundaryMesh;
 using MeshNav.TraitInterfaces;
 // ReSharper restore RedundantUsingDirective
@@ -83,7 +82,7 @@ namespace Templates
             return new RayHalfEdge(vertex, opposite, face, nextEdge);
         }
 
-        internal override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal override Vertex CreateVertex(Mesh mesh, Vector vec)
         {
             return new RayVertex(mesh, vec);
         }
@@ -170,13 +169,13 @@ namespace Templates
         , IUV
 #endif
     {
-        internal RayVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
+        internal RayVertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
 #if NORMALS
-        public Vector<T> NormalAccessor { get; set; }
+        public Vector? NormalAccessor { get; set; }
 #endif
 
 #if UV
-        public Vector<T> UvAccessor { get; set; }
+        public Vector? UvAccessor { get; set; }
 #endif
     }
 

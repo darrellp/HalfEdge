@@ -25,7 +25,6 @@ namespace MeshNav
 #endregion
 
         #region Traits
-
         public HalfEdge PreviousEdge
         {
             // ReSharper disable PossibleNullReferenceException
@@ -93,6 +92,20 @@ namespace MeshNav
 			    return !(InitVertex as IRayed).IsRayed && (NextVertex as IRayed).IsRayed;
 				// ReSharper restore PossibleNullReferenceException
 			}
+	    }
+
+	    public bool IsRayed
+	    {
+		    get
+		    {
+			    if (!Mesh.RayedTrait)
+			    {
+				    return false;
+			    }
+			    // ReSharper disable PossibleNullReferenceException
+			    return (InitVertex as IRayed).IsRayed || (NextVertex as IRayed).IsRayed;
+			    // ReSharper restore PossibleNullReferenceException
+		    }
 	    }
         #endregion
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
 #if FLOAT
 using T = System.Single;
@@ -7,13 +6,13 @@ using T = System.Single;
 using T = System.Double;
 #endif
 
-namespace MeshNav.RayedMesh
+namespace MeshNav.RayedMeshSpace
 {
     public class RayedFactory : Factory
     {
         public RayedFactory(int dimension) : base(dimension) { }
 
-        internal override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal override Vertex CreateVertex(Mesh mesh, Vector vec)
         {
             return new RayedVertex(mesh, vec);
         }

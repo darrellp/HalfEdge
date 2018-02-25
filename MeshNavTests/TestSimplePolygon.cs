@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MeshNav;
-using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else
@@ -17,36 +15,37 @@ namespace MeshNavTests
 		[TestMethod]
 		public void TestSimple()
 		{
-			var polylist = new List<Vector<T>>
+			var polylist = new List<Vector>
 			{
-				Make(0, 0),
-				Make(4, 0),
-				Make(3, 1),
-				Make(5, 2),
-				Make(1, 2),
-				Make(2, 1)
+				new Vector(0, 0),
+				new Vector(4, 0),
+				new Vector(3, 1),
+				new Vector(5, 2),
+				new Vector(1, 2),
+				new Vector(2, 1)
 			};
 			Assert.IsTrue(SimplePolygon.FTestSimplePolygon(polylist));
 
 			// Square
-			polylist = new List<Vector<T>>
+			polylist = new List<Vector>
 			{
-				Make(0, 0),
-				Make(0, 1),
-				Make(1, 1),
-				Make(1, 0)
+				new Vector(0, 0),
+				new Vector(0, 1),
+				new Vector(1, 1),
+				new Vector(1, 0)
 			};
 			Assert.IsTrue(SimplePolygon.FTestSimplePolygon(polylist));
 
 			// Almost the same as second case in TestNonSimple except we don't quite touch
 			// the line
-			polylist = new List<Vector<T>>
+			polylist = new List<Vector>
 			{
-				Make(0, 0),
-				Make(1, 1),
-				Make(0.01, 1),
-				Make(1, 2),
-				Make(0, 2)
+				new Vector(0, 0),
+				new Vector(1, 1),
+				// ReSharper disable once RedundantCast
+				new Vector((T)0.01, 1),
+				new Vector(1, 2),
+				new Vector(0, 2)
 			};
 			Assert.IsTrue(SimplePolygon.FTestSimplePolygon(polylist));
 		}
@@ -54,25 +53,25 @@ namespace MeshNavTests
 		[TestMethod]
 		public void TestNonSimple()
 		{
-			var polylist = new List<Vector<T>>
+			var polylist = new List<Vector>
 			{
-				Make(0, 0),
-				Make(4, 0),
-				Make(2, 1),
-				Make(5, 2),
-				Make(1, 2),
-				Make(3, 1),
+				new Vector(0, 0),
+				new Vector(4, 0),
+				new Vector(2, 1),
+				new Vector(5, 2),
+				new Vector(1, 2),
+				new Vector(3, 1),
 			};
 			Assert.IsFalse(SimplePolygon.FTestSimplePolygon(polylist));
 
 			// Just barely touching the line
-			polylist = new List<Vector<T>>
+			polylist = new List<Vector>
 			{
-				Make(0, 0),
-				Make(1, 1),
-				Make(0, 1),
-				Make(1, 2),
-				Make(0, 2)
+				new Vector(0, 0),
+				new Vector(1, 1),
+				new Vector(0, 1),
+				new Vector(1, 2),
+				new Vector(0, 2)
 			};
 			Assert.IsFalse(SimplePolygon.FTestSimplePolygon(polylist));
 		}

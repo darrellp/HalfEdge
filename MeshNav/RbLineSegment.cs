@@ -1,5 +1,4 @@
 ﻿using System;
-using MathNet.Numerics.LinearAlgebra;
 using static MeshNav.Geometry2D;
 #if FLOAT
 using T = System.Single;
@@ -16,8 +15,8 @@ namespace MeshNav
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	internal class RbLineSegment : IComparable<RbLineSegment>
 	{
-		private readonly Vector<T> _left;
-		private readonly Vector<T> _right;
+		private readonly Vector _left;
+		private readonly Vector _right;
 		// Should be a closure that tracks the sweep line position
 		private readonly Func<T> _sweepPos;
 		private T _valLast;
@@ -26,10 +25,10 @@ namespace MeshNav
 		public RbLineSegment NextHigher { get; set; }
 		public RbLineSegment NextLower { get; set; }
 
-		public RbLineSegment(Vector<T> left, Vector<T> right, Func<T> sweepPos)
+		public RbLineSegment(Vector left, Vector right, Func<T> sweepPos)
 		{
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
-			if (left.X() > right.X() || (left.X() == right.X() && left.Y() > right.Y()))
+			if (left.X > right.X || (left.X == right.X && left.Y > right.Y))
 			{
 				(left, right) = (right, left);
 			}
@@ -51,13 +50,13 @@ namespace MeshNav
 
 				// TODO: Should we be using CloseEnough() here?
 				// Seems possible that they could still cause a NAN in the calculation below if they are close enough.
-				if (_right.X() == _left.X())
+				if (_right.X == _left.X)
 				{
-					_valLast = _left.X();
+					_valLast = _left.X;
 				}
 				else
 				{
-					_valLast = (pos - _left.X()) * (_right.Y() - _left.Y()) / (_right.X() - _left.X()) + _left.Y();
+					_valLast = (pos - _left.X) * (_right.Y - _left.Y) / (_right.X - _left.X) + _left.Y;
 				}
 				// ReSharper restore CompareOfFloatsByEqualityOperator
 				_sweepPosLast = pos;
@@ -72,21 +71,21 @@ namespace MeshNav
 			{
 				// If they're the same, then compare slopes
 				// ReSharper disable CompareOfFloatsByEqualityOperator
-				if (_left.X() == _right.X())
+				if (_left.X == _right.X)
 				{
-					return _left.Y().CompareTo(_right.Y());
+					return _left.Y.CompareTo(_right.Y);
 				}
 
-				if (other._left.X() == other._right.X())
+				if (other._left.X == other._right.X)
 				{
-					return other._left.Y().CompareTo(other._right.Y());
+					return other._left.Y.CompareTo(other._right.Y);
 				}
 				// ReSharper restore CompareOfFloatsByEqualityOperator
 
-				var dxUs = _right.X() - _left.X();
-				var dyUs = _right.Y() - _left.Y();
-				var dxThem = other._right.X() - other._left.X();
-				var dyThem = other._right.Y() - other._left.Y();
+				var dxUs = _right.X - _left.X;
+				var dyUs = _right.Y - _left.Y;
+				var dxThem = other._right.X - other._left.X;
+				var dyThem = other._right.Y - other._left.Y;
 
 				ret = (dyUs / dxUs).CompareTo(dyThem / dxThem);
 			}
@@ -101,7 +100,7 @@ namespace MeshNav
 				// We don't intersect non-existent segments.
 				return false;
 			}
-			(CrossingType ct, Vector<T> pt) = SegSegInt(_left, _right, ls._left, ls._right);
+			(CrossingType ct, Vector _) = SegSegInt(_left, _right, ls._left, ls._right);
 			// TODO: Think about the various crossing types more carefully
 			// ReSharper disable PossibleUnintendedReferenceComparison
 			return ct == CrossingType.Normal || ct == CrossingType.Edge || ct == CrossingType.Vertex;
@@ -110,7 +109,7 @@ namespace MeshNav
 
 		public override string ToString()
 		{
-			return $"({_left.X()}, {_left.Y()}) - ({_right.X()}, {_right.Y()})";
+			return $"({_left.X}, {_left.Y}) - ({_right.X}, {_right.Y})";
 		}
 	}
 }

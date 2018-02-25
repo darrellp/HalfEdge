@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
-using static MeshNav.Utilities;
 #if FLOAT
 using T = System.Single;
 #else
@@ -50,7 +48,7 @@ namespace MeshNav
 		/// <returns>	True if they're "equal", else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static bool FCloseEnough(Vector<T> pt1, Vector<T> pt2)
+		public static bool FCloseEnough(Vector pt1, Vector pt2)
 		{
 			return FNearZero(ManhattanDistance(pt1, pt2));
 		}
@@ -81,9 +79,9 @@ namespace MeshNav
 		/// <returns>	Dot product. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static T Dot(Vector<T> pt1, Vector<T> pt2)
+		public static T Dot(Vector pt1, Vector pt2)
 		{
-			return pt1.X() * pt2.X() + pt1.Y() * pt2.Y();
+			return pt1.X * pt2.X + pt1.Y * pt2.Y;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +101,7 @@ namespace MeshNav
         /// <returns>	Distance from the point to the line. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static T PtToLineDistance(Vector<T> ptTest, Vector<T> ptLine1, Vector<T> ptLine2)
+        public static T PtToLineDistance(Vector ptTest, Vector ptLine1, Vector ptLine2)
 		{
 			var ptVec12 = (ptLine2 - ptLine1).Flip90Ccw().Normalize();
 			var ptRel = ptTest - ptLine1;
@@ -124,20 +122,20 @@ namespace MeshNav
 		/// <returns>	Quadrant index. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static int IQuad(Vector<T> pt)
+		public static int IQuad(Vector pt)
 		{
 			var iRet = 0;
-			if (pt.X() < 0)
+			if (pt.X < 0)
 			{
 				iRet += 2;
-				if (pt.Y() > 0)
+				if (pt.Y > 0)
 				{
 					iRet += 1;
 				}
 			}
 			else
 			{
-				if (pt.Y() < 0)
+				if (pt.Y < 0)
 				{
 					iRet += 1;
 				}
@@ -156,7 +154,7 @@ namespace MeshNav
 		/// <returns>	Midpoint. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static Vector<T> MidPoint(Vector<T> pt1, Vector<T> pt2)
+		public static Vector MidPoint(Vector pt1, Vector pt2)
 		{
 		    // ReSharper disable once RedundantCast
 			return (pt1 + pt2) / (T)2;
@@ -178,14 +176,14 @@ namespace MeshNav
 		/// <returns>	Signed area of the triangle. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static T SignedArea(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
+		public static T SignedArea(Vector pt1, Vector pt2, Vector pt3)
 		{
-		    var x1 = pt1.X();
-		    var x2 = pt2.X();
-		    var x3 = pt3.X();
-		    var y1 = pt1.Y();
-		    var y2 = pt2.Y();
-		    var y3 = pt3.Y();
+		    var x1 = pt1.X;
+		    var x2 = pt2.X;
+		    var x3 = pt3.X;
+		    var y1 = pt1.Y;
+		    var y2 = pt2.Y;
+		    var y3 = pt3.Y;
 			return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
 		}
 
@@ -202,14 +200,14 @@ namespace MeshNav
         ///
         /// <returns>   Signed area of a polygon. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public static T SignedArea(List<Vector<T>> polyPoints)
+        public static T SignedArea(List<Vector> polyPoints)
         {
             T areaTimes2 = 0;
             for (var i = 0; i < polyPoints.Count; i++)
             {
                 var pti = polyPoints[i];
                 var ptip1 = polyPoints[(i + 1) % polyPoints.Count];
-                areaTimes2 += (pti.X() + ptip1.X()) * (ptip1.Y() - pti.Y());
+                areaTimes2 += (pti.X + ptip1.X) * (ptip1.Y - pti.Y);
             }
             return areaTimes2/2;
         }
@@ -226,7 +224,7 @@ namespace MeshNav
 		/// <returns>	1 if they appear in CCW order, -1 if CW order and 0 if they're linear. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static int ICcw(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
+		public static int ICcw(Vector pt1, Vector pt2, Vector pt3)
 		{
 			return Math.Sign(SignedArea(pt1, pt2, pt3));
 		}
@@ -243,7 +241,7 @@ namespace MeshNav
 		/// <returns>	triangle area. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static double Area(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
+		public static double Area(Vector pt1, Vector pt2, Vector pt3)
 		{
 			return Math.Abs(SignedArea(pt1, pt2, pt3));
 		}
@@ -263,7 +261,7 @@ namespace MeshNav
 		/// <returns>	true if test point is to the left of the line segment, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static bool FLeft(Vector<T> ptSegmentStart, Vector<T> ptSegmentEnd, Vector<T> ptTest)
+		public static bool FLeft(Vector ptSegmentStart, Vector ptSegmentEnd, Vector ptTest)
 		{
 			return SignedArea(ptSegmentStart, ptSegmentEnd, ptTest) > 0;
 		}
@@ -280,7 +278,7 @@ namespace MeshNav
 		/// <returns>	True if points are (essentially) collinear, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static bool FCollinear(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3)
+		public static bool FCollinear(Vector pt1, Vector pt2, Vector pt3)
 		{
 			return Area(pt1, pt2, pt3) < Tolerance;
 		}
@@ -322,23 +320,23 @@ namespace MeshNav
 		/// <returns>	A crossing type as outlined above. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static (CrossingType, Vector<T>) SegSegInt(Vector<T> seg1Pt1, Vector<T> seg1Pt2, Vector<T> seg2Pt1, Vector<T> seg2Pt2)
+		public static (CrossingType, Vector) SegSegInt(Vector seg1Pt1, Vector seg1Pt2, Vector seg2Pt1, Vector seg2Pt2)
 		{
 			// ReSharper disable once RedundantAssignment
 			var code = (CrossingType)(-1);
-			var pPt = Make();
+			var pPt = new Vector(0, 0);
 
-			var denom = (seg1Pt1.X() - seg1Pt2.X())* (seg2Pt2.Y() - seg2Pt1.Y()) +
-						   (seg2Pt2.X() - seg2Pt1.X()) * (seg1Pt2.Y() - seg1Pt1.Y());
+			var denom = (seg1Pt1.X - seg1Pt2.X)* (seg2Pt2.Y - seg2Pt1.Y) +
+						   (seg2Pt2.X - seg2Pt1.X) * (seg1Pt2.Y - seg1Pt1.Y);
 
 			if (FNearZero(denom))
 			{
 				return ParallelInt(seg1Pt1, seg1Pt2, seg2Pt1, seg2Pt2);
 			}
 
-			var num = seg1Pt1.X() * (seg2Pt2.Y() - seg2Pt1.Y()) +
-						 seg2Pt1.X() * (seg1Pt1.Y() - seg2Pt2.Y()) +
-						 seg2Pt2.X() * (seg2Pt1.Y() - seg1Pt1.Y());
+			var num = seg1Pt1.X * (seg2Pt2.Y - seg2Pt1.Y) +
+						 seg2Pt1.X * (seg1Pt1.Y - seg2Pt2.Y) +
+						 seg2Pt2.X * (seg2Pt1.Y - seg1Pt1.Y);
 
 			if (FNearZero(num) || FCloseEnough(num, denom))
 			{
@@ -352,9 +350,9 @@ namespace MeshNav
 				return (CrossingType.NonCrossing, pPt);
 			}
 
-			num = -(seg1Pt1.X() * (seg2Pt1.Y() - seg1Pt2.Y()) +
-				   seg1Pt2.X() * (seg1Pt1.Y() - seg2Pt1.Y()) +
-				   seg2Pt1.X() * (seg1Pt2.Y() - seg1Pt1.Y()));
+			num = -(seg1Pt1.X * (seg2Pt1.Y - seg1Pt2.Y) +
+				   seg1Pt2.X * (seg1Pt1.Y - seg2Pt1.Y) +
+				   seg2Pt1.X * (seg1Pt2.Y - seg1Pt1.Y));
 
 			if (FNearZero(num) || FCloseEnough(num, denom))
 			{
@@ -380,8 +378,8 @@ namespace MeshNav
 				code = CrossingType.EndToEnd;
 			}
 
-		    pPt = Make(seg1Pt1.X() + tSeg1 * (seg1Pt2.X() - seg1Pt1.X()),
-		        seg1Pt1.Y() + tSeg1 * (seg1Pt2.Y() - seg1Pt1.Y()));
+		    pPt = new Vector(seg1Pt1.X + tSeg1 * (seg1Pt2.X - seg1Pt1.X),
+		        seg1Pt1.Y + tSeg1 * (seg1Pt2.Y - seg1Pt1.Y));
 
 			return (code, pPt);
 		}
@@ -402,7 +400,7 @@ namespace MeshNav
 		/// <returns>	true if it succeeds, false if it fails. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static bool Between(Vector<T> ptSegEndpoint1, Vector<T> ptSegmentEndpoint2, Vector<T> ptTest)
+		public static bool Between(Vector ptSegEndpoint1, Vector ptSegmentEndpoint2, Vector ptTest)
 		{
 			if (!FCollinear(ptSegEndpoint1, ptSegmentEndpoint2, ptTest))
 			{
@@ -410,19 +408,19 @@ namespace MeshNav
 			}
 
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
-			if (ptSegEndpoint1.X() != ptSegmentEndpoint2.X())
+			if (ptSegEndpoint1.X != ptSegmentEndpoint2.X)
 			{
-				return ptSegEndpoint1.X() <= ptTest.X() && ptTest.X() <= ptSegmentEndpoint2.X() ||
-				       ptSegEndpoint1.X() >= ptTest.X() && ptTest.X() >= ptSegmentEndpoint2.X();
+				return ptSegEndpoint1.X <= ptTest.X && ptTest.X <= ptSegmentEndpoint2.X ||
+				       ptSegEndpoint1.X >= ptTest.X && ptTest.X >= ptSegmentEndpoint2.X;
 			}
 
-			return ptSegEndpoint1.Y() <= ptTest.Y() && ptTest.Y() <= ptSegmentEndpoint2.Y() ||
-			       ptSegEndpoint1.Y() >= ptTest.Y() && ptTest.Y() >= ptSegmentEndpoint2.Y();
+			return ptSegEndpoint1.Y <= ptTest.Y && ptTest.Y <= ptSegmentEndpoint2.Y ||
+			       ptSegEndpoint1.Y >= ptTest.Y && ptTest.Y >= ptSegmentEndpoint2.Y;
 		}
 
-		private static (CrossingType, Vector<T>) ParallelInt(Vector<T> aPt, Vector<T> bPt, Vector<T> cPt, Vector<T> dPt)
+		private static (CrossingType, Vector) ParallelInt(Vector aPt, Vector bPt, Vector cPt, Vector dPt)
 		{
-			var pPt = Make();
+			var pPt = new Vector(0, 0);
 			if (!FCollinear(aPt, bPt, cPt))
 			{
 				return (CrossingType.NonCrossing, pPt);
@@ -462,10 +460,10 @@ namespace MeshNav
 		/// <returns>	Distance between the two points. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static double Distance(Vector<T> pt1, Vector<T> pt2)
+		public static double Distance(Vector pt1, Vector pt2)
 		{
-			var dx = pt1.X() - pt2.X();
-			var dy = pt1.Y() - pt2.Y();
+			var dx = pt1.X - pt2.X;
+			var dy = pt1.Y - pt2.Y;
 
 			return Math.Sqrt(dx * dx + dy * dy);
 		}
@@ -481,10 +479,10 @@ namespace MeshNav
 		/// <returns>	Squared distance between the two points. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static double DistanceSq(Vector<T> pt1, Vector<T> pt2)
+		public static double DistanceSq(Vector pt1, Vector pt2)
 		{
-			var dx = pt1.X() - pt2.X();
-			var dy = pt1.Y() - pt2.Y();
+			var dx = pt1.X - pt2.X;
+			var dy = pt1.Y - pt2.Y;
 
 			return dx * dx + dy * dy;
 		}
@@ -503,10 +501,10 @@ namespace MeshNav
 		/// <returns>	Manhattan distance. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static double ManhattanDistance(Vector<T> pt1, Vector<T> pt2)
+		public static double ManhattanDistance(Vector pt1, Vector pt2)
 		{
-			var dx = pt1.X() - pt2.X();
-			var dy = pt1.Y() - pt2.Y();
+			var dx = pt1.X - pt2.X;
+			var dy = pt1.Y - pt2.Y;
 
 			return Math.Abs(dx) + Math.Abs(dy);
 		}
@@ -529,19 +527,19 @@ namespace MeshNav
 		/// <returns>	X coordinate of the intersection of the two parabolas. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		internal static double ParabolicCut(Vector<T> pt1, Vector<T> pt2, double ys)
+		internal static double ParabolicCut(Vector pt1, Vector pt2, double ys)
 		{
 			// If the foci are identical
-			if(FCloseEnough(pt1.X(), pt2.X()) && FCloseEnough(pt1.Y(), pt2.Y()))
+			if(FCloseEnough(pt1.X, pt2.X) && FCloseEnough(pt1.Y, pt2.Y))
 			{
 				// Throw an exception
 				throw new InvalidOperationException("Identical datapoints are not allowed!");
 			}
 
 			// If the focii are at the same y coordinate, the intersection is halfway between them
-			if (FCloseEnough(pt1.Y(), pt2.Y()))
+			if (FCloseEnough(pt1.Y, pt2.Y))
 			{
-				return (pt1.X() + pt2.X()) / 2;
+				return (pt1.X + pt2.X) / 2;
 			}
 
 			// Handle degenerate vertical lines (y coordinate on the directrix)
@@ -552,15 +550,15 @@ namespace MeshNav
 			// it's own x coordinate...
 
 			// if pt1 is on the directrix
-			if (FCloseEnough(pt1.Y(), ys))
+			if (FCloseEnough(pt1.Y, ys))
 			{
-				return pt1.X();
+				return pt1.X;
 			}
 			
 			// if pt2 is on the directrix
-			if (FCloseEnough(pt2.Y(), ys))
+			if (FCloseEnough(pt2.Y, ys))
 			{
-				return pt2.X();
+				return pt2.X;
 			}
 
 			// Initialize for the general case
@@ -569,12 +567,12 @@ namespace MeshNav
 			// will be two places where the parabolas intersect so we have to compute
 			// both and pick the one we want.
 			//
-			var a1 = 1 / (2 * (pt1.Y() - ys));
-			var a2 = 1 / (2 * (pt2.Y() - ys));
+			var a1 = 1 / (2 * (pt1.Y - ys));
+			var a2 = 1 / (2 * (pt2.Y - ys));
 			var da = a1 - a2;
-			var s1 = 4 * a1 * pt1.X() - 4 * a2 * pt2.X();
-			var dx = pt1.X() - pt2.X();
-			var s2 = 2 * Math.Sqrt(2 * (2 * a1 * a2 * dx * dx - da * (pt1.Y() - pt2.Y())));
+			var s1 = 4 * a1 * pt1.X - 4 * a2 * pt2.X;
+			var dx = pt1.X - pt2.X;
+			var s2 = 2 * Math.Sqrt(2 * (2 * a1 * a2 * dx * dx - da * (pt1.Y - pt2.Y)));
 			var m = 0.25 / da;
 			var xs1 = m * (s1 + s2);
 			var xs2 = m * (s1 - s2);
@@ -589,7 +587,7 @@ namespace MeshNav
 			}
 
 			// Get the solution we're looking for
-			return pt1.Y() >= pt2.Y() ? xs2 : xs1;
+			return pt1.Y >= pt2.Y ? xs2 : xs1;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -607,11 +605,11 @@ namespace MeshNav
 		/// <returns>	Comparison of absolute angle. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static int ICompareCw(Vector<T> ptCenter, Vector<T> pt1, Vector<T> pt2)
+		public static int ICompareCw(Vector ptCenter, Vector pt1, Vector pt2)
 		{
 			// Get values relative to the Center of rotation
-			var pt1Rel = Make(pt1.X() - ptCenter.X(), pt1.Y() - ptCenter.Y());
-			var pt2Rel = Make(pt2.X() - ptCenter.X(), pt2.Y() - ptCenter.Y());
+			var pt1Rel = new Vector(pt1.X - ptCenter.X, pt1.Y - ptCenter.Y);
+			var pt2Rel = new Vector(pt2.X - ptCenter.X, pt2.Y - ptCenter.Y);
 
 			// Determine quadrants of each point
 			var iQuad1 = IQuad(pt1Rel);
@@ -644,7 +642,7 @@ namespace MeshNav
 		/// <returns>	true if ptTest is in the polygon, false if it fails. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static bool PointInConvexPoly(Vector<T> ptTest, IEnumerable<Vector<T>> poly)
+		public static bool PointInConvexPoly(Vector ptTest, IEnumerable<Vector> poly)
 		{
 			var polyCycle = poly.ToList();
 			if (polyCycle.Count == 0)
@@ -679,17 +677,17 @@ namespace MeshNav
 		/// </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		public static bool FFindCircumcenter(Vector<T> pt1, Vector<T> pt2, Vector<T> pt3, out Vector<T> ptCenter)
+		public static bool FFindCircumcenter(Vector pt1, Vector pt2, Vector pt3, out Vector ptCenter)
 		{
-		    var x1 = pt1.X();
-		    var y1 = pt1.Y();
-		    var x2 = pt2.X();
-		    var y2 = pt2.Y();
-		    var x3 = pt3.X();
-		    var y3 = pt3.Y();
+		    var x1 = pt1.X;
+		    var y1 = pt1.Y;
+		    var x2 = pt2.X;
+		    var y2 = pt2.Y;
+		    var x3 = pt3.X;
+		    var y3 = pt3.Y;
 
 			// Initialize for ugly math to follow
-			ptCenter = Make();
+			ptCenter = new Vector(0, 0);
 			var d = (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
 
 			// If we've got some points identical to others
@@ -706,7 +704,7 @@ namespace MeshNav
 				- ((x1 - x3) * (x1 + x3) + (y1 - y3) * (y1 + y3)) / 2 * (x2 - x3))
 				/ d;
 
-		    ptCenter = Make(centerX, centerY);
+		    ptCenter = new Vector(centerX, centerY);
 			return true;
 		}
     }
