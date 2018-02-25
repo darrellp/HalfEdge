@@ -145,7 +145,7 @@ namespace DAP.CompGeom
 				// This means that one edge of the polys meets the edge of the other with the polygons lying on
 				// opposite sides so that this overlap is the entirety of the overlap for the polygons.  We've
 				// already returned the points so nothing to do here but quit out.
-				if (code == Geometry2D.CrossingType.Edge && Geometry2D.Dot(vecA, vecB) < 0)
+				if (code == CrossingType.Edge && Dot(vecA, vecB) < 0)
 				{
 					yield break;
 				}
