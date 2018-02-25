@@ -7,7 +7,7 @@ using T = System.Single;
 using T = System.Double;
 #endif
 
-namespace MeshNav.RayedMesh
+namespace MeshNav.RayedMeshSpace
 {
     public class RayedMesh : Mesh
     {
@@ -48,6 +48,19 @@ namespace MeshNav.RayedMesh
             MapVerticesToEdges[newVertex] = new List<HalfEdge>();
             return newVertex;
         }
+
+	    public Vertex AddRayedVertex(Vector vec)
+	    {
+		    if (IsInitialized)
+		    {
+			    throw new MeshNavException("Adding vertex to finalized mesh");
+		    }
+		    var newVertex = AddVertex(vec);
+		    // ReSharper disable once PossibleNullReferenceException
+		    (newVertex as IRayed).IsRayed = true;
+		    MapVerticesToEdges[newVertex] = new List<HalfEdge>();
+		    return newVertex;
+	    }
 
         internal RayedVertex InternalAddRayedVertex(params T[] coords)
         {

@@ -48,7 +48,7 @@ using T = System.Double;
 
 // ReSharper disable RedundantUsingDirective
 using MeshNav;
-using MeshNav.RayedMesh;
+using MeshNav.RayedMeshSpace;
 using MeshNav.BoundaryMesh;
 using MeshNav.TraitInterfaces;
 // ReSharper restore RedundantUsingDirective

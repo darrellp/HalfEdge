@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Mesh Types\Boundary.cs" />
     <Compile Include="Mesh Types\Ray.cs" />
+    <Compile Include="Mesh Types\Voronoi.cs" />
     <Compile Include="TestVertex.cs" />
     <Compile Include="TestMesh.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="TestMeshNavRbTree.cs" />
     <Compile Include="TestSimplePolygon.cs" />
     <Compile Include="TestPlacement.cs" />
+    <Compile Include="TestVoronoi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

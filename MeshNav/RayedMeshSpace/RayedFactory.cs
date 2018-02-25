@@ -6,7 +6,7 @@ using T = System.Single;
 using T = System.Double;
 #endif
 
-namespace MeshNav.RayedMesh
+namespace MeshNav.RayedMeshSpace
 {
     public class RayedFactory : Factory
     {

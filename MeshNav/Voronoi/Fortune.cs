@@ -59,7 +59,7 @@ namespace DAP.CompGeom
 		/// <param name="points">	Points whose Voronoi diagram will be calculated. If the library is
 		/// 						built for double precision, these should be Vector, else PointF. </param>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		private Fortune(IEnumerable<Vector> points)
+		internal Fortune(IEnumerable<Vector> points)
 		{
 			Bchl = new Beachline();
 			QevEvents = new EventQueue();
@@ -240,7 +240,7 @@ namespace DAP.CompGeom
 		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		private void Voronoi()
+		internal void Voronoi()
 		{
 			// Process all the events
 			//

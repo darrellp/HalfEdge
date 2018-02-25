@@ -75,6 +75,7 @@ namespace MeshNav
         internal bool PreviousEdgeTrait;
         internal bool RayedTrait;
         internal bool UvTrait;
+	    internal bool VoronoiTrait;
         #endregion
  
         #region Element collections
@@ -126,7 +127,8 @@ namespace MeshNav
             UvTrait = vertex is IUV;
             PreviousEdgeTrait = halfEdge is IPreviousEdge;
 	        RayedTrait = vertex is IRayed;
-		}
+	        VoronoiTrait = face is IVoronoi;
+        }
 		#endregion
 
 		#region Queries
@@ -224,7 +226,7 @@ namespace MeshNav
 
 	    public Face AddFace(params Vertex[] vertices)
 	    {
-			return AddFaceEnumerable(vertices);
+			return AddFaceEnumerable(vertices.Where(v => v != null));
 
 		}
 

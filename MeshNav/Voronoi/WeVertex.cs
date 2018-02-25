@@ -83,6 +83,7 @@ namespace DAP.CompGeom
 
 		public object Cookie { get; set; }
 
+		public Vertex HalfEdgeVertex { get; set; }
 		#endregion
 
 		#region Constructor

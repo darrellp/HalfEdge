@@ -25,7 +25,6 @@ namespace DAP.CompGeom
 	internal abstract class FortuneEvent : ILocatable
 	{
 		#region Private Variables
-		int _i = -1;				// Index we maintain for the IPriorityQueueElement operations
 		// and the location of the site for site events.
 		#endregion
 
@@ -48,12 +47,8 @@ namespace DAP.CompGeom
 		}
 		#endregion
 
-		#region PriorityQueueElement Members
-		int ILocatable.Index
-		{
-			get => _i;
-		    set { _i = value; }
-		}
+		#region ILocatable Members
+		int ILocatable.Index { get; set; } = -1;
 		#endregion
 
 		#region IComparable Members
@@ -72,26 +67,26 @@ namespace DAP.CompGeom
 			{
 				if (Pt.X > ptCompare.X)
 				{
-					return 1;
+					return -1;
 				}
 				if (Pt.X < ptCompare.X)
 				{
-					return -1;
+					return 1;
 				}
 				// If we are a site event and the compared object is a circle event
 				if (GetType() == typeof(SiteEvent) && obj.GetType() == typeof(CircleEvent))
 				{
 					// Site events are bigger than circle events at the same point
 
-					return 1;
+					return -1;
 				}
 				return 0;
 			}
 			if (Pt.Y > ptCompare.Y)
 			{
-				return 1;
+				return -1;
 			}
-			return -1;
+			return 1;
 		}
 		#endregion
 

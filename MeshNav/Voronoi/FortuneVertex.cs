@@ -15,7 +15,7 @@ namespace DAP.CompGeom
 		#region Private variables
 		bool _fAlreadyOrdered;			// True after this vertex has had its edges ordered in post processing
 		bool _fAddedToWingedEdge;		// True if this vertex has already been added to the winged edge data structure
-
+		private bool _fAddedToHalfEdge;	// True if this vertex has already been added to the half edge data structure
 		#endregion
 
 		#region Properties
@@ -102,6 +102,19 @@ namespace DAP.CompGeom
 				we.AddVertex(this);
 				_fAddedToWingedEdge = true;
 			}
+		}
+		#endregion
+
+		#region Half Edge
+		internal void AddToHalfEdge(Mesh mesh)
+		{
+			if (_fAddedToHalfEdge)
+			{
+				return;
+			}
+
+			mesh.AddVertex(this.Pt);
+			_fAddedToHalfEdge = true;
 		}
 		#endregion
 

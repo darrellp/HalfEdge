@@ -51,6 +51,11 @@ namespace MeshNav
 		public Vector(int rank)
 		{
 			Rank = rank;
+			if (Rank < 2)
+			{
+				throw new ArgumentException("Rank must be at least two in Vector constructor");
+			}
+
 			X = Y = Z = 0;
 			MoreCoordinates = null;
 			if (rank > 3)
