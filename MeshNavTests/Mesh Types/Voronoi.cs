@@ -5,11 +5,11 @@
 /// <remarks>   To Use:
 ///             1. Copy to your own Build.  
 ///             2. Rename the file if desired   
-///             3. Define TEMPLATE below  
+///             3. Uncomment the TEMPLATE define below  
 ///             4. Define exactly one boundary type  
 ///             5. Define whatever other traits are desired  
 ///             6. Rename the namespace if desired  
-///             7. Search and replace "Ray" with an arbitrary prefix for your project  
+///             7. Search and replace "Voronoi" with an arbitrary prefix for your project  
 ///             
 ///             After this, you should be able to build.  If you picked MyMesh for your prefix
 ///             then your classes will be MyMeshFactory, MyMeshMesh, etc.
@@ -27,9 +27,13 @@
 #define RAYED
 
 // Pick any of the following
-#define NORMALS
+//#define NORMALS
 #define PREVIOUSEDGE
-#define UV
+//#define UV
+#if RAYED
+// VORONOI is subclass of RAYED
+#define VORONOI
+#endif
 
 #region Template Definition
 #if (RAYED && BOUNDARY) || (RAYED && NULLBOUNDARY) || (BOUNDAY && NULLBOUNDARY) || (!BOUNDARY && !NULLBOUNDARY && !RAYED)
@@ -63,28 +67,28 @@ using MeshNav.TraitInterfaces;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace Templates
 {
-    public partial class RayFactory : Factory
+    public partial class VoronoiFactory : Factory
     {
-        public RayFactory(int dimension) : base(dimension) { }
+        public VoronoiFactory(int dimension) : base(dimension) { }
 
         public override Mesh CreateMesh()
         {
-            return new RayMesh(Dimension, this);
+            return new VoronoiMesh(Dimension, this);
         }
 
         public override Face CreateFace()
         {
-            return new RayFace();
+            return new VoronoiFace();
         }
 
         public override HalfEdge CreateHalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
         {
-            return new RayHalfEdge(vertex, opposite, face, nextEdge);
+            return new VoronoiHalfEdge(vertex, opposite, face, nextEdge);
         }
 
         internal override Vertex CreateVertex(Mesh mesh, Vector vec)
         {
-            return new RayVertex(mesh, vec);
+            return new VoronoiVertex(mesh, vec);
         }
 
         protected internal override void CloneVertex(Vertex newVertex, Vertex oldVertex)
@@ -101,7 +105,7 @@ namespace Templates
         }
     }
 
-    public partial class RayMesh :
+    public partial class VoronoiMesh :
 #if BOUNDARY
         BoundaryMesh
 #elif RAYED
@@ -110,7 +114,7 @@ namespace Templates
         Mesh
 #endif
     {
-        public RayMesh(int dimension, Factory factory) : base(dimension, factory) { }
+        public VoronoiMesh(int dimension, Factory factory) : base(dimension, factory) { }
 
         protected override void PatchClone(Mesh oldMesh, Dictionary<Vertex, Vertex> oldToNewVertex, Dictionary<HalfEdge, HalfEdge> oldToNewHalfEdge, Dictionary<Face, Face> oldToNewFace)
         {
@@ -127,22 +131,29 @@ namespace Templates
         }
     }
 
-    public class RayFace :
+	public class VoronoiFace :
 #if BOUNDARY
-        BoundaryFace
-#elif RAYED
+		BoundaryFace
+#elif RAYED || VORONOI
         RayedFace
 #else
         Face
 #endif
-    { }
+#if VORONOI
+	, IVoronoi
+#endif
+	{
+#if VORONOI
+		public Vector VoronoiPoint { get; set; }
+#endif
+	}
 
-    public class RayHalfEdge : HalfEdge
+    public class VoronoiHalfEdge : HalfEdge
 #if PREVIOUSEDGE
         , IPreviousEdge
 #endif
     {
-        public RayHalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
+        public VoronoiHalfEdge(Vertex vertex, HalfEdge opposite, Face face, HalfEdge nextEdge)
             : base(vertex, opposite, face, nextEdge)
         {
         }
@@ -152,7 +163,7 @@ namespace Templates
 #endif
     }
 
-    public class RayVertex :
+    public class VoronoiVertex :
 #if RAYED
         RayedVertex
 #else
@@ -169,7 +180,8 @@ namespace Templates
         , IUV
 #endif
     {
-        internal RayVertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
+        internal VoronoiVertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
+
 #if NORMALS
         public Vector? NormalAccessor { get; set; }
 #endif
@@ -179,32 +191,32 @@ namespace Templates
 #endif
     }
 
-    #region Conditionals
-    public partial class RayFactory
-    {
-        [Conditional("NORMALS")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void FactoryNormalsCloneVertex(Vertex newVertex, Vertex oldVertex)
-        {
-            (newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
-        }
+#region Conditionals
+	public partial class VoronoiFactory
+	{
+		[Conditional("NORMALS")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void FactoryNormalsCloneVertex(Vertex newVertex, Vertex oldVertex)
+		{
+			(newVertex as INormal).NormalAccessor = (oldVertex as INormal).NormalAccessor;
+		}
 
-        [Conditional("UV")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void FactoryUVCloneVertex(Vertex newVertex, Vertex oldVertex)
-        {
-            (newVertex as IUV).UvAccessor = (oldVertex as IUV).UvAccessor;
-        }
+		[Conditional("UV")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void FactoryUVCloneVertex(Vertex newVertex, Vertex oldVertex)
+		{
+			(newVertex as IUV).UvAccessor = (oldVertex as IUV).UvAccessor;
+		}
 
-        [Conditional("UV")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void FactoryPreviousEdgeCloneHalfedge(HalfEdge newHalfEdge, HalfEdge halfEdge)
-        {
-            (newHalfEdge as IPreviousEdge).PreviousEdgeAccessor = (halfEdge as IPreviousEdge).PreviousEdgeAccessor;
-        }
-    }
+		[Conditional("UV")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void FactoryPreviousEdgeCloneHalfedge(HalfEdge newHalfEdge, HalfEdge halfEdge)
+		{
+			(newHalfEdge as IPreviousEdge).PreviousEdgeAccessor = (halfEdge as IPreviousEdge).PreviousEdgeAccessor;
+		}
+	}
 
-    public partial class RayMesh
+    public partial class VoronoiMesh
     {
         [Conditional("BOUNDARY")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -237,7 +249,7 @@ namespace Templates
             }
         }
     }
-    #endregion
+#endregion
 }
 #endregion
 #endif

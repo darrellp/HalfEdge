@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
 #if FLOAT
 using T = System.Single;
 #else
 using T = System.Double;
 #endif
 
-namespace MeshNav.RayedMesh
+namespace MeshNav.RayedMeshSpace
 {
     public class RayedVertex : Vertex
     {
@@ -21,16 +20,16 @@ namespace MeshNav.RayedMesh
 		// that it gets clipped off the edge of your drawing surface.
         public T MaxLength = 1000000;
 
-        internal RayedVertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
+        internal RayedVertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
         public bool IsRayed { get; set; }
 
-	    public Vector<T> Ray
+	    public Vector Ray
 	    {
 		    get => base.Position;
 		    set => base.Position = value;
 	    }
 
-	    internal override Vector<T> Position
+	    internal override Vector Position
 	    {
 		    get
 		    {

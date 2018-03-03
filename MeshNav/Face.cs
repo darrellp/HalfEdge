@@ -1,25 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.TraitInterfaces;
-#if FLOAT
-using T = System.Single;
-#else
-using T = System.Double;
-#endif
 
 namespace MeshNav
 {
     public class Face : MeshComponent
     {
-        #region Public Properties
-        public HalfEdge HalfEdge { get; internal set; }
+		#region Private fields
+	    private bool _orientationIsSet;
+	    private bool _isCcw;
+		#endregion
+
+		#region Public Properties
+		public HalfEdge HalfEdge { get; internal set; }
 	    public Mesh Mesh => HalfEdge.Mesh;
+	    public bool IsCcw => ICcw();
         #endregion
 
         #region Traits
-        public bool IsBoundary
+	    public bool IsRayed => Mesh.RayedTrait && Edges().Any(e => e.IsRayed);
+	    public bool IsNormal => !IsRayed && !IsBoundary;
+
+	    public bool IsBoundary
         {
             // ReSharper disable PossibleNullReferenceException
             get => Mesh.BoundaryTrait && (this as IBoundary).IsBoundaryAccessor;
@@ -33,7 +36,12 @@ namespace MeshNav
             // ReSharper restore PossibleNullReferenceException
         }
 
-	    public bool IsSimple => IsBoundary || SimplePolygon.FTestSimplePolygon(Vertices().Select(v => v.Position));
+
+		// TODO: maybe we should do rayed faces also?
+		// Perhaps by ensuring that the rays don't cross in the exterior of the mesh and that the polygon formed by the
+		// intersection of a bounding box and the rays is simple.  This wouldn't be exactly the classic definition of
+		// simple since such faces aren't the classic definition of polygons.  Still...
+	    public bool IsSimple => !IsNormal || SimplePolygon.FTestSimplePolygon(Vertices().Select(v => v.Position));
 	    #endregion
 
         #region Constructor
@@ -90,7 +98,7 @@ namespace MeshNav
         /// An enumerator of points in this face.
         /// </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public IEnumerable<Vector<T>> Points()
+        public IEnumerable<Vector> Points()
         {
             return Vertices().Select(v => v.Position);
         }
@@ -132,13 +140,19 @@ namespace MeshNav
         ////////////////////////////////////////////////////////////////////////////////////////////////////
  
         // ReSharper disable once InconsistentNaming
-        public virtual int ICcw()
+        public bool ICcw()
         {
+	        if (_orientationIsSet)
+	        {
+		        return _isCcw;
+	        }
             if (Mesh.Factory.Dimension != 2)
             {
                 throw new MeshNavException("Calling ICcw on non 2D mesh");
             }
-            return Math.Sign(Geometry2D.SignedArea(Points().ToList()));
+            _isCcw = Math.Sign(Geometry2D.SignedArea(Points().ToList())) > 0;
+	        _orientationIsSet = true;
+	        return _isCcw;
         }
         #endregion
 

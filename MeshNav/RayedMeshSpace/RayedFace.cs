@@ -1,6 +1,6 @@
 ﻿using MeshNav.TraitInterfaces;
 
-namespace MeshNav.RayedMesh
+namespace MeshNav.RayedMeshSpace
 {
 	public class RayedFace : Face, IBoundary
     {

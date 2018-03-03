@@ -38,6 +38,7 @@
     <DefineConstants>TRACE;DEBUG;FLOAT</DefineConstants>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'FLRelease|AnyCPU'">
     <OutputPath>bin\FLRelease\</OutputPath>
@@ -45,13 +46,14 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AssimpNet, Version=3.3.2.0, Culture=neutral, PublicKeyToken=3edc10cb77b1bca2, processorArchitecture=MSIL">
       <HintPath>..\packages\AssimpNet.3.3.2\lib\net45\AssimpNet.dll</HintPath>
     </Reference>
-    <Reference Include="MathNet.Numerics, Version=3.20.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.3.20.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Priority Queue, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -59,6 +61,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,6 +70,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Placement\PlaceementTree.cs" />
+    <Compile Include="Placement\PlacementNode.cs" />
+    <Compile Include="Placement\Trapezoid.cs" />
+    <Compile Include="Placement\TrapezoidalMap.cs" />
+    <Compile Include="Placement\TrapNode.cs" />
+    <Compile Include="Placement\XNode.cs" />
+    <Compile Include="Placement\YNode.cs" />
     <Compile Include="RbLineSegment.cs" />
     <Compile Include="MeshNavRbTree.cs" />
     <Compile Include="RedBlack\Color.cs" />
@@ -81,10 +91,10 @@
     <Compile Include="HalfEdge.cs" />
     <Compile Include="Import.cs" />
     <Compile Include="MeshComponent.cs" />
-    <Compile Include="RayedMesh\RayedFace.cs" />
-    <Compile Include="RayedMesh\RayedFactory.cs" />
-    <Compile Include="RayedMesh\RayedMesh.cs" />
-    <Compile Include="RayedMesh\RayedVertex.cs" />
+    <Compile Include="RayedMeshSpace\RayedFace.cs" />
+    <Compile Include="RayedMeshSpace\RayedFactory.cs" />
+    <Compile Include="RayedMeshSpace\RayedMesh.cs" />
+    <Compile Include="RayedMeshSpace\RayedVertex.cs" />
     <Compile Include="Scanline.cs" />
     <Compile Include="TraitInterfaces\IBoundary.cs" />
     <Compile Include="TraitInterfaces\INormal.cs" />
@@ -94,9 +104,29 @@
     <Compile Include="TraitInterfaces\IPreviousEdge.cs" />
     <Compile Include="TraitInterfaces\IRayed.cs" />
     <Compile Include="TraitInterfaces\IUV.cs" />
+    <Compile Include="Placement\Placement.cs" />
+    <Compile Include="TraitInterfaces\IVoronoi.cs" />
     <Compile Include="Utilities.cs" />
+    <Compile Include="Vector.cs" />
     <Compile Include="Vertex.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="Voronoi\Beachline.cs" />
+    <Compile Include="Voronoi\BuildHalfEdge.cs" />
+    <Compile Include="Voronoi\ConvexPolyIntersection.cs" />
+    <Compile Include="Voronoi\EventQueue.cs" />
+    <Compile Include="Voronoi\Fortune.cs" />
+    <Compile Include="Voronoi\FortuneEdge.cs" />
+    <Compile Include="Voronoi\FortuneEvent.cs" />
+    <Compile Include="Voronoi\FortunePoly.cs" />
+    <Compile Include="Voronoi\FortuneVertex.cs" />
+    <Compile Include="Voronoi\Geometry.cs" />
+    <Compile Include="Voronoi\InternalNode.cs" />
+    <Compile Include="Voronoi\LeafNode.cs" />
+    <Compile Include="Voronoi\Node.cs" />
+    <Compile Include="Voronoi\WeEdge.cs" />
+    <Compile Include="Voronoi\WePolygon.cs" />
+    <Compile Include="Voronoi\WeVertex.cs" />
+    <Compile Include="Voronoi\WingedEdge.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -107,6 +137,7 @@
   <ItemGroup>
     <Content Include="Local Refs\Priority Queue.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.2\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.2\build\AssimpNet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

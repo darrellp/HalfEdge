@@ -7,8 +7,8 @@ namespace MeshNav
 {
     public class Scanline<TEvent, TInput, TScan>
     {
-        private BinaryPriorityQueue<TScan> _pq;
-        private IEnumerator<TScan> _events;
+        private readonly BinaryPriorityQueue<TScan> _pq;
+        private readonly IEnumerator<TScan> _events;
 
         public int ScanCount => _pq.Count;
 
@@ -58,7 +58,7 @@ namespace MeshNav
 
         public TScan PopScan()
         {
-            return ScanCount == 0 ? default(TScan) : _pq.Pop();
+            return ScanCount == 0 ? default : _pq.Pop();
         }
     }
 }

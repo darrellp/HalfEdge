@@ -35,12 +35,12 @@ namespace MeshNav.BoundaryMesh
 			// other faces while interior hole boundaries have the same orientation
 		    foreach (var face in BoundaryFaces)
 		    {
-				if (face.ICcw() == (fCcw ? 1 : -1) * (((BoundaryFace)face).IsOuterBoundary ? -1 : 1))
+				// If we forget about outer boundaries, then we want to reverse when face.IsCcw != fCcw.  The sense of
+				// this is reversed if we do have an outer boundary so the proper bool is (face.IsCcw != fCcw) ^ IsOuterBoundary
+			    if ((face.IsCcw != fCcw) ^ ((BoundaryFace)face).IsOuterBoundary)
 			    {
-				    continue;
+				    face.Reverse();
 			    }
-			    face.Reverse();
-
 			}
 			base.SetOrientation(fCcw);
 	    }

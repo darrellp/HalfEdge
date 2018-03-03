@@ -2,10 +2,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <summary>   A template factory. </summary>
 ///
-/// <remarks>   To Use:
+/// <remarks>   The purpose of this file is to allow easy creation of a mesh with any specifications
+///				supported in MeshNav.  You can add on your own custom fields, etc. also, but you
+///				should probably start with this file and then subclass off the result.
+/// 
+///				To Use:
 ///             1. Copy to your own Build.  
 ///             2. Rename the file if desired   
-///             3. Define TEMPLATE below  
+///             3. Uncomment the TEMPLATE define below  
 ///             4. Define exactly one boundary type  
 ///             5. Define whatever other traits are desired  
 ///             6. Rename the namespace if desired  
@@ -13,6 +17,11 @@
 ///             
 ///             After this, you should be able to build.  If you picked MyMesh for your prefix
 ///             then your classes will be MyMeshFactory, MyMeshMesh, etc.
+/// 
+///				Of course, this may not be all you'd want in your custom class but it should get you
+///				90% of the way there.  If there's more, then you can subclass off the class defined
+///				here and put in whatever other fancy doohickeys you like.
+/// 
 ///             Darrell Plank, 12/28/2017. </remarks>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma warning restore 1587
@@ -30,6 +39,10 @@
 #define NORMALS
 #define PREVIOUSEDGE
 #define UV
+#if RAYED
+// VORONOI is subclass of RAYED
+#define VORONOI
+#endif
 
 #region Template Definition
 #if (RAYED && BOUNDARY) || (RAYED && NULLBOUNDARY) || (BOUNDAY && NULLBOUNDARY) || (!BOUNDARY && !NULLBOUNDARY && !RAYED)
@@ -48,7 +61,6 @@ using T = System.Double;
 
 // ReSharper disable RedundantUsingDirective
 using MeshNav;
-using MathNet.Numerics.LinearAlgebra;
 using MeshNav.RayedMesh;
 using MeshNav.BoundaryMesh;
 using MeshNav.TraitInterfaces;
@@ -83,7 +95,7 @@ namespace Templates
             return new __TEMPLATE__HalfEdge(vertex, opposite, face, nextEdge);
         }
 
-        public override Vertex CreateVertex(Mesh mesh, Vector<T> vec)
+        internal override Vertex CreateVertex(Mesh mesh, Vector vec)
         {
             return new __TEMPLATE__Vertex(mesh, vec);
         }
@@ -128,15 +140,19 @@ namespace Templates
         }
     }
 
-    public class __TEMPLATE__Face :
+	public class __TEMPLATE__Face :
 #if BOUNDARY
-        BoundaryFace
-#elif RAYED
+		BoundaryFace
+#elif RAYED || VORONOI
         RayedFace
 #else
         Face
 #endif
-    {}
+	{
+#if VORONOI
+		public Vertex VoronoiPoint { get; set; }
+#endif
+	}
 
     public class __TEMPLATE__HalfEdge : HalfEdge
 #if PREVIOUSEDGE
@@ -170,17 +186,13 @@ namespace Templates
         , IUV
 #endif
     {
-        internal __TEMPLATE__Vertex(Mesh mesh, Vector<T> vec) : base(mesh, vec) { }
-#if RAYED
-        public bool IsRayed { get; set; }
-#endif
-
+        internal __TEMPLATE__Vertex(Mesh mesh, Vector vec) : base(mesh, vec) { }
 #if NORMALS
-        public Vector<T> NormalAccessor { get; set; }
+        public Vector? NormalAccessor { get; set; }
 #endif
 
 #if UV
-        public Vector<T> UvAccessor { get; set; }
+        public Vector? UvAccessor { get; set; }
 #endif
     }
 

@@ -1,37 +1,47 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-#if FLOAT
-using T = System.Single;
-#else
-using T = System.Double;
-#endif
+using MeshNav;
+
 // ReSharper disable InconsistentNaming
 
-namespace MeshNav
+namespace DAP.CompGeom
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>	Static class to provide geometric utility functions on points. </summary>
-    ///
-    /// <remarks>	Darrellp, 2/17/2011. </remarks>
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// <summary>	Static class to provide geometric utility functions on points. </summary>
+	/// <remarks>	Darrellp, 2/17/2011. </remarks>
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static class GeometryOld
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>	Values that represent CrossingType for segment to segment intersection. </summary>
+		/// <remarks>	Darrellp, 2/24/2011. </remarks>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		public enum CrossingType
+		{
+			/// <summary> Segments overlap and are collinear.  </summary>
+			Edge,
 
-    public static class Geometry2D
-    {
+			/// <summary> The endpoing of one segment lies on the other and they are not collinear.  </summary>
+			Vertex,
+
+			/// <summary> Normal crossing.  </summary>
+			Normal,
+
+			/// <summary> Segments are parallel and do not cross.  </summary>
+			NonCrossing
+		}
+
 		/// Tolerance we use in "near enough" calculations
 		public const double Tolerance = 1e-10;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	True if two values are "essentially" equal (i.e., equal within tolerance). </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="a">	First value. </param>
 		/// <param name="b">	Second value. </param>
-		///
 		/// <returns>	True if values are essentially equal, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool FCloseEnough(double a, double b)
 		{
 			return Math.Abs(a - b) < Tolerance;
@@ -39,15 +49,11 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	True if two points are "essentially" equal. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
-		///
 		/// <returns>	True if they're "equal", else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool FCloseEnough(Vector pt1, Vector pt2)
 		{
 			return FNearZero(ManhattanDistance(pt1, pt2));
@@ -55,14 +61,10 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Determines if a number is equal to zero within tolerance. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="val">	Value to be checked. </param>
-		///
 		/// <returns>	True if it's near zero, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool FNearZero(double val)
 		{
 			return Math.Abs(val) < Tolerance;
@@ -70,58 +72,46 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Dot product of two points. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
-		///
 		/// <returns>	Dot product. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		public static T Dot(Vector pt1, Vector pt2)
+		public static double Dot(Vector pt1, Vector pt2)
 		{
 			return pt1.X * pt2.X + pt1.Y * pt2.Y;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>	Point to line distance. </summary>
-        ///
-        /// <remarks>	
-        /// This is a SIGNED distance - positive if ptTest is the lefts of the line looking from ptLine1
-        /// to ptLine2, negative if it's on the right side.
-        /// 
-        /// Darrellp, 2/27/2011. 
-        /// </remarks>
-        ///
-        /// <param name="ptTest">	Test point that we measure the distance from. </param>
-        /// <param name="ptLine1">	One point on the line. </param>
-        /// <param name="ptLine2">	Another point on the line. </param>
-        ///
-        /// <returns>	Distance from the point to the line. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static T PtToLineDistance(Vector ptTest, Vector ptLine1, Vector ptLine2)
+		/// <summary>	Point to line distance. </summary>
+		/// <remarks>
+		///     This is a SIGNED distance - positive if ptTest is the lefts of the line looking from ptLine1
+		///     to ptLine2, negative if it's on the right side.
+		///     Darrellp, 2/27/2011.
+		/// </remarks>
+		/// <param name="ptTest">	Test point that we measure the distance from. </param>
+		/// <param name="ptLine1">	One point on the line. </param>
+		/// <param name="ptLine2">	Another point on the line. </param>
+		/// <returns>	Distance from the point to the line. </returns>
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		public static double PtToLineDistance(Vector ptTest, Vector ptLine1, Vector ptLine2)
 		{
 			var ptVec12 = (ptLine2 - ptLine1).Flip90Ccw().Normalize();
 			var ptRel = ptTest - ptLine1;
 			return Dot(ptRel, ptVec12);
 		}
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Gives an index for the quad a point appears in as follows: 
-		/// 3 | 0
-		/// --+--
-		/// 2 | 1. 
+		/// <summary>
+		///     Gives an index for the quad a point appears in as follows:
+		///     3 | 0
+		///     --+--
+		///     2 | 1.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt">	Point to evaluate. </param>
-		///
 		/// <returns>	Quadrant index. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static int IQuad(Vector pt)
 		{
 			var iRet = 0;
@@ -140,90 +130,50 @@ namespace MeshNav
 					iRet += 1;
 				}
 			}
+
 			return iRet;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Midpoint between two other points. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
-		///
 		/// <returns>	Midpoint. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static Vector MidPoint(Vector pt1, Vector pt2)
 		{
-		    // ReSharper disable once RedundantCast
-			return (pt1 + pt2) / (T)2;
+			return new Vector(
+				(pt1.X + pt2.X) / 2,
+				(pt1.Y + pt2.Y) / 2);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Signed area of the triangle between three points.  This routine is fundamental to a number of
-		/// other geometry routines.  It's positive if the three points are in counterclockwise order,
-		/// negative otherwise and it's absolute value is the area of the triangle. 
+		/// <summary>
+		///     Signed area of the triangle between three points.  This routine is fundamental to a number of
+		///     other geometry routines.  It's positive if the three points are in counterclockwise order,
+		///     negative otherwise and it's absolute value is the area of the triangle.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
 		/// <param name="pt3">	Third point. </param>
-		///
 		/// <returns>	Signed area of the triangle. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		public static T SignedArea(Vector pt1, Vector pt2, Vector pt3)
+		public static double SignedArea(Vector pt1, Vector pt2, Vector pt3)
 		{
-		    var x1 = pt1.X;
-		    var x2 = pt2.X;
-		    var x3 = pt3.X;
-		    var y1 = pt1.Y;
-		    var y2 = pt2.Y;
-		    var y3 = pt3.Y;
-			return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
+			return (pt2.X - pt1.X) * (pt3.Y - pt1.Y) -
+			       (pt3.X - pt1.X) * (pt2.Y - pt1.Y);
 		}
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Signed area of a polygon.
-        /// </summary>
-        ///
-        /// <remarks>   It's positive if the points are in counterclockwise order,
-        ///             negative otherwise and it's absolute value is the area of the polygon.
-        ///             Darrell Plank, 1/1/2018. </remarks>
-        ///
-        /// <param name="polyPoints">   The polygon points. </param>
-        ///
-        /// <returns>   Signed area of a polygon. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public static T SignedArea(List<Vector> polyPoints)
-        {
-            T areaTimes2 = 0;
-            for (var i = 0; i < polyPoints.Count; i++)
-            {
-                var pti = polyPoints[i];
-                var ptip1 = polyPoints[(i + 1) % polyPoints.Count];
-                areaTimes2 += (pti.X + ptip1.X) * (ptip1.Y - pti.Y);
-            }
-            return areaTimes2/2;
-        }
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Determine if pt1, pt2, pt3 occur in Counter Clockwise order. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
 		/// <param name="pt3">	Third point. </param>
-		///
 		/// <returns>	1 if they appear in CCW order, -1 if CW order and 0 if they're linear. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static int ICcw(Vector pt1, Vector pt2, Vector pt3)
 		{
 			return Math.Sign(SignedArea(pt1, pt2, pt3));
@@ -231,36 +181,28 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Area of triangle defined by three points. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
 		/// <param name="pt3">	Third point. </param>
-		///
 		/// <returns>	triangle area. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static double Area(Vector pt1, Vector pt2, Vector pt3)
 		{
 			return Math.Abs(SignedArea(pt1, pt2, pt3));
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Determine if the test point is to the left of the line looking from ptSegmentStart to
-		/// ptSegmentEnd. 
+		/// <summary>
+		///     Determine if the test point is to the left of the line looking from ptSegmentStart to
+		///     ptSegmentEnd.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="ptSegmentStart">	Start point. </param>
 		/// <param name="ptSegmentEnd">		End point. </param>
 		/// <param name="ptTest">			Test point. </param>
-		///
 		/// <returns>	true if test point is to the left of the line segment, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool FLeft(Vector ptSegmentStart, Vector ptSegmentEnd, Vector ptTest)
 		{
 			return SignedArea(ptSegmentStart, ptSegmentEnd, ptTest) > 0;
@@ -268,98 +210,74 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Determine if three points are essentially collinear. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
 		/// <param name="pt3">	Third point. </param>
-		///
 		/// <returns>	True if points are (essentially) collinear, else false. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool FCollinear(Vector pt1, Vector pt2, Vector pt3)
 		{
 			return Area(pt1, pt2, pt3) < Tolerance;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Values that represent CrossingType for segment to segment intersection. </summary>
-		///
-		/// <remarks>	Darrellp, 2/24/2011. </remarks>
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		public enum CrossingType
-		{
-			/// <summary> Segments overlap and are collinear.  </summary>
-			Edge,
-			/// <summary> The endpoint of one segment lies on the other and they are not collinear.  </summary>
-			Vertex,
-			/// <summary> Normal crossing.  </summary>
-			Normal,
-			/// <summary> Segments are parallel and do not cross.  </summary>
-			NonCrossing,
-			/// <summary>	Segments meet at the endpoints. </summary>
-			EndToEnd
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Does segment to segment crossings. </summary>
-		///
-		/// <remarks>	
-		/// Based on code from Computational Geometry in C by Joseph O'Rourke.
-		/// 
-		/// Darrellp, 2/24/2011. 
+		/// <remarks>
+		///     Based on code from Computational Geometry in C by Joseph O'Rourke.
+		///     Darrellp, 2/24/2011.
 		/// </remarks>
-		///
 		/// <param name="seg1Pt1">	The first point of the segment 1. </param>
 		/// <param name="seg1Pt2">	The second point of the segment 1. </param>
 		/// <param name="seg2Pt1">	The first point of segment 2. </param>
 		/// <param name="seg2Pt2">	The second point of segment 2. </param>
-		///
+		/// <param name="pPt">		[out] The intersection if any. </param>
 		/// <returns>	A crossing type as outlined above. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		public static (CrossingType, Vector) SegSegInt(Vector seg1Pt1, Vector seg1Pt2, Vector seg2Pt1, Vector seg2Pt2)
+		public static CrossingType SegSegInt(Vector seg1Pt1, Vector seg1Pt2, Vector seg2Pt1, Vector seg2Pt2, out Vector pPt)
 		{
 			// ReSharper disable once RedundantAssignment
-			var code = (CrossingType)(-1);
-			var pPt = new Vector(0, 0);
+			var code = (CrossingType) (-1);
+			pPt = new Vector();
 
-			var denom = (seg1Pt1.X - seg1Pt2.X)* (seg2Pt2.Y - seg2Pt1.Y) +
-						   (seg2Pt2.X - seg2Pt1.X) * (seg1Pt2.Y - seg1Pt1.Y);
+			var denom = (seg1Pt1.X - seg1Pt2.X) * (seg2Pt2.Y - seg2Pt1.Y) +
+			            (seg2Pt2.X - seg2Pt1.X) * (seg1Pt2.Y - seg1Pt1.Y);
 
 			if (FNearZero(denom))
 			{
-				return ParallelInt(seg1Pt1, seg1Pt2, seg2Pt1, seg2Pt2);
+				return ParallelInt(seg1Pt1, seg1Pt2, seg2Pt1, seg2Pt2, out pPt);
 			}
 
 			var num = seg1Pt1.X * (seg2Pt2.Y - seg2Pt1.Y) +
-						 seg2Pt1.X * (seg1Pt1.Y - seg2Pt2.Y) +
-						 seg2Pt2.X * (seg2Pt1.Y - seg1Pt1.Y);
+			          seg2Pt1.X * (seg1Pt1.Y - seg2Pt2.Y) +
+			          seg2Pt2.X * (seg2Pt1.Y - seg1Pt1.Y);
 
 			if (FNearZero(num) || FCloseEnough(num, denom))
 			{
+				// TODO: Figure out why Resharper complains about the following...
+				// ReSharper disable once RedundantAssignment
 				code = CrossingType.Vertex;
 			}
-			// tSeg1 is t value where seg2 intersects seg1
-			var tSeg1 = num/denom;
+
+			var tSeg1 = num / denom;
 
 			if (tSeg1 < 0 || tSeg1 > 1)
 			{
-				return (CrossingType.NonCrossing, pPt);
+				return CrossingType.NonCrossing;
 			}
 
 			num = -(seg1Pt1.X * (seg2Pt1.Y - seg1Pt2.Y) +
-				   seg1Pt2.X * (seg1Pt1.Y - seg2Pt1.Y) +
-				   seg2Pt1.X * (seg1Pt2.Y - seg1Pt1.Y));
+			        seg1Pt2.X * (seg1Pt1.Y - seg2Pt1.Y) +
+			        seg2Pt1.X * (seg1Pt2.Y - seg1Pt1.Y));
 
 			if (FNearZero(num) || FCloseEnough(num, denom))
 			{
+				// TODO: Figure out why Resharper complains about the following...
+				// ReSharper disable once RedundantAssignment
 				code = CrossingType.Vertex;
 			}
-			// tSeg2 is t value where seg1 intersects seg2
-			var tSeg2 = num/denom;
+
+			var tSeg2 = num / denom;
 
 
 			if (0 < tSeg2 && tSeg2 < 1)
@@ -371,35 +289,23 @@ namespace MeshNav
 				code = CrossingType.NonCrossing;
 			}
 
-			if (code == CrossingType.Vertex &&
-			    (FCloseEnough(tSeg1, 0) || FCloseEnough(tSeg1, 1)) &&
-			    (FCloseEnough(tSeg2, 0) || FCloseEnough(tSeg2, 1)))
-			{
-				code = CrossingType.EndToEnd;
-			}
+			pPt.X = seg1Pt1.X + tSeg1 * (seg1Pt2.X - seg1Pt1.X);
+			pPt.Y = seg1Pt1.Y + tSeg1 * (seg1Pt2.Y - seg1Pt1.Y);
 
-		    pPt = new Vector(seg1Pt1.X + tSeg1 * (seg1Pt2.X - seg1Pt1.X),
-		        seg1Pt1.Y + tSeg1 * (seg1Pt2.Y - seg1Pt1.Y));
-
-			return (code, pPt);
+			return code;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Determines if point B lies between points A and C. </summary>
-		///
-		/// <remarks>	
-		/// Based on code from Computational Geometry in C by Joseph O'Rourke.
-		/// 
-		/// Darrellp, 2/24/2011. 
+		/// <remarks>
+		///     Based on code from Computational Geometry in C by Joseph O'Rourke.
+		///     Darrellp, 2/24/2011.
 		/// </remarks>
-		///
 		/// <param name="ptSegEndpoint1">	a point. </param>
 		/// <param name="ptSegmentEndpoint2">	The point. </param>
 		/// <param name="ptTest">	The point. </param>
-		///
 		/// <returns>	true if it succeeds, false if it fails. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool Between(Vector ptSegEndpoint1, Vector ptSegmentEndpoint2, Vector ptTest)
 		{
 			if (!FCollinear(ptSegEndpoint1, ptSegmentEndpoint2, ptTest))
@@ -418,48 +324,48 @@ namespace MeshNav
 			       ptSegEndpoint1.Y >= ptTest.Y && ptTest.Y >= ptSegmentEndpoint2.Y;
 		}
 
-		private static (CrossingType, Vector) ParallelInt(Vector aPt, Vector bPt, Vector cPt, Vector dPt)
+		private static CrossingType ParallelInt(Vector aPt, Vector bPt, Vector cPt, Vector dPt, out Vector pPt)
 		{
-			var pPt = new Vector(0, 0);
+			pPt = new Vector();
 			if (!FCollinear(aPt, bPt, cPt))
 			{
-				return (CrossingType.NonCrossing, pPt);
+				return CrossingType.NonCrossing;
 			}
 
 			if (Between(aPt, bPt, cPt))
 			{
 				pPt = cPt;
-				return (CrossingType.Edge, pPt);
+				return CrossingType.Edge;
 			}
+
 			if (Between(aPt, bPt, dPt))
 			{
 				pPt = dPt;
-				return (CrossingType.Edge, pPt);
+				return CrossingType.Edge;
 			}
+
 			if (Between(cPt, dPt, aPt))
 			{
 				pPt = aPt;
-				return (CrossingType.Edge, pPt);
+				return CrossingType.Edge;
 			}
+
 			if (Between(cPt, dPt, bPt))
 			{
 				pPt = cPt;
-				return (CrossingType.Edge, pPt);
+				return CrossingType.Edge;
 			}
-			return (CrossingType.NonCrossing, pPt);
+
+			return CrossingType.NonCrossing;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Euclidean distance between two points. </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
-		///
 		/// <returns>	Distance between the two points. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static double Distance(Vector pt1, Vector pt2)
 		{
 			var dx = pt1.X - pt2.X;
@@ -469,16 +375,12 @@ namespace MeshNav
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	Squared euclidean distance between two points. </summary>
-		///
+		/// <summary>	Euclidean distance between two points. </summary>
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
-		///
-		/// <returns>	Squared distance between the two points. </returns>
+		/// <returns>	Distance between the two points. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static double DistanceSq(Vector pt1, Vector pt2)
 		{
 			var dx = pt1.X - pt2.X;
@@ -488,19 +390,15 @@ namespace MeshNav
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Manhattan Distance between two points.  Quicker metric for short distances than the Euclidean
-		/// one. 
+		/// <summary>
+		///     Manhattan Distance between two points.  Quicker metric for short distances than the Euclidean
+		///     one.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">	First point. </param>
 		/// <param name="pt2">	Second point. </param>
-		///
 		/// <returns>	Manhattan distance. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static double ManhattanDistance(Vector pt1, Vector pt2)
 		{
 			var dx = pt1.X - pt2.X;
@@ -510,27 +408,24 @@ namespace MeshNav
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Determine the x coordinate where the parabolas with focus at pt1 and pt2 intersect between
-		/// the two points. The directrix for both parabolas is the line y = ys.
+		/// <summary>
+		///     Determine the x coordinate where the parabolas with focus at pt1 and pt2 intersect between
+		///     the two points. The directrix for both parabolas is the line y = ys.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
-		/// <exception cref="InvalidOperationException">	Thrown when the requested operation is
-		/// 												invalid. </exception>
-		///
+		/// <exception cref="InvalidOperationException">
+		///     Thrown when the requested operation is
+		///     invalid.
+		/// </exception>
 		/// <param name="pt1">	First focus. </param>
 		/// <param name="pt2">	Second focus. </param>
 		/// <param name="ys">	Y coordinate of the directrix. </param>
-		///
 		/// <returns>	X coordinate of the intersection of the two parabolas. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		internal static double ParabolicCut(Vector pt1, Vector pt2, double ys)
 		{
 			// If the foci are identical
-			if(FCloseEnough(pt1.X, pt2.X) && FCloseEnough(pt1.Y, pt2.Y))
+			if (FCloseEnough(pt1.X, pt2.X) && FCloseEnough(pt1.Y, pt2.Y))
 			{
 				// Throw an exception
 				throw new InvalidOperationException("Identical datapoints are not allowed!");
@@ -554,7 +449,7 @@ namespace MeshNav
 			{
 				return pt1.X;
 			}
-			
+
 			// if pt2 is on the directrix
 			if (FCloseEnough(pt2.Y, ys))
 			{
@@ -578,12 +473,12 @@ namespace MeshNav
 			var xs2 = m * (s1 - s2);
 
 			// If we need to reorder
-			if(xs1 > xs2)
+			if (xs1 > xs2)
 			{
 				// Swap xs values
 				var h = xs1;
-				xs1=xs2;
-				xs2=h;
+				xs1 = xs2;
+				xs2 = h;
 			}
 
 			// Get the solution we're looking for
@@ -592,19 +487,15 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Compares absolute clockwise angles from the y axis. </summary>
-		///
-		/// <remarks>	
-		/// This compares the absolute angle of (ptCenter,pt1) with (ptCenter,pt2) measured clockwise
-		/// from the positive y axis. 
+		/// <remarks>
+		///     This compares the absolute angle of (ptCenter,pt1) with (ptCenter,pt2) measured clockwise
+		///     from the positive y axis.
 		/// </remarks>
-		///
 		/// <param name="ptCenter">	Center of the angle formed. </param>
 		/// <param name="pt1">		First point in check. </param>
 		/// <param name="pt2">		Second point in check. </param>
-		///
 		/// <returns>	Comparison of absolute angle. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static int ICompareCw(Vector ptCenter, Vector pt1, Vector pt2)
 		{
 			// Get values relative to the Center of rotation
@@ -628,20 +519,15 @@ namespace MeshNav
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary>	Determines if a point is in the interior of a convex polygon. </summary>
-		///
-		/// <remarks>	
-		/// No check is made for the convexity of the polygon and it must be enumerated in CCW order.
-		/// Points on the border are not considered to be in the interior - i.e., it's an open set.
-		/// 
-		/// Darrellp, 2/25/2011. 
+		/// <remarks>
+		///     No check is made for the convexity of the polygon and it must be enumerated in CCW order.
+		///     Points on the border are not considered to be in the interior.
+		///     Darrellp, 2/25/2011.
 		/// </remarks>
-		///
 		/// <param name="ptTest">	Test point. </param>
 		/// <param name="poly">		The points enumerating the polygon in CCW order. </param>
-		///
 		/// <returns>	true if ptTest is in the polygon, false if it fails. </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool PointInConvexPoly(Vector ptTest, IEnumerable<Vector> poly)
 		{
 			var polyCycle = poly.ToList();
@@ -649,6 +535,7 @@ namespace MeshNav
 			{
 				return false;
 			}
+
 			// We need to check the last vertex with the first, so add the first at the end for a cycle
 			polyCycle.Add(polyCycle[0]);
 			return polyCycle.
@@ -659,36 +546,25 @@ namespace MeshNav
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary>	
-		/// Determine the center of a circle passing through three points in the plane.  Most of this is
-		/// ugly math generated from Mathematica. 
+		/// <summary>
+		///     Determine the center of a circle passing through three points in the plane.  Most of this is
+		///     ugly math generated from Mathematica.
 		/// </summary>
-		///
 		/// <remarks>	Darrellp, 2/17/2011. </remarks>
-		///
 		/// <param name="pt1">		First point. </param>
 		/// <param name="pt2">		Second point. </param>
 		/// <param name="pt3">		Third point. </param>
 		/// <param name="ptCenter">	[out] out parameter returning the circumcenter. </param>
-		///
-		/// <returns>	XD
-		/// False if the three points lie on a line in which case the circumcenter is not valid.  True
-		/// otherwise and the returned point is the circumcenter. 
+		/// <returns>
+		///     False if the three points lie on a line in which case the circumcenter is not valid.  True
+		///     otherwise and the returned point is the circumcenter.
 		/// </returns>
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		public static bool FFindCircumcenter(Vector pt1, Vector pt2, Vector pt3, out Vector ptCenter)
 		{
-		    var x1 = pt1.X;
-		    var y1 = pt1.Y;
-		    var x2 = pt2.X;
-		    var y2 = pt2.Y;
-		    var x3 = pt3.X;
-		    var y3 = pt3.Y;
-
 			// Initialize for ugly math to follow
-			ptCenter = new Vector(0, 0);
-			var d = (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
+			ptCenter = new Vector();
+			var d = (pt1.X - pt3.X) * (pt2.Y - pt3.Y) - (pt2.X - pt3.X) * (pt1.Y - pt3.Y);
 
 			// If we've got some points identical to others
 			if (Math.Abs(d) <= Tolerance)
@@ -696,16 +572,15 @@ namespace MeshNav
 				return false;
 			}
 
-			var centerX = (((x1 - x3) * (x1 + x3) + (y1 - y3) * (y1 + y3)) / 2 * (y2 - y3) 
-			    -  ((x2 - x3) * (x2 + x3) + (y2 - y3) * (y2 + y3)) / 2 * (y1 - y3)) 
-			    / d;
+			ptCenter.X = (((pt1.X - pt3.X) * (pt1.X + pt3.X) + (pt1.Y - pt3.Y) * (pt1.Y + pt3.Y)) / 2 * (pt2.Y - pt3.Y)
+			              - ((pt2.X - pt3.X) * (pt2.X + pt3.X) + (pt2.Y - pt3.Y) * (pt2.Y + pt3.Y)) / 2 * (pt1.Y - pt3.Y))
+			             / d;
 
-			var centerY = (((x2 - x3) * (x2 + x3) + (y2 - y3) * (y2 + y3)) / 2 * (x1 - x3)
-				- ((x1 - x3) * (x1 + x3) + (y1 - y3) * (y1 + y3)) / 2 * (x2 - x3))
-				/ d;
+			ptCenter.Y = (((pt2.X - pt3.X) * (pt2.X + pt3.X) + (pt2.Y - pt3.Y) * (pt2.Y + pt3.Y)) / 2 * (pt1.X - pt3.X)
+			              - ((pt1.X - pt3.X) * (pt1.X + pt3.X) + (pt1.Y - pt3.Y) * (pt1.Y + pt3.Y)) / 2 * (pt2.X - pt3.X))
+			             / d;
 
-		    ptCenter = new Vector(centerX, centerY);
 			return true;
 		}
-    }
+	}
 }
